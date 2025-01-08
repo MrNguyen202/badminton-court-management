@@ -44,7 +44,7 @@ function Hero() {
             developer. Learn to build dynamic and interactive web applications
             using one of the most popular JavaScript libraries in the industry.
           </div>
-          <Link href="/">
+          <Link href={"/find-address"}>
             <Button color="default" size="lg">
               ENROLL TODAY
             </Button>

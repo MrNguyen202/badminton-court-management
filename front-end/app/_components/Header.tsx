@@ -11,11 +11,10 @@ import {
 } from "@nextui-org/navbar";
 import { Button, Image, MenuItem } from "@nextui-org/react";
 import Link from "next/link";
-import { div } from "framer-motion/client";
-// import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 
 function Header() {
-  //   const { user, isSignedIn } = useUser();
+    const { user, isSignedIn } = useUser();
 
   const MenuList = [
     {
@@ -60,20 +59,19 @@ function Header() {
           {MenuList.map((item, index) => (
             <NavbarItem
               key={index}
-              className="ml-10 hidden items-center gap-6 lg:flex"
+              className="text-xl ml-10 hidden items-center gap-6 lg:flex"
             >
               <Link href={item.path}>{item.name}</Link>
             </NavbarItem>
           ))}
         </NavbarContent>
-        <NavbarContent justify="end">
+        <NavbarContent justify="end" className="flex justify-center items-center">
           <Link href="/dashboard">
-            <Button color="primary" className="mt-3">
-              {/* {isSignedIn ? "Dashboard" : "Get Started"} */}
-              Log In
+            <Button color="primary">
+              {isSignedIn ? "Dashboard" : "Sign in"}
             </Button>
           </Link>
-          {/* <UserButton /> */}
+          <UserButton />
         </NavbarContent>
         <NavbarMenu>
           {MenuList.map((item, index) => (
