@@ -4,10 +4,15 @@ import Image from "next/image";
 export default function Page() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">
-      <div>
-        <Image src={"/ig.png"} alt="login" width={700} height={1000} />
+      <div className="flex justify-center items-center mt-20">
+        <Image
+          src={"/badminton-gif.gif"}
+          alt="badminton"
+          width={600}
+          height={600}
+        />
       </div>
-      <div className="flex justify-center items-center h-screen order-first md:order-last">
+      <div className="flex justify-center items-center order-first md:order-last mt-20">
         <SignIn />
       </div>
     </div>
