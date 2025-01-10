@@ -16,8 +16,6 @@ import { UserButton, useUser } from "@clerk/nextjs";
 function Header() {
   const { user, isSignedIn } = useUser();
 
-  console.log(user);
-
   const MenuList = [
     {
       name: "Home",
