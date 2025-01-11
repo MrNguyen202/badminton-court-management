@@ -67,7 +67,7 @@ function Header() {
       </NavbarContent>
       <NavbarContent justify="end" className="flex justify-center items-center">
         <Link href="/dashboard">
-          <Button color="primary">
+          <Button color="primary" className="rounded-3xl">
             {isSignedIn ? "Dashboard" : "Sign in"}
           </Button>
         </Link>
