@@ -1,10 +1,8 @@
-import { Button } from "@nextui-org/button";
-import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import FindAddress from "./FindAddress/FindAddress";
-import { div } from "framer-motion/client";
 import SearchBar from "./SearchBar/SearchBar";
+import RecommendedItem from "./RecommendedItem";
+import Footer from "./Footer";
 
 function Hero() {
   return (
@@ -26,7 +24,9 @@ function Hero() {
           </div>
         </div>
       </div>
+      <RecommendedItem />
       <FindAddress />
+      <Footer />
     </div>
   );
 }
