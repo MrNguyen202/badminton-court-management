@@ -22,15 +22,15 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 function Footer() {
   return (
-    <footer className="px-8 pt-24 pb-8">
+    <footer className="px-8 pt-24 pb-8 mt-20 border-t border-gray-200 ">
       <div className="container max-w-6xl flex flex-col mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 !w-full ">
           <div className="flex col-span-2 items-center gap-10 mb-10 lg:mb-0 md:gap-36">
             {LINKS.map(({ title, items }) => (
               <ul key={title}>
-                <p className="mb-4">{title}</p>
+                <p className="mb-4 font-bold text-xl">{title}</p>
                 {items.map((link) => (
-                  <li key={link}>
+                  <li key={link} className="mb-2">
                     <Link
                       href="/"
                       className="py-1 font-normal !text-gray-700 transition-colors hover:!text-gray-900"
@@ -43,7 +43,7 @@ function Footer() {
             ))}
           </div>
           <div className="">
-            <p className="mb-3 text-left">Subscribe</p>
+            <p className="mb-3 text-left font-bold text-xl">Subscribe</p>
             <p className="!text-gray-500 font-normal mb-4 text-base">
               Get access to subscriber exclusive deals and be the first who gets
               informed about fresh sales.
@@ -63,8 +63,12 @@ function Footer() {
                   </a>
                 </p>
               </div>
-              <Button color="primary" className="w-full lg:w-fit" size="md">
-                button
+              <Button
+                color="primary"
+                className="w-full lg:w-fit p-7 text-[16px]"
+                size="md"
+              >
+                Agree
               </Button>
             </div>
           </div>

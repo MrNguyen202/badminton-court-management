@@ -1,5 +1,5 @@
 import React from "react";
-import FindAddress from "./FindAddress/FindAddress";
+import MainMap from "./MainMap/MainMap";
 import SearchBar from "./SearchBar/SearchBar";
 import RecommendedItem from "./RecommendedItem";
 import Footer from "./Footer";
@@ -25,7 +25,7 @@ function Hero() {
         </div>
       </div>
       <RecommendedItem />
-      <FindAddress />
+      <MainMap />
       <Footer />
     </div>
   );

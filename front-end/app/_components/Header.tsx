@@ -49,10 +49,10 @@ function Header() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          {/* <Image src={"logo.svg"} alt="logo" width={40} height={40} /> */}
-          <h2 className="font-bold text-2xl text-primary ml-3">
+          <Image src={"logo.png"} alt="logo" width={80} height={80} />
+          {/* <h2 className="font-bold text-2xl text-primary ml-3">
             Material Tailwind
-          </h2>
+          </h2> */}
         </NavbarBrand>
       </NavbarContent>
       <NavbarContent justify="center" className="hidden sm:flex">
