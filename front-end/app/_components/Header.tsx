@@ -68,7 +68,7 @@ function Header() {
       <NavbarContent justify="end" className="flex justify-center items-center">
         <Link href="/profile">
           <Button color="primary" className="rounded-3xl">
-            {isSignedIn ? "Cá nhân" : "Sign in"}
+            {isSignedIn ? "Cá nhân" : "Đăng nhập"}
           </Button>
         </Link>
         <UserButton />
