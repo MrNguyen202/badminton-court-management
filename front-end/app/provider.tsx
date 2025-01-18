@@ -5,7 +5,7 @@ import Header from "./_components/Header";
 
 function Provider({ children }: { children: React.ReactNode }) {
   return (
-    <NextUIProvider>
+    <NextUIProvider className="bg-white">
       {/* Header */}
       <Header />
       {children}

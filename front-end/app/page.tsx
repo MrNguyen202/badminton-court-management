@@ -25,7 +25,7 @@ export default function Home() {
     });
   };
   return (
-    <div className="bg-white">
+    <div>
       <UserLocationContext.Provider value={{ userLocation, setUserLocation }}>
         <SourceCoordinateContext.Provider
           value={{ sourceCoordinates, setSourceCoordinates }}

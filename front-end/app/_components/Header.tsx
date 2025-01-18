@@ -18,20 +18,20 @@ function Header() {
 
   const MenuList = [
     {
-      name: "Home",
+      name: "Trang chủ",
       path: "/",
     },
     {
-      name: "About Us",
-      path: "/",
+      name: "Danh sách sân",
+      path: "/dashboard",
     },
     {
-      name: "Docs",
-      path: "/",
+      name: "Điều khoản",
+      path: "/policy",
     },
     {
-      name: "Contact Us",
-      path: "/",
+      name: "Dành cho chủ sân",
+      path: "/owners",
     },
   ];
 
@@ -66,9 +66,9 @@ function Header() {
         ))}
       </NavbarContent>
       <NavbarContent justify="end" className="flex justify-center items-center">
-        <Link href="/dashboard">
+        <Link href="/profile">
           <Button color="primary" className="rounded-3xl">
-            {isSignedIn ? "Dashboard" : "Sign in"}
+            {isSignedIn ? "Cá nhân" : "Sign in"}
           </Button>
         </Link>
         <UserButton />

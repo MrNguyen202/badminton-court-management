@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Page() {
   // Danh sách các ảnh
-  const images = ["/shuttlecock.png", "/badminton (1).png", "/badminton (2).png", "/scoreboard.png"];
+  const images = ["/shuttlecock.png", "/badminton1.png", "/badminton2.png", "/scoreboard.png"];
 
   // State để lưu ảnh hiện tại
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
