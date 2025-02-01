@@ -26,6 +26,7 @@ function Hero() {
       </div>
       <RecommendedItem />
       <MainMap />
+      
       <Footer />
     </div>
   );
