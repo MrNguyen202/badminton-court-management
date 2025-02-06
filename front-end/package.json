@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.9.7",
+    "@clerk/nextjs": "^6.11.1",
     "@heroui/scroll-shadow": "^2.3.6",
     "@heroui/system": "^2.4.7",
     "@heroui/theme": "^2.4.6",

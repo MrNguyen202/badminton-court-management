@@ -1,6 +1,7 @@
 import React from 'react'
 import EventSearch from './EventSearch'
 import { Button } from '@nextui-org/button'
+import EventLocation from './EventLocation'
 
 function SearchBar() {
   return (
@@ -10,9 +11,7 @@ function SearchBar() {
         {/* Search */}
         <EventSearch />
         {/* Location */}
-        <div>Location</div>
-        {/* Date */}
-        <div>Date</div>
+        <EventLocation />
         {/* Submit */}
         <Button className='w-full xl:w-auto rounded-3xl xl:rounded-full' color='primary'>Submit</Button>
     </div>
