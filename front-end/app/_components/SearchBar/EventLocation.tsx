@@ -38,7 +38,7 @@ const EventLocation = () => {
         id="location"
         value={selectedLocation}
         onChange={(e) => setSelectedLocation(e.target.value)}
-        className="w-full p-2 rounded-lg text-white bg-white/5"
+        className="w-full p-2 rounded-lg text-white bg-white/5 cursor-pointer"
       >
         {locations.map((location) => (
           <option key={location} value={location} className="text-black">
