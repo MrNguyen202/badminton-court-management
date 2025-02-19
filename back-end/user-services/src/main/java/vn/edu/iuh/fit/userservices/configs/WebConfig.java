@@ -1,4 +1,4 @@
-package vn.edu.iuh.fit.userservices;
+package vn.edu.iuh.fit.userservices.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
