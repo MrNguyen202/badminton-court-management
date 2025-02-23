@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.9.7",
+    "@heroui/scroll-shadow": "^2.3.6",
+    "@heroui/system": "^2.4.7",
+    "@heroui/theme": "^2.4.6",
     "@nextui-org/button": "^2.2.9",
     "@nextui-org/input": "^2.4.8",
     "@nextui-org/navbar": "^2.2.8",
@@ -17,6 +19,7 @@
     "@nextui-org/system": "^2.4.6",
     "@nextui-org/theme": "^2.4.5",
     "@types/mapbox-gl": "^3.4.1",
+    "axios": "^1.7.9",
     "framer-motion": "^11.16.1",
     "mapbox-gl": "^3.9.3",
     "next": "15.1.3",

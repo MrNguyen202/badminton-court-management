@@ -1,3 +1,4 @@
+import {heroui} from '@heroui/theme';
 import { nextui } from "@nextui-org/react";
 import type { Config } from "tailwindcss";
 
@@ -7,6 +8,7 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/components/scroll-shadow.js"
   ],
   theme: {
     extend: {
@@ -16,8 +18,7 @@ export default {
       },
     },
   },
-  plugins: [
-    nextui({
+  plugins: [nextui({
       themes: {
         light: {
           // ...
@@ -25,14 +26,8 @@ export default {
             primary: {
               DEFAULT: "#21A691"
             }
-          },
-        },
-        dark: {
+          },},dark: {
           // ...
-          colors: {},
-        },
-        // ... custom themes
-      },
-    }),
-  ],
+          colors: {},},// ... custom themes
+      },}),heroui()],
 } satisfies Config;
