@@ -116,11 +116,11 @@ function Header() {
   useEffect(() => {
   const userData = localStorage.getItem("user");
   if (userData) {
-    console.log("User data:", JSON.parse(userData)); // Kiểm tra dữ liệu đầy đủ
+    console.log("User data:", JSON.parse(userData)); 
     setUserInfo(JSON.parse(userData));
   }
 }, []);
-console.log(userInfo);
+console.log("userInfo", userInfo);
 
   // Danh sách các liên kết trang
   const MenuList = [

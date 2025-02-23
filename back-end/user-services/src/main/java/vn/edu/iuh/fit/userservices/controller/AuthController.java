@@ -41,9 +41,9 @@ public class AuthController {
             response.put("status", "success");
             response.put("email", user.get().getEmail());
             response.put("username", user.get().getUsername());
-            response.put("password", user.get().getPassword());  // (Lưu ý: Không nên gửi password thực tế)
-            response.put("role", user.get().getRole()); // Nếu bạn có thông tin role hoặc name
-            // Thêm tất cả thông tin khác bạn cần
+            response.put("password", user.get().getPassword());
+            response.put("role", user.get().getRole());
+
             return ResponseEntity.ok(response);
         }
         else {
