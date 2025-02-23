@@ -102,6 +102,7 @@ import {
 import { Button, Image } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 type User = {
   username: string;
@@ -109,18 +110,20 @@ type User = {
 };
 
 function Header() {
+  const { user, setUser } = useUser();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
-  const userData = localStorage.getItem("user");
-  if (userData) {
-    console.log("User data:", JSON.parse(userData)); 
-    setUserInfo(JSON.parse(userData));
-  }
-}, []);
-console.log("userInfo", userInfo);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+  
+
+  
 
   // Danh sách các liên kết trang
   const MenuList = [

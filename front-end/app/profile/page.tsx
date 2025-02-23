@@ -20,7 +20,7 @@ function ProfilePage() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setUser(null); 
+    setUser(null); // Cập nhật state để giao diện phản ứng ngay lập tức
     router.push("/sign-in");
   };
 

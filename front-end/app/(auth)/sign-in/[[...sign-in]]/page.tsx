@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useUser } from "@/context/UserContext";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -10,15 +11,16 @@ const SignIn = () => {
     password: "",
   });
 
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const router = useRouter();
+  const { setUser } = useUser();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("user");
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //   }
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,6 +31,24 @@ const SignIn = () => {
     router.push("/sign-up");
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:8080/api/auth/login",
+  //       formData
+  //     );
+  //     if (response.data.status === "success") {
+  //       localStorage.setItem("user", JSON.stringify(response.data));
+  //       setUser(response.data);
+  //       alert(`Chào mừng ${response.data.email}!`);
+  //       router.push("/dashboard");
+  //     }
+  //   } catch (error) {
+  //     alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -38,12 +58,12 @@ const SignIn = () => {
       );
       if (response.data.status === "success") {
         localStorage.setItem("user", JSON.stringify(response.data));
-        setUser(response.data);
-        alert(`Chào mừng ${response.data.email}!`);
+        window.dispatchEvent(new Event("storage"));
+        setUser(response.data); // Cập nhật context
         router.push("/dashboard");
       }
     } catch (error) {
-      alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");
+      alert("Đăng nhập thất bại! Kiểm tra lại thông tin.");
     }
   };
 
