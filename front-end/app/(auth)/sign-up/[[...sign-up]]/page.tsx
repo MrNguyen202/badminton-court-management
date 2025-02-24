@@ -7,8 +7,11 @@ import Image from "next/image";
 const SignIn = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    username: "",
+    firstName: "",
+    lastName: "",
     email: "",
+    phone: "",
+    address: "",
     password: "",
     resetPassword: "",
   });
@@ -30,7 +33,10 @@ const SignIn = () => {
       const response = await axios.post(
         "http://localhost:8080/api/auth/register",
         {
-          username: formData.username,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          address: formData.address,
           email: formData.email,
           password: formData.password,
         }
@@ -55,47 +61,39 @@ const SignIn = () => {
             <div className="text-left font-bold">
               <span className="text-primary">B</span>T
             </div>
-            <div className="py-10">
+            <div className="py-5">
               <h2 className="text-3xl font-bold text-primary">Đăng kí</h2>
-              <div className="border-2 w-10 border-green-500 inline-block mb-2"></div>
-              <div className="flex justify-center my-2">
-                <button className="mx-2">
-                  <Image
-                    src="/facebook.png"
-                    width={50}
-                    height={50}
-                    alt="facebook"
-                  />
-                </button>
-                <button className="mx-2">
-                  <Image src="/IN.png" width={50} height={50} alt="IN" />
-                </button>
-                <button className="mx-2">
-                  <Image src="/G.png" width={50} height={50} alt="G" />
-                </button>
-              </div>
+              <div className="border-2 w-10 border-green-500 inline-block"></div>
 
               {/* login */}
-              <p className="text-gray-400 my-3">
+              <p className="text-gray-400 mb-2">
                 Hãy điền vào các thông tin dưới đây
               </p>
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center">
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image src="/user.png" width={30} height={30} alt="mail" />
                     <input
-                      type="username"
-                      name="username"
-                      placeholder="UserName"
+                      type="text"
+                      name="firstName"
+                      placeholder="FirstName"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image src="/mail.png" width={30} height={30} alt="mail" />
                     <input
-                      type="email"
+                      type="text"
+                      name="lastName"
+                      placeholder="LastName"
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
+                    />
+                  </div>
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                    <input
+                      type="text"
                       name="email"
                       placeholder="Email"
                       onChange={handleChange}
@@ -104,12 +102,26 @@ const SignIn = () => {
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image
-                      src="/lock.png"
-                      width={30}
-                      height={30}
-                      alt="password"
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Phone"
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
+                  </div>
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Address"
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
+                    />
+                  </div>
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
                     <input
                       type="password"
                       name="password"
@@ -120,12 +132,6 @@ const SignIn = () => {
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image
-                      src="/reset-password.png"
-                      width={30}
-                      height={30}
-                      alt="password"
-                    />
                     <input
                       type="password"
                       name="resetPassword"

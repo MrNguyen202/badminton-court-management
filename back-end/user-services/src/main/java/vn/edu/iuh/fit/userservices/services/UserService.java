@@ -16,17 +16,23 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public User registerUser(UserDTO userDTO) {
 
-        if (userRepository.findByUsername(userDTO.getUsername()).isPresent() ||
-                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new RuntimeException("Username hoặc Email đã tồn tại!");
         }
 
         User user = new User();
-        user.setUsername(userDTO.getUsername());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
+        user.setPhone(userDTO.getPhone());
+        user.setAddress(userDTO.getAddress());
 
         return userRepository.save(user);
     }

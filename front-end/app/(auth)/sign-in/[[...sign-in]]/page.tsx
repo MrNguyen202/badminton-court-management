@@ -53,11 +53,11 @@ const SignIn = () => {
         setUser(userData);
 
         alert(`Chào mừng ${userData.username}!`);
+        router.push("/dashboard"); // Chuyển hướng trước
 
-
-        window.location.reload();
-
-        router.push("/");
+        setTimeout(() => {
+          window.location.reload();
+        }, 100); // Reload sau khi chuyển trang
       }
     } catch (error) {
       alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");

@@ -1,13 +1,10 @@
 package vn.edu.iuh.fit.userservices.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.fit.userservices.dtos.UserDTO;
-import vn.edu.iuh.fit.userservices.exceptions.EntityIdNotFoundException;
-import vn.edu.iuh.fit.userservices.models.Response;
 import vn.edu.iuh.fit.userservices.models.User;
 import vn.edu.iuh.fit.userservices.services.UserService;
 
@@ -31,23 +28,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody UserDTO userDTO) {
-        System.out.println("Nhận được yêu cầu đăng nhập từ username: " + userDTO.getEmail());
+        System.out.println("Nhận được yêu cầu đăng nhập từ email: " + userDTO.getEmail());
 
         Optional<User> user = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
         if (user.isPresent()) {
-            System.out.println("Đăng nhập thành công với username: " + user.get().getUsername());
+            System.out.println("Đăng nhập thành công với email: " + user.get().getEmail());
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
+            response.put("firstName", user.get().getFirstName());
+            response.put("lastName", user.get().getLastName());
             response.put("email", user.get().getEmail());
-            response.put("username", user.get().getUsername());
             response.put("password", user.get().getPassword());
+            response.put("phone", user.get().getPhone());
+            response.put("address", user.get().getAddress());
             response.put("role", user.get().getRole());
 
             return ResponseEntity.ok(response);
-        }
-        else {
-            System.out.println("Đăng nhập thất bại cho username: " + userDTO.getEmail());
+        } else {
+            System.out.println("Đăng nhập thất bại cho email: " + userDTO.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -61,12 +60,15 @@ public class AuthController {
 
         Optional<User> user = userService.authenticateUser(email, password);
         if (user.isPresent()) {
-            System.out.println("Đăng nhập thành công với username: " + user.get().getUsername());
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
+            response.put("firstName", user.get().getFirstName());
+            response.put("lastName", user.get().getLastName());
             response.put("email", user.get().getEmail());
-            response.put("username", user.get().getUsername());
+            response.put("password", user.get().getPassword());
+            response.put("phone", user.get().getPhone());
+            response.put("address", user.get().getAddress());
             response.put("role", user.get().getRole());
 
             return ResponseEntity.ok(response);
@@ -75,9 +77,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Sai thông tin đăng nhập"));
         }
     }
-
-
-
 
 
 }

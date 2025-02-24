@@ -3,14 +3,18 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useContext } from "react";
 
 type User = {
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  phone: string;
+  address: string;
+  role: string;
 };
 
 function ProfilePage() {
   const router = useRouter();
 
-  const [useAuth, setUseAuth] = useState<any>(null);
+  const [useAuth, setUseAuth] = useState<User | null>(null);
 
   useEffect(() => {
     const loadUser = () => {
@@ -44,7 +48,7 @@ function ProfilePage() {
     <div>
       {useAuth ? (
         <div>
-          <h1>Chào, {useAuth.username}!</h1>
+          <h1>Chào, {useAuth.phone}!</h1>
           <button onClick={handleLogout}>Đăng xuất</button>
         </div>
       ) : (
