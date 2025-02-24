@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import noImage from "../../public/no-product-image.jpg";
 
 const courts = [
-  { id: 1, name: "Sân Cầu Lông A", address: "123 Đường A, Quận 1", price: "100.000 VND/h", image: "https://picsum.photos/200/320", rating: 4.5, district: 1 },
+  { id: 1, name: "Sân Cầu Lông A", address: "123 Đường A, Quận 1", price: "100.000 VND/h", image: null, rating: 4.5, district: 1 },
   { id: 2, name: "Sân Cầu Lông B", address: "456 Đường B, Quận 3", price: "120.000 VND/h", image: "https://picsum.photos/200/321", rating: 4.0, district: 3 },
   { id: 3, name: "Sân Cầu Lông C", address: "789 Đường C, Quận 5", price: "90.000 VND/h", image: "https://picsum.photos/200/322", rating: 4.2, district: 5 },
   { id: 4, name: "Sân Cầu Lông D", address: "101 Đường D, Quận 7", price: "110.000 VND/h", image: "https://picsum.photos/200/323", rating: 3.8, district: 7 },
@@ -21,7 +22,7 @@ type Court = {
   name: string;
   address: string;
   price: string;
-  image: string;
+  image: string | null;
   rating: number;
   district: number;
 };
@@ -32,7 +33,7 @@ function BadmintonCourtList() {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedRating, setSelectedRating] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const courtsPerPage = 6;
+  const courtsPerPage = 8;
 
   const handleBooking = (court : Court) => {
     setSelectedCourt(court);
@@ -58,7 +59,7 @@ function BadmintonCourtList() {
   return (
     <div className="p-6 max-w-full mx-auto flex flex-col items-center">
       <div className="flex w-full">
-        <div className="w-1/4 p-4 border-r">
+        <div className="w-1/5 p-4 border-r">
           <h2 className="text-lg font-bold mb-2">Bộ lọc</h2>
           <input
             type="text"
@@ -88,11 +89,11 @@ function BadmintonCourtList() {
             ))}
           </select>
         </div>
-        <div className="w-3/4 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="w-4/5 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentCourts.map((court) => (
               <div key={court.id} className="border p-4 rounded-lg shadow-md bg-white">
-                <img src={court.image} alt={court.name} className="w-full h-56 object-cover rounded-md mb-2" />
+                <img src={court.image || noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold">{court.name}</h2>
                   <p className="text-yellow-500 font-semibold">
@@ -104,13 +105,15 @@ function BadmintonCourtList() {
                 </div>
                 <p className="text-gray-600">{court.address}</p>
                 <p className="font-bold text-red-500">Giá: {court.price}</p>
-                <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full" onClick={() => handleViewDetails(court)}>Xem chi tiết</button>
+                <div className="flex flex-col-2 justify-center items-center">
+                <button className="mt-2 mr-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full" onClick={() => handleViewDetails(court)}>Xem chi tiết</button>
                 <button
-                  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
+                  className="mt-2 ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
                   onClick={() => handleBooking(court)}
                 >
                   Đặt sân
                 </button>
+                </div>
               </div>
             ))}
           </div>
