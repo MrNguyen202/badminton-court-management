@@ -42,6 +42,7 @@ const SignIn = () => {
         }
       );
       alert(response.data); // Hiển thị thông báo thành công
+      router.push("/sign-in");
     } catch (error) {
       alert("Đăng ký thất bại!"); // Hiển thị thông báo lỗi
     }

@@ -52,4 +52,19 @@ public class UserService {
     public Iterator<User> getAll() {
         return userRepository.findAll().iterator();
     }
+
+    public User updateUser(UserDTO userDTO) {
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            User user = new User();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword());
+            user.setPhone(userDTO.getPhone());
+            user.setAddress(userDTO.getAddress());
+
+            return userRepository.save(user);
+        }
+        return null;
+    }
 }

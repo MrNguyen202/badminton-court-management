@@ -52,8 +52,9 @@ const SignIn = () => {
         localStorage.setItem("user", JSON.stringify(userData)); // Lưu thông tin user
         setUser(userData);
 
-        alert(`Chào mừng ${userData.username}!`);
-        router.push("/dashboard"); // Chuyển hướng trước
+        alert(`Chào mừng ${userData.email}!`);
+        
+        router.push("/"); // Chuyển hướng trước
 
         setTimeout(() => {
           window.location.reload();

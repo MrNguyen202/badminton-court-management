@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.fit.userservices.dtos.UserDTO;
+import vn.edu.iuh.fit.userservices.exceptions.EntityIdNotFoundException;
 import vn.edu.iuh.fit.userservices.models.User;
 import vn.edu.iuh.fit.userservices.services.UserService;
 
@@ -27,26 +28,27 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDTO userDTO) {
-        System.out.println("Nhận được yêu cầu đăng nhập từ email: " + userDTO.getEmail());
+    public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+        System.out.println("Nhận được yêu cầu đăng nhập từ email: " + user.getEmail());
 
-        Optional<User> user = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
-        if (user.isPresent()) {
-            System.out.println("Đăng nhập thành công với email: " + user.get().getEmail());
+        Optional<User> checkUser = userService.authenticateUser(user.getEmail(), user.getPassword());
+        if (checkUser.isPresent()) {
+            System.out.println("Đăng nhập thành công với email: " + checkUser.get().getEmail());
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("firstName", user.get().getFirstName());
-            response.put("lastName", user.get().getLastName());
-            response.put("email", user.get().getEmail());
-            response.put("password", user.get().getPassword());
-            response.put("phone", user.get().getPhone());
-            response.put("address", user.get().getAddress());
-            response.put("role", user.get().getRole());
+            response.put("id", checkUser.get().getId());
+            response.put("firstName", checkUser.get().getFirstName());
+            response.put("lastName", checkUser.get().getLastName());
+            response.put("email", checkUser.get().getEmail());
+            response.put("password", checkUser.get().getPassword());
+            response.put("phone", checkUser.get().getPhone());
+            response.put("address", checkUser.get().getAddress());
+            response.put("role", checkUser.get().getRole());
 
             return ResponseEntity.ok(response);
         } else {
-            System.out.println("Đăng nhập thất bại cho email: " + userDTO.getEmail());
+            System.out.println("Đăng nhập thất bại cho email: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -63,6 +65,7 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
+            response.put("id", user.get().getId());
             response.put("firstName", user.get().getFirstName());
             response.put("lastName", user.get().getLastName());
             response.put("email", user.get().getEmail());
@@ -78,5 +81,40 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/update-user")
+    public ResponseEntity<Map<String, Object>> updateUser(@RequestBody UserDTO userDTO) {
+        User user = userService.updateUser(userDTO);
+        System.out.println("Cập nhật thông tin người dùng thành công!"+user);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("firstName", user.getFirstName());
+        response.put("lastName", user.getLastName());
+        response.put("email", user.getEmail());
+        response.put("password", user.getPassword());
+        response.put("phone", user.getPhone());
+        response.put("address", user.getAddress());
+        response.put("role", user.getRole());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get-user")
+    public ResponseEntity<Map<String, Object>> getUser(@RequestParam Long id) throws EntityIdNotFoundException {
+        Optional<User> user = userService.getById(id);
+        if (user.isPresent()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("id", user.get().getId());
+            response.put("firstName", user.get().getFirstName());
+            response.put("lastName", user.get().getLastName());
+            response.put("email", user.get().getEmail());
+            response.put("password", user.get().getPassword());
+            response.put("phone", user.get().getPhone());
+            response.put("address", user.get().getAddress());
+            response.put("role", user.get().getRole());
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Không tìm thấy người dùng"));
+        }
+    }
 
 }
