@@ -19,20 +19,20 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Kiểm tra nếu mật khẩu không khớp
     if (formData.password !== formData.resetPassword) {
       alert("Mật khẩu không khớp!");
       return;
     }
-  
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/register",
-        { 
+        {
           username: formData.username,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }
       );
       alert(response.data); // Hiển thị thông báo thành công
@@ -40,7 +40,6 @@ const SignIn = () => {
       alert("Đăng ký thất bại!"); // Hiển thị thông báo lỗi
     }
   };
-  
 
   // Xử lý điều hướng đến trang đăng ký
   const handleSignInClick = () => {
@@ -151,10 +150,9 @@ const SignIn = () => {
           <div className="w-2/5 bg-primary text-white rounded-tr-2xl rounded-br-2xl py-36 px-12">
             <h2 className="text-3xl font-bold mb-2">Chào bạn!</h2>
             <div className="border-2 w-10 border-white inline-block mb-2"></div>
-            <p className="mb-10">
-              Chào mừng đến với BT.
-              <p>Đăng ký ngay để chơi cùng mọi người nhé.</p>
-            </p>
+            <p>Chào mừng đến với BT.</p>
+
+            <p className="mb-10">Đăng ký ngay để chơi cùng mọi người nhé.</p>
 
             <button
               onClick={handleSignInClick}

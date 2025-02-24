@@ -52,4 +52,32 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestParam String email,
+            @RequestParam String password) {
+
+        System.out.println("Nhận yêu cầu đăng nhập với email: " + email + " và password: " + password);
+
+        Optional<User> user = userService.authenticateUser(email, password);
+        if (user.isPresent()) {
+            System.out.println("Đăng nhập thành công với username: " + user.get().getUsername());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("email", user.get().getEmail());
+            response.put("username", user.get().getUsername());
+            response.put("role", user.get().getRole());
+
+            return ResponseEntity.ok(response);
+        } else {
+            System.out.println("Sai email hoặc password!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Sai thông tin đăng nhập"));
+        }
+    }
+
+
+
+
+
 }

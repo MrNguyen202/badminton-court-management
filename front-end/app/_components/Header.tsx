@@ -87,7 +87,6 @@
 
 // export default Header;
 
-
 "use client";
 import React, { useEffect, useState } from "react";
 import {
@@ -102,7 +101,6 @@ import {
 import { Button, Image } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/context/UserContext";
 
 type User = {
   username: string;
@@ -110,20 +108,29 @@ type User = {
 };
 
 function Header() {
-  const { user, setUser } = useUser();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-  
+    const loadUser = () => {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        setUserInfo(JSON.parse(userData));
+      }
+    };
 
-  
+    loadUser(); // Load khi component mount
+
+    // Lắng nghe khi localStorage thay đổi (do đăng nhập)
+    window.addEventListener("storage", loadUser);
+
+    return () => {
+      window.removeEventListener("storage", loadUser);
+    };
+  }, []);
+
+  console.log("header", userInfo);
 
   // Danh sách các liên kết trang
   const MenuList = [
@@ -141,6 +148,8 @@ function Header() {
       router.push("/sign-in"); // Điều hướng đến trang đăng nhập nếu chưa đăng nhập
     }
   };
+
+  
 
   return (
     <Navbar

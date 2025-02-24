@@ -5,6 +5,7 @@ import { UserLocationContext } from "@/context/UserLocationContext";
 import { SourceCoordinateContext } from "@/context/SourceCoordinateContext";
 import { DestinationCoordinateContext } from "@/context/DestinationCoordinateContext";
 import { DirectionDataContext } from "@/context/DirectionDataContext";
+import { UseAuthContext } from "@/context/AuthContext";
 
 export default function Home() {
   const [userLocation, setUserLocation] = useState<any>();
@@ -24,6 +25,7 @@ export default function Home() {
       });
     });
   };
+
   return (
     <div>
       <UserLocationContext.Provider value={{ userLocation, setUserLocation }}>
