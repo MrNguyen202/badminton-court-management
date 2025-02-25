@@ -23,6 +23,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+        System.out.println("Nhận yêu cầu đăng ký từ email: " + userDTO.toString());
         userService.registerUser(userDTO);
         return ResponseEntity.ok("Đăng ký thành công!");
     }
@@ -38,8 +39,7 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("id", checkUser.get().getId());
-            response.put("firstName", checkUser.get().getFirstName());
-            response.put("lastName", checkUser.get().getLastName());
+            response.put("name", checkUser.get().getName());
             response.put("email", checkUser.get().getEmail());
             response.put("password", checkUser.get().getPassword());
             response.put("phone", checkUser.get().getPhone());
@@ -66,8 +66,7 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("id", user.get().getId());
-            response.put("firstName", user.get().getFirstName());
-            response.put("lastName", user.get().getLastName());
+            response.put("name", user.get().getName());
             response.put("email", user.get().getEmail());
             response.put("password", user.get().getPassword());
             response.put("phone", user.get().getPhone());
@@ -82,20 +81,24 @@ public class AuthController {
     }
 
     @PostMapping("/update-user")
-    public ResponseEntity<Map<String, Object>> updateUser(@RequestBody UserDTO userDTO) {
-        User user = userService.updateUser(userDTO);
-        System.out.println("Cập nhật thông tin người dùng thành công!"+user);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("firstName", user.getFirstName());
-        response.put("lastName", user.getLastName());
-        response.put("email", user.getEmail());
-        response.put("password", user.getPassword());
-        response.put("phone", user.getPhone());
-        response.put("address", user.getAddress());
-        response.put("role", user.getRole());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
+        try {
+            User updatedUser = userService.updateUser(userDTO);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("name", updatedUser.getName());
+            response.put("email", updatedUser.getEmail());
+            response.put("phone", updatedUser.getPhone());
+            response.put("address", updatedUser.getAddress());
+            response.put("role", updatedUser.getRole());
+            return ResponseEntity.ok(response);
+        } catch (EntityIdNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Có lỗi xảy ra khi cập nhật user"));
+        }
     }
+
 
     @GetMapping("/get-user")
     public ResponseEntity<Map<String, Object>> getUser(@RequestParam Long id) throws EntityIdNotFoundException {
@@ -104,8 +107,7 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("id", user.get().getId());
-            response.put("firstName", user.get().getFirstName());
-            response.put("lastName", user.get().getLastName());
+            response.put("name", user.get().getName());
             response.put("email", user.get().getEmail());
             response.put("password", user.get().getPassword());
             response.put("phone", user.get().getPhone());

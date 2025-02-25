@@ -25,7 +25,6 @@ export default function Home() {
       });
     });
   };
-
   return (
     <div>
       <UserLocationContext.Provider value={{ userLocation, setUserLocation }}>

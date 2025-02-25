@@ -56,9 +56,10 @@ const SignIn = () => {
         
         router.push("/"); // Chuyển hướng trước
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 100); // Reload sau khi chuyển trang
+         // Đợi 500ms rồi reload trang
+         setTimeout(() => {
+           window.location.reload();
+         }, 500);
       }
     } catch (error) {
       alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");

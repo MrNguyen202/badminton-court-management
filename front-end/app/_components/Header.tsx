@@ -14,8 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type User = {
-  firstName: string;
-  lastName: string;
+  name: string;
 };
 
 function Header() {
@@ -40,8 +39,6 @@ function Header() {
       window.removeEventListener("storage", loadUser);
     };
   }, []);
-
-  console.log("header", userInfo);
 
   // Danh sách các liên kết trang
   const MenuList = [
@@ -102,7 +99,7 @@ function Header() {
                 width={35}
                 height={35}
               />
-              <span className="text-black">{userInfo.lastName}</span>
+              <span className="text-black">{userInfo.name}</span>
             </div>
           ) : (
             <div className="border-2 border-primary rounded-full px-6 py-2 inline-block font-semibold hover:bg-primary hover:text-white">Đăng nhập</div>

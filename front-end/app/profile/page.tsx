@@ -1,73 +1,10 @@
-// "use client";
-// import { useRouter } from "next/navigation";
-// import { useState, useEffect, useContext } from "react";
-
-// type User = {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   phone: string;
-//   address: string;
-//   role: string;
-// };
-
-// function ProfilePage() {
-//   const router = useRouter();
-
-//   const [useAuth, setUseAuth] = useState<User | null>(null);
-
-//   useEffect(() => {
-//     const loadUser = () => {
-//       const userData = localStorage.getItem("user");
-//       if (userData) {
-//         setUseAuth(JSON.parse(userData));
-//       }
-//     };
-
-//     loadUser(); // Load khi component mount
-
-//     // Lắng nghe khi localStorage thay đổi (do đăng nhập)
-//     window.addEventListener("storage", loadUser);
-
-//     return () => {
-//       window.removeEventListener("storage", loadUser);
-//     };
-//   }, []);
-
-//   console.log("profile", useAuth);
-
-//   const handleLogout = () => {
-//     localStorage.removeItem("user");
-
-//     window.location.reload();
-
-//     router.push("/");
-//   };
-
-//   return (
-//     <div>
-//       {useAuth ? (
-//         <div>
-//           <h1>Chào, {useAuth.phone}!</h1>
-//           <button onClick={handleLogout}>Đăng xuất</button>
-//         </div>
-//       ) : (
-//         <p>Bạn chưa đăng nhập.</p>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default ProfilePage;
-
 "use client";
-import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface User {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
   address: string;
@@ -93,52 +30,73 @@ const Profile = () => {
   // Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.removeItem("user");
-    router.push("/sign-in");
+    router.push("/");
+  
+     // Đợi 500ms rồi reload trang
+     setTimeout(() => {
+       window.location.reload();
+     }, 500);
   };
 
   const handleGoToUpdate = () => {
-    router.push('/profile/update'); // Chuyển hướng đến trang update profile
+    router.push("/profile/update"); // Chuyển hướng đến trang update profile
   };
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-500 p-4">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-96 text-center transform transition duration-500 hover:scale-105">
-        {/* Avatar */}
-        <div className="relative">
-          <img
-            src={user.avatar || "https://via.placeholder.com/150"}
-            alt="User Avatar"
-            className="w-28 h-28 mx-auto rounded-full border-4 border-blue-300 shadow-lg"
-          />
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg flex">
+      {/* Sidebar */}
+      <div className="w-1/4 p-4 border-r">
+        <div className="flex flex-col items-center">
+          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+            <Image
+              src={"/user-header.png"}
+              alt="user-header"
+              width={35}
+              height={35}
+            />
+          </div>
+          <h3 className="mt-2 text-lg font-semibold">{user.name}</h3>
         </div>
-        ?
-        <h2 className="text-2xl font-semibold text-gray-800 mt-4">
-          {user?.lastName}
-        </h2>
-        <p className="text-gray-500">{user.email}</p>
-        <span
-          className={`px-4 py-1 rounded-full text-sm mt-2 inline-block ${
-            user.role === "ADMIN"
-              ? "bg-red-200 text-red-600"
-              : "bg-green-200 text-green-600"
-          }`}
+        <ul className="mt-6 space-y-4 text-gray-700">
+          <li className="font-semibold">📄 Tài khoản của tôi</li>
+          <li className="pl-4">Thông tin tài khoản</li>
+          <li className="pl-4">Đổi mật khẩu</li>
+          <li className="font-semibold mt-4">📅 Danh sách lịch của tôi</li>
+          <li className="pl-4">Lịch đã đặt</li>
+        </ul>
+      </div>
+      {/* Main Content */}
+      <div className="w-3/4 p-6">
+        <h2 className="text-2xl font-bold border-b pb-2">Thông tin cá nhân</h2>
+        <div className="mt-6 space-y-4 text-gray-800">
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-semibold">Email:</span>
+            <span>{user.email}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-semibold">Số điện thoại:</span>
+            <span>{user.phone}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-semibold">Họ & tên:</span>
+            <span>{user.name}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-semibold">Địa chỉ:</span>
+            <span>{user.address}</span>
+          </div>
+        </div>
+        <button onClick={handleGoToUpdate} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
+          Chỉnh sửa
+        </button>
+        <button
+          className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+          onClick={handleLogout}
         >
-          {user.role}
-        </span>
-        {/* Nút chỉnh sửa & đăng xuất */}
-        <div className="mt-6 flex justify-center space-x-4">
-          <button onClick={handleGoToUpdate} className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300">
-            Chỉnh sửa
-          </button>
-          <button
-            className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
-            onClick={handleLogout}
-          >
-            Đăng xuất
-          </button>
-        </div>
+          Đăng xuất
+        </button>
       </div>
     </div>
   );

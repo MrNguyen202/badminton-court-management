@@ -2,19 +2,19 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Image from "next/image";
 
 const SignIn = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
     phone: "",
     address: "",
     password: "",
     resetPassword: "",
   });
+
+  console.log("formData", formData);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,8 +33,7 @@ const SignIn = () => {
       const response = await axios.post(
         "http://localhost:8080/api/auth/register",
         {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
+          name: formData.name,
           phone: formData.phone,
           address: formData.address,
           email: formData.email,
@@ -75,18 +74,8 @@ const SignIn = () => {
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
                     <input
                       type="text"
-                      name="firstName"
-                      placeholder="FirstName"
-                      onChange={handleChange}
-                      required
-                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
-                    />
-                  </div>
-                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <input
-                      type="text"
-                      name="lastName"
-                      placeholder="LastName"
+                      name="name"
+                      placeholder="Name"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"

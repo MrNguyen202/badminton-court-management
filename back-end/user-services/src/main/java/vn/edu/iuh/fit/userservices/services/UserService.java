@@ -23,12 +23,11 @@ public class UserService {
     public User registerUser(UserDTO userDTO) {
 
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("Username hoặc Email đã tồn tại!");
+            throw new RuntimeException("Name hoặc Email đã tồn tại!");
         }
 
         User user = new User();
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
+        user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
         user.setPhone(userDTO.getPhone());
@@ -53,18 +52,19 @@ public class UserService {
         return userRepository.findAll().iterator();
     }
 
-    public User updateUser(UserDTO userDTO) {
-        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            User user = new User();
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setEmail(userDTO.getEmail());
-            user.setPassword(userDTO.getPassword());
+    public User updateUser(UserDTO userDTO) throws EntityIdNotFoundException {
+        Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            user.setName(userDTO.getName());
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
 
             return userRepository.save(user);
+        } else {
+            throw new EntityIdNotFoundException("User không tồn tại");
         }
-        return null;
     }
+
 }

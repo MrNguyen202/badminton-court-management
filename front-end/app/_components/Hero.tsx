@@ -1,32 +1,40 @@
 import React from "react";
 import MainMap from "./MainMap/MainMap";
-import SearchBar from "./SearchBar/SearchBar";
 import RecommendedItem from "./RecommendedItem";
 import Footer from "./Footer";
+import Image from "next/image";
+import TypicalFeatures from "./TypicalFeatures";
 
 function Hero() {
   return (
     <div>
-      <div className="relative min-h-screen w-full bg-[url('/course.png')] bg-cover bg-no-repeat">
-        <div className="absolute inset-0 h-full w-full bg-gray-900/60" />
-        <div className="grid min-h-screen px-8">
-          <div className="container relative z-10 my-auto mx-auto grid place-items-center text-center">
-            <div className="md:max-w-full lg:max-w-3xl text-white text-[50px] font-extrabold">
-              Master the Power of React Beginner Course
-            </div>
-            <div className="mt-6 mb-10 w-full md:max-w-full lg:max-w-3xl text-white text-[20px]">
-              Our React Course is your gateway to becoming a proficient React
-              developer. Learn to build dynamic and interactive web applications
-              using one of the most popular JavaScript libraries in the
-              industry.
-            </div>
-            <SearchBar />
+      <div className="pb-20 px-8 pt-20">
+        <div className="container mx-auto grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-1 xl:grid-cols-2">
+          <div>
+            <p className="text-7xl pt-5 m-10">
+              Phần mềm quản lý lịch hẹn đặt sân thể thao
+            </p>
+            <p className="ml-10 text-xl">
+              Đặt hẹn và quản lý lịch hẹn Sân thể thao: Sân đá bóng, Sân Tennis,
+              Sân Bóng rổ, Sân Cầu lông…tiện lợi và nhanh chóng với phần mềm BT
+            </p>
+          </div>
+          <div className="flex justify-center items-center">
+            <Image
+              src="/calendar.gif"
+              alt="badminton"
+              width={300}
+              height={300}
+              className="mx-auto"
+            />
           </div>
         </div>
       </div>
+
       <RecommendedItem />
+      <TypicalFeatures />
       <MainMap />
-      
+
       <Footer />
     </div>
   );
