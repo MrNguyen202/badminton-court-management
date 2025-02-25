@@ -20,6 +20,7 @@ import vn.edu.iuh.hero.services.impls.CourtServiceImpl;
  *
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/courts")
 public class CourtController {
     @Autowired
@@ -32,6 +33,11 @@ public class CourtController {
 
     @PostMapping("/create")
     public ResponseEntity<Court> createCourt(@RequestBody Court court) {
+        return ResponseEntity.ok(courtService.save(court));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Court> updateCourt(@RequestBody Court court) {
         return ResponseEntity.ok(courtService.save(court));
     }
 }

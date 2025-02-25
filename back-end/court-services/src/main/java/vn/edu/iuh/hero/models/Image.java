@@ -13,6 +13,7 @@ package vn.edu.iuh.hero.models;
  *
  */
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,5 +35,6 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name = "court_id")
+    @JsonBackReference
     private Court court;
 }

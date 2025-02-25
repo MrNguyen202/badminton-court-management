@@ -13,6 +13,7 @@ package vn.edu.iuh.hero.models;
  *
  */
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,6 +46,7 @@ public class Court {
     private double price;
 
     @OneToMany(mappedBy = "court")
+    @JsonManagedReference
     private Set<Image> images;
 
     @OneToMany(mappedBy = "court")
