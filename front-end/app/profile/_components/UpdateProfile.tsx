@@ -1,0 +1,129 @@
+import { Button } from "@nextui-org/button";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/modal";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Input } from "@nextui-org/input";
+
+interface User {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+export default function UpdateProfile() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [user, setUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState<User>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      setFormData(userData);
+    } else {
+      alert("Vui lòng đăng nhập trước!");
+      router.push("/sign-in");
+    }
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/update-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Cập nhật thành công!");
+        localStorage.setItem("user", JSON.stringify(data));
+        setUser(data);
+        onOpenChange();
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        alert(data.error || "Có lỗi xảy ra khi cập nhật");
+      }
+    } catch (error) {
+      console.error("Lỗi cập nhật:", error);
+      alert("Không thể kết nối đến server!");
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={onOpen}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+      >
+        Cập nhật thông tin
+      </button>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1 text-center text-xl font-bold text-blue-600">
+            Cập nhật hồ sơ
+          </ModalHeader>
+          <ModalBody>
+            <form className="space-y-4">
+              <Input
+                label="Họ và tên"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                isRequired
+              />
+              <Input
+                label="Số điện thoại"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                isRequired
+              />
+              <Input
+                label="Địa chỉ"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                isRequired
+              />
+              <Input
+                label="Email"
+                name="email"
+                value={formData.email}
+                isReadOnly
+                className="bg-gray-100 cursor-not-allowed"
+              />
+            </form>
+          </ModalBody>
+          <ModalFooter className="flex justify-end">
+            <Button color="primary" onClick={handleSubmit}>
+              Lưu
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}

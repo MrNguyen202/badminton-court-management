@@ -1,6 +1,7 @@
 package vn.edu.iuh.fit.userservices.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.fit.userservices.dtos.UserDTO;
 import vn.edu.iuh.fit.userservices.exceptions.EntityIdNotFoundException;
@@ -15,6 +16,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -29,7 +32,7 @@ public class UserService {
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhone(userDTO.getPhone());
         user.setAddress(userDTO.getAddress());
 
@@ -37,10 +40,16 @@ public class UserService {
     }
 
     public Optional<User> authenticateUser(String email, String password) {
-        Optional<User> user = userRepository.findByEmailAndPassword(email, password);
-        if (user.isPresent()) {
-            return user;
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return Optional.of(user);
+            }
         }
+
         return Optional.empty();
     }
 
@@ -66,5 +75,25 @@ public class UserService {
             throw new EntityIdNotFoundException("User không tồn tại");
         }
     }
+
+    public User updatePassword(String email, String currentPassword, String newPassword) throws EntityIdNotFoundException {
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+
+            // Kiểm tra xem mật khẩu hiện tại có đúng không
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                throw new RuntimeException("Mật khẩu hiện tại không đúng!");
+            }
+
+            // Cập nhật mật khẩu mới
+            user.setPassword(passwordEncoder.encode(newPassword));
+            return userRepository.save(user);
+        } else {
+            throw new EntityIdNotFoundException("User không tồn tại");
+        }
+    }
+
 
 }

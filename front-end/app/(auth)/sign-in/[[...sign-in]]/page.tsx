@@ -32,39 +32,39 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        formData
-      );
-
+      const response = await axios.post("http://localhost:8080/api/auth/login", formData);
+  
       if (response.data.status === "success") {
-        // Sau khi đăng nhập thành công, gọi API lấy thông tin user
-        const userInfoResponse = await axios.get(
-          `http://localhost:8080/api/auth/login?email=${formData.email}&password=${formData.password}`,
-          {
-            headers: { Authorization: `Bearer ${response.data.token}` },
-          }
-        );
-
-        console.log("userInfoResponse", userInfoResponse);
+        const token = response.data.token;
+  
+        if (!token) {
+          alert("Token không tồn tại. Kiểm tra lại API login!");
+          return;
+        }
+  
+        localStorage.setItem("token", token);
+    
+        // Lấy thông tin user với token
+        const userInfoResponse = await axios.get("http://localhost:8080/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` }, // Đính kèm token
+        });
 
         const userData = userInfoResponse.data;
-        localStorage.setItem("user", JSON.stringify(userData)); // Lưu thông tin user
+        localStorage.setItem("user", JSON.stringify(userData)); 
         setUser(userData);
-
+    
         alert(`Chào mừng ${userData.email}!`);
-        
-        router.push("/"); // Chuyển hướng trước
-
-         // Đợi 500ms rồi reload trang
-         setTimeout(() => {
-           window.location.reload();
-         }, 500);
+        router.push("/");
+        setTimeout(() => window.location.reload(), 500);
       }
     } catch (error) {
-      alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");
+      console.error("Lỗi đăng nhập:", error);
+      alert("Đăng nhập thất bại! Kiểm tra lại thông tin.");
     }
   };
+  
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">

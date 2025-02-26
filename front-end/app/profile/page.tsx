@@ -1,7 +1,10 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import UpdateProfile from "./_components/UpdateProfile";
+import UpdatePassword from "./_components/UpdatePassword";
 
 interface User {
   name: string;
@@ -31,15 +34,11 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem("user");
     router.push("/");
-  
-     // Đợi 500ms rồi reload trang
-     setTimeout(() => {
-       window.location.reload();
-     }, 500);
-  };
 
-  const handleGoToUpdate = () => {
-    router.push("/profile/update"); // Chuyển hướng đến trang update profile
+    // Đợi 500ms rồi reload trang
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
@@ -47,7 +46,7 @@ const Profile = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg flex">
       {/* Sidebar */}
-      <div className="w-1/4 p-4 border-r">
+      <div className="w-1/4 border-r">
         <div className="flex flex-col items-center">
           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
             <Image
@@ -59,13 +58,20 @@ const Profile = () => {
           </div>
           <h3 className="mt-2 text-lg font-semibold">{user.name}</h3>
         </div>
-        <ul className="mt-6 space-y-4 text-gray-700">
-          <li className="font-semibold">📄 Tài khoản của tôi</li>
-          <li className="pl-4">Thông tin tài khoản</li>
-          <li className="pl-4">Đổi mật khẩu</li>
-          <li className="font-semibold mt-4">📅 Danh sách lịch của tôi</li>
-          <li className="pl-4">Lịch đã đặt</li>
-        </ul>
+
+        <div className="mt-6 text-gray-700">
+          <div className="font-semibold">📄 Tài khoản của tôi</div>
+          <div className="ml-7">
+            <p className="py-3">Thông tin tài khoản</p>
+            <p><UpdatePassword /></p>
+          </div>
+          <div className="mt-4">
+            <div className="font-semibold">📅 Danh sách lịch của tôi</div>
+            <div className="ml-7 py-3">
+              <Link href={"/profile/booked"}>Lịch đã đặt</Link>
+            </div>
+          </div>
+        </div>
       </div>
       {/* Main Content */}
       <div className="w-3/4 p-6">
@@ -88,15 +94,15 @@ const Profile = () => {
             <span>{user.address}</span>
           </div>
         </div>
-        <button onClick={handleGoToUpdate} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
-          Chỉnh sửa
-        </button>
-        <button
-          className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
-          onClick={handleLogout}
-        >
-          Đăng xuất
-        </button>
+        <div className="flex justify-between items-center mt-6">
+          <UpdateProfile />
+          <button
+            className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+            onClick={handleLogout}
+          >
+            Đăng xuất
+          </button>
+        </div>
       </div>
     </div>
   );
