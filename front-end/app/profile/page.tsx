@@ -68,7 +68,7 @@ const Profile = () => {
           <div className="mt-4">
             <div className="font-semibold">📅 Danh sách lịch của tôi</div>
             <div className="ml-7 py-3">
-              <Link href={"/profile/booked"}>Lịch đã đặt</Link>
+              <Link href={"/profile/booked-calendar"}>Lịch đã đặt</Link>
             </div>
           </div>
         </div>
@@ -92,6 +92,10 @@ const Profile = () => {
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold">Địa chỉ:</span>
             <span>{user.address}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-semibold">Vai trò:</span>
+            <span>{user.role}</span>
           </div>
         </div>
         <div className="flex justify-between items-center mt-6">

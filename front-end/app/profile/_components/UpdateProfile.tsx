@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -16,6 +17,7 @@ interface User {
   email: string;
   phone: string;
   address: string;
+  role: string;
 }
 
 export default function UpdateProfile() {
@@ -26,7 +28,9 @@ export default function UpdateProfile() {
     email: "",
     phone: "",
     address: "",
+    role: "",
   });
+  const [error, setError] = useState<string | null>(null); // State để lưu thông báo lỗi
 
   const router = useRouter();
 
@@ -48,6 +52,21 @@ export default function UpdateProfile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Kiểm tra tên
+    const nameError = validateName(formData.name);
+    if (nameError !== "Tên hợp lệ") {
+      setError(nameError);  // Hiển thị lỗi nếu tên không hợp lệ
+      return;
+    }
+    setError(null);  // Nếu tên hợp lệ, reset lỗi
+
+    // Kiểm tra số điện thoại
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Số điện thoại không hợp lệ!");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:8080/api/auth/update-user", {
         method: "POST",
@@ -88,6 +107,13 @@ export default function UpdateProfile() {
           <ModalBody>
             <form className="space-y-4">
               <Input
+                label="Email"
+                name="email"
+                value={formData.email}
+                isReadOnly
+                className="bg-gray-100 cursor-not-allowed"
+              />
+              <Input
                 label="Họ và tên"
                 name="name"
                 value={formData.name}
@@ -109,12 +135,14 @@ export default function UpdateProfile() {
                 isRequired
               />
               <Input
-                label="Email"
-                name="email"
-                value={formData.email}
-                isReadOnly
-                className="bg-gray-100 cursor-not-allowed"
+                label="Vai trò"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
               />
+
+              {/* Hiển thị thông báo lỗi tên nếu có */}
+              {error && <p className="text-red-500">{error}</p>}
             </form>
           </ModalBody>
           <ModalFooter className="flex justify-end">
@@ -126,4 +154,18 @@ export default function UpdateProfile() {
       </Modal>
     </>
   );
+}
+
+function validateName(name: string): string {
+  // Kiểm tra tên không được rỗng
+  if (name.trim() === '') {
+    return "Tên không được để trống";
+  }
+
+  // Kiểm tra tên không phải là số
+  if (!isNaN(Number(name))) {
+    return "Tên không được là chữ số";
+  }
+
+  return "Tên hợp lệ";
 }

@@ -131,6 +131,25 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/update-role")
+    public ResponseEntity<?> updateRole(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String role = request.get("role");
+        String name = request.get("name");
+        try {
+            User updatedUser = userService.updateRole(email, role);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("role", updatedUser.getRole());
+            response.put("name", name);
+            response.put("email", email);
+            return ResponseEntity.ok(response);
+        } catch (EntityIdNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/update-password")
     public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");

@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -14,7 +14,7 @@ const SignIn = () => {
     resetPassword: "",
   });
 
-  console.log("formData", formData);
+  const [error, setError] = useState<string | null>(null); // Thêm state để chứa lỗi
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,6 +22,20 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Kiểm tra tên
+    const nameError = validateName(formData.name);
+    if (nameError !== "Tên hợp lệ") {
+      setError(nameError);  // Hiển thị lỗi
+      return;
+    }
+    setError(null);  // Nếu tên hợp lệ, xóa lỗi
+
+    // Kiểm tra số điện thoại
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Số điện thoại không hợp lệ!");
+      return;
+    }
 
     // Kiểm tra nếu mật khẩu không khớp
     if (formData.password !== formData.resetPassword) {
@@ -71,6 +85,7 @@ const SignIn = () => {
               </p>
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center">
+                  {/* Input Fields */}
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
                     <input
                       type="text"
@@ -83,7 +98,7 @@ const SignIn = () => {
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
                     <input
-                      type="text"
+                      type="email"
                       name="email"
                       placeholder="Email"
                       onChange={handleChange}
@@ -131,6 +146,8 @@ const SignIn = () => {
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
+                  {/* Hiển thị thông báo lỗi nếu có */}
+                  {error && <p className="text-red-500">{error}</p>}
                   <button
                     type="submit"
                     className="border-2 border-primary rounded-full px-12 py-2 inline-block font-semibold hover:bg-primary hover:text-white"
@@ -162,5 +179,19 @@ const SignIn = () => {
     </div>
   );
 };
+
+function validateName(name: string): string {
+  // Kiểm tra tên không được rỗng
+  if (name.trim() === '') {
+    return "Tên không được để trống";
+  }
+
+  // Kiểm tra tên không phải là số
+  if (!isNaN(Number(name))) {
+    return "Tên không được là chữ số";
+  }
+
+  return "Tên hợp lệ";
+}
 
 export default SignIn;

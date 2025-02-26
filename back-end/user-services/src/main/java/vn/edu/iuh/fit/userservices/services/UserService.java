@@ -69,6 +69,19 @@ public class UserService {
             user.setName(userDTO.getName());
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
+            user.setRole(userDTO.getRole());
+            return userRepository.save(user);
+        } else {
+            throw new EntityIdNotFoundException("User không tồn tại");
+        }
+    }
+
+    public User updateRole(String email, String role) throws EntityIdNotFoundException {
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            user.setRole("ADMIN");
 
             return userRepository.save(user);
         } else {
@@ -94,6 +107,4 @@ public class UserService {
             throw new EntityIdNotFoundException("User không tồn tại");
         }
     }
-
-
 }
