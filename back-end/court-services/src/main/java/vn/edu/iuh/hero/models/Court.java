@@ -44,6 +44,7 @@ public class Court {
     @Column(name = "user_id")
     private Long userID;
     private double price;
+    private String utilities;
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference

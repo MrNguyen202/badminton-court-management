@@ -7,6 +7,7 @@ import courtImage from "../../public/football-field.gif";
 import calenderImage from "../../public/calendar.gif";
 import utilityImage from "../../public/utility.gif";
 import { getAllCourt } from "../api/court-services/courtAPI";
+import Footer from "../_components/Footer";
 
 type Court = {
   id: number;
@@ -21,7 +22,8 @@ type Court = {
   images: Image[] | null;
   courtSchedules: string[] | null;
   rating: number;
-  district: number;
+  district: string;
+  utilities: string;
 };
 
 type Image = {
@@ -66,7 +68,7 @@ function BadmintonCourtList() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div className="p-6 max-w-full mx-auto flex flex-col items-center">
+    <div className="p-6 max-w-full mx-auto flex flex-col ">
       <div className="flex w-full">
         <div className="w-1/5 p-4 border-r">
           <h2 className="text-lg font-bold mb-2">Bộ lọc</h2>
@@ -122,13 +124,13 @@ function BadmintonCourtList() {
                     ({court.numberOfCourts})
                   </p>
                 </div>
-                <div className="flex">
+                <div className="flex items-center">
                   <img src={calenderImage.src} alt="location" className="w-5 h-5 mr-1" />
                   <p className="text-gray-600">Sân trống: </p>
                 </div>
-                <div className="flex">
+                <div className="flex items-center">
                   <img src={utilityImage.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Tiện ích: {court.price}</p>
+                  <p className="text-gray-600">Tiện ích: {court.utilities}</p>
                 </div>
                 <button
                   className="mt-3 bg-slate-900 border-slate-900 border-1 text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition duration-500 w-full"
@@ -154,6 +156,7 @@ function BadmintonCourtList() {
           )}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }
