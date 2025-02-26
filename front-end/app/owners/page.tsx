@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import SignUpAdmin from "./_components/SignUpAdmin";
+import RecommendedItem from "../_components/RecommendedItem";
+import Footer from "../_components/Footer";
 
 type User = {
   firstName: string;
@@ -52,7 +54,9 @@ function AdminPage() {
       <div className="text-center mt-10">
         <h1 className="text-2xl font-bold">Bạn không phải Admin</h1>
         <p className="mt-2">Bạn cần đăng ký làm Admin để truy cập trang này.</p>
-        <div className="mt-2"><SignUpAdmin /></div>
+        <div className="mt-2 mb-20"><SignUpAdmin /></div>
+        <RecommendedItem/>
+        <Footer/>
       </div>
     );
   }
