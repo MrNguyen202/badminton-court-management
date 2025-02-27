@@ -36,7 +36,7 @@ public class CourtController {
     @Autowired
     private AddressServiceImpl addressService;
 
-    @GetMapping("/all")
+    @GetMapping("/get-courts")
     public ResponseEntity<?> getAllCourts() {
         return ResponseEntity.ok(courtService.findAll());
     }
@@ -46,17 +46,22 @@ public class CourtController {
         return ResponseEntity.ok(courtService.save(court));
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-court")
     public ResponseEntity<Court> updateCourt(@RequestBody Court court) {
         return ResponseEntity.ok(courtService.save(court));
     }
 
-    @GetMapping("/owner/{id}")
+    @PutMapping("/delete-court/{id}")
+    public ResponseEntity<?> deleteCourt(@PathVariable Long id) {
+        return ResponseEntity.ok(courtService.delete(id));
+    }
+
+    @GetMapping("/get-by-user/{id}")
     public ResponseEntity<?> getCourtById(@PathVariable Long id) {
         return ResponseEntity.ok(courtService.getCourtByUserID(id));
     }
 
-    @PostMapping("/createCourt")
+    @PostMapping("/create-court")
     public ResponseEntity<?> createCourt(@RequestBody CourtDTO courtDTO) {
         try {
             // 1. Lấy address từ DTO
