@@ -76,11 +76,14 @@ public class UserService {
         }
     }
 
-    public User updateRole(String email, String role) throws EntityIdNotFoundException {
-        Optional<User> existingUser = userRepository.findByEmail(email);
+    public User updateRole(UserDTO userDTO) throws EntityIdNotFoundException {
+        Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
 
         if (existingUser.isPresent()) {
             User user = existingUser.get();
+            user.setName(userDTO.getName());
+            user.setPhone(userDTO.getPhone());
+            user.setAddress(userDTO.getAddress());
             user.setRole("ADMIN");
 
             return userRepository.save(user);

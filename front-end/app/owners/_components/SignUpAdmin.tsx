@@ -12,16 +12,21 @@ import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
 
 interface RoleUser {
-  email: string;
   name: string;
+  email: string;
+  phone: string;
+  address: string;
   role: string;
 }
+
 function SignUpAdmin() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<RoleUser | null>(null);
   const [formData, setFormData] = useState({
-    email: "",
     name: "",
+    email: "",
+    phone: "",
+    address: "",
     role: "",
   });
 
@@ -31,12 +36,8 @@ function SignUpAdmin() {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const userData = JSON.parse(storedUser);
-      setFormData((prev) => ({
-        ...prev,
-        email: userData.email,
-        name: userData.name,
-        role: userData.role,
-      }));
+      setUser(userData);
+      setFormData(userData);
     } else {
       alert("Vui lòng đăng nhập trước!");
       router.push("/sign-in");
@@ -61,11 +62,7 @@ function SignUpAdmin() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            name: formData.name,
-            role: formData.role,
-          }),
+          body: JSON.stringify(formData),
         }
       );
 
