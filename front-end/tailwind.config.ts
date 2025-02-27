@@ -8,7 +8,7 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@heroui/theme/dist/components/scroll-shadow.js"
+    "./node_modules/@heroui/theme/dist/components/(modal|scroll-shadow).js"
   ],
   theme: {
     extend: {

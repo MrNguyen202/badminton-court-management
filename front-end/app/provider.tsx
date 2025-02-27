@@ -1,6 +1,6 @@
 "use client";
 import { NextUIProvider } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./_components/Header";
 import ChatWidget from "./_components/ChatBot/ChatWidget";
 

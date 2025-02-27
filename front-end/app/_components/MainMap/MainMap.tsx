@@ -4,7 +4,7 @@ import React from "react";
 
 function MainMap() {
   return (
-    <div>
+    <div className="pb-20 px-8 pt-20">
       <div className="grid grid-cols-1 md:grid-cols-3">
         <div className="">
           <MapAddress />

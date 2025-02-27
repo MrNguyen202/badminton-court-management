@@ -32,20 +32,39 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        formData
-      );
+      const response = await axios.post("http://localhost:8080/api/auth/login", formData);
+  
       if (response.data.status === "success") {
-        localStorage.setItem("user", JSON.stringify(response.data));
-        setUser(response.data);
-        alert(`Chào mừng ${response.data.email}!`);
-        router.push("/dashboard");
+        const token = response.data.token;
+  
+        if (!token) {
+          alert("Token không tồn tại. Kiểm tra lại API login!");
+          return;
+        }
+  
+        localStorage.setItem("token", token);
+    
+        // Lấy thông tin user với token
+        const userInfoResponse = await axios.get("http://localhost:8080/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` }, // Đính kèm token
+        });
+
+        const userData = userInfoResponse.data;
+        localStorage.setItem("user", JSON.stringify(userData)); 
+        setUser(userData);
+    
+        alert(`Chào mừng ${userData.email}!`);
+        router.push("/");
+        setTimeout(() => window.location.reload(), 500);
       }
     } catch (error) {
-      alert("Đăng nhập thất bại! Kiểm tra lại thông tin đăng nhập.");
+      console.error("Lỗi đăng nhập:", error);
+      alert("Đăng nhập thất bại! Kiểm tra lại thông tin.");
     }
   };
+  
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">

@@ -1,17 +1,20 @@
-"use client";
+"use client"
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Image from "next/image";
 
 const SignIn = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
+    phone: "",
+    address: "",
     password: "",
     resetPassword: "",
   });
+
+  const [error, setError] = useState<string | null>(null); // Thêm state để chứa lỗi
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,28 +22,44 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Kiểm tra tên
+    const nameError = validateName(formData.name);
+    if (nameError !== "Tên hợp lệ") {
+      setError(nameError);  // Hiển thị lỗi
+      return;
+    }
+    setError(null);  // Nếu tên hợp lệ, xóa lỗi
+
+    // Kiểm tra số điện thoại
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Số điện thoại không hợp lệ!");
+      return;
+    }
+
     // Kiểm tra nếu mật khẩu không khớp
     if (formData.password !== formData.resetPassword) {
       alert("Mật khẩu không khớp!");
       return;
     }
-  
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/register",
-        { 
-          username: formData.username,
+        {
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }
       );
       alert(response.data); // Hiển thị thông báo thành công
+      router.push("/sign-in");
     } catch (error) {
       alert("Đăng ký thất bại!"); // Hiển thị thông báo lỗi
     }
   };
-  
 
   // Xử lý điều hướng đến trang đăng ký
   const handleSignInClick = () => {
@@ -56,45 +75,28 @@ const SignIn = () => {
             <div className="text-left font-bold">
               <span className="text-primary">B</span>T
             </div>
-            <div className="py-10">
+            <div className="py-5">
               <h2 className="text-3xl font-bold text-primary">Đăng kí</h2>
-              <div className="border-2 w-10 border-green-500 inline-block mb-2"></div>
-              <div className="flex justify-center my-2">
-                <button className="mx-2">
-                  <Image
-                    src="/facebook.png"
-                    width={50}
-                    height={50}
-                    alt="facebook"
-                  />
-                </button>
-                <button className="mx-2">
-                  <Image src="/IN.png" width={50} height={50} alt="IN" />
-                </button>
-                <button className="mx-2">
-                  <Image src="/G.png" width={50} height={50} alt="G" />
-                </button>
-              </div>
+              <div className="border-2 w-10 border-green-500 inline-block"></div>
 
               {/* login */}
-              <p className="text-gray-400 my-3">
+              <p className="text-gray-400 mb-2">
                 Hãy điền vào các thông tin dưới đây
               </p>
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center">
+                  {/* Input Fields */}
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image src="/user.png" width={30} height={30} alt="mail" />
                     <input
-                      type="username"
-                      name="username"
-                      placeholder="UserName"
+                      type="text"
+                      name="name"
+                      placeholder="Name"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image src="/mail.png" width={30} height={30} alt="mail" />
                     <input
                       type="email"
                       name="email"
@@ -105,12 +107,26 @@ const SignIn = () => {
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image
-                      src="/lock.png"
-                      width={30}
-                      height={30}
-                      alt="password"
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Phone"
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
+                  </div>
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Address"
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
+                    />
+                  </div>
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
                     <input
                       type="password"
                       name="password"
@@ -121,12 +137,6 @@ const SignIn = () => {
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <Image
-                      src="/reset-password.png"
-                      width={30}
-                      height={30}
-                      alt="password"
-                    />
                     <input
                       type="password"
                       name="resetPassword"
@@ -136,6 +146,8 @@ const SignIn = () => {
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
+                  {/* Hiển thị thông báo lỗi nếu có */}
+                  {error && <p className="text-red-500">{error}</p>}
                   <button
                     type="submit"
                     className="border-2 border-primary rounded-full px-12 py-2 inline-block font-semibold hover:bg-primary hover:text-white"
@@ -151,10 +163,9 @@ const SignIn = () => {
           <div className="w-2/5 bg-primary text-white rounded-tr-2xl rounded-br-2xl py-36 px-12">
             <h2 className="text-3xl font-bold mb-2">Chào bạn!</h2>
             <div className="border-2 w-10 border-white inline-block mb-2"></div>
-            <p className="mb-10">
-              Chào mừng đến với BT.
-              <p>Đăng ký ngay để chơi cùng mọi người nhé.</p>
-            </p>
+            <p>Chào mừng đến với BT.</p>
+
+            <p className="mb-10">Đăng ký ngay để chơi cùng mọi người nhé.</p>
 
             <button
               onClick={handleSignInClick}
@@ -168,5 +179,19 @@ const SignIn = () => {
     </div>
   );
 };
+
+function validateName(name: string): string {
+  // Kiểm tra tên không được rỗng
+  if (name.trim() === '') {
+    return "Tên không được để trống";
+  }
+
+  // Kiểm tra tên không phải là số
+  if (!isNaN(Number(name))) {
+    return "Tên không được là chữ số";
+  }
+
+  return "Tên hợp lệ";
+}
 
 export default SignIn;
