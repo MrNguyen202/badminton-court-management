@@ -13,6 +13,7 @@ package vn.edu.iuh.hero.models;
  *
  */
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -34,7 +35,6 @@ public class Court {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String address;
     private String phone;
     private String description;
     @Column(name = "number_of_courts")
@@ -43,13 +43,22 @@ public class Court {
     private CourtStatus status;
     @Column(name = "user_id")
     private Long userID;
-    private double price;
     private String utilities;
+    private String linkWeb;
+    private String linkMap;
+    private String openTime;
+    private String closeTime;
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
     private Set<Image> images;
 
     @OneToMany(mappedBy = "court")
+    @JsonManagedReference
     private Set<CourtSchedule> courtSchedules;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    @JsonManagedReference
+    private Address address;
 }

@@ -8,4 +8,5 @@ public interface IServices<T, P> {
     T save(T t);
     T delete(P p);
     T update(T t);
+
 }

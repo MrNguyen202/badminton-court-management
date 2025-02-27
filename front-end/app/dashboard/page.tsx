@@ -6,13 +6,13 @@ import location from "../../public/location.png";
 import courtImage from "../../public/football-field.gif";
 import calenderImage from "../../public/calendar.gif";
 import utilityImage from "../../public/utility.gif";
-import { getAllCourt } from "../api/court-services/courtAPI";
+import { courtApi } from "../api/court-services/courtAPI";
 import Footer from "../_components/Footer";
 
 type Court = {
   id: number;
   name: string;
-  address: string;
+  address: Address;
   phone: string;
   description: string;
   numberOfCourts: number;
@@ -32,6 +32,13 @@ type Image = {
   courtID: number;
 }
 
+type Address = {
+  province: number;
+  district: number;
+  ward: number;
+  specificAddress: string;
+}
+
 function BadmintonCourtList() {
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [filter, setFilter] = useState("");
@@ -43,7 +50,7 @@ function BadmintonCourtList() {
 
   //get all courts tu api
   useEffect(() => {
-    getAllCourt().then((data) => setCourts(data));
+    courtApi.getAllCourt().then((data) => setCourts(data));
   }, []);
 
   const handleBooking = (court: Court) => {
@@ -106,10 +113,10 @@ function BadmintonCourtList() {
             {currentCourts.map((court) => (
               <div key={court.id} className="border p-4 rounded-lg shadow-md bg-white">
                 <img src={court.images && court.images[0] ? court.images[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
-                <h2 className="text-lg font-semibold mb-4">{court.name}</h2>
+                <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Khu vực: {court.address}</p>
+                  <p className="text-gray-600">Khu vực: {court.address.district} - {court.address.province}</p>
                 </div>
                 <div className="flex justify-between">
                   <div className="flex items-center">
@@ -130,7 +137,7 @@ function BadmintonCourtList() {
                 </div>
                 <div className="flex items-center">
                   <img src={utilityImage.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Tiện ích: {court.utilities}</p>
+                  <p className="text-gray-600 truncate pr-4">Tiện ích: {court.utilities}</p>
                 </div>
                 <button
                   className="mt-3 bg-slate-900 border-slate-900 border-1 text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition duration-500 w-full"

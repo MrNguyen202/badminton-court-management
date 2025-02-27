@@ -59,4 +59,9 @@ public class CourtServiceImpl implements IServices<Court, Long> {
         return courtRepository.save(court);
     }
 
+
+    public Iterable<Court> getCourtByUserID(Long aLong) {
+        return courtRepository.getCourtByUserID(aLong);
+    }
+
 }
