@@ -20,7 +20,9 @@ import vn.edu.iuh.hero.models.Court;
 import vn.edu.iuh.hero.repositories.CourtRepository;
 import vn.edu.iuh.hero.services.IServices;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 public class CourtServiceImpl implements IServices<Court, Long> {
@@ -61,7 +63,13 @@ public class CourtServiceImpl implements IServices<Court, Long> {
 
 
     public Iterable<Court> getCourtByUserID(Long aLong) {
-        return courtRepository.getCourtByUserID(aLong);
+        Iterable<Court> courts = courtRepository.getCourtByUserID(aLong);
+        if (courts == null) {
+            return Collections.emptyList();
+        }
+        return StreamSupport.stream(courts.spliterator(), false)
+                .filter(court -> court.getStatus() == CourtStatus.OPEN)
+                .toList();
     }
 
 }
