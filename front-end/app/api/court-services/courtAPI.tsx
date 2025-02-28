@@ -23,7 +23,7 @@ export const courtApi = {
 
     // Delete sân
     deleteCourt: async (courtID: number) => {
-        const response = await axios.delete(`${API_BASE_URL}/delete-court/${courtID}`);
+        const response = await axios.put(`${API_BASE_URL}/delete-court/${courtID}`);
         return response.data;
     }
 };
