@@ -56,9 +56,19 @@ public class CourtController {
         return ResponseEntity.ok(courtService.delete(id));
     }
 
-    @GetMapping("/get-by-user/{id}")
-    public ResponseEntity<?> getCourtById(@PathVariable Long id) {
+    @GetMapping("/get-courts-user/{id}")
+    public ResponseEntity<?> getCourtByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(courtService.getCourtByUserID(id));
+    }
+
+    @GetMapping("/get-court/{id}")
+    public ResponseEntity<?> getCourtById(@PathVariable Long id) {
+        Optional<Court> court = courtService.findById(id);
+        if (court.isPresent()) {
+            return ResponseEntity.ok(court.get());
+        } else {
+            return ResponseEntity.badRequest().body("Court not found");
+        }
     }
 
     @PostMapping("/create-court")

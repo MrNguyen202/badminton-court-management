@@ -11,7 +11,7 @@ export const courtApi = {
 
     // Lấy sân theo userID
     getCourtByUserID: async (userID: number) => {
-        const response = await axios.get(`${API_BASE_URL}/get-by-user/${userID}`);
+        const response = await axios.get(`${API_BASE_URL}/get-courts-user/${userID}`);
         return response.data;
     },
 
@@ -25,5 +25,11 @@ export const courtApi = {
     deleteCourt: async (courtID: number) => {
         const response = await axios.put(`${API_BASE_URL}/delete-court/${courtID}`);
         return response.data;
-    }
+    },
+
+    //Lấy sân theo id
+    getCourtById: async (courtID: number) => {
+        const response = await axios.get(`${API_BASE_URL}/get-court/${courtID}`);
+        return response.data;
+    },
 };

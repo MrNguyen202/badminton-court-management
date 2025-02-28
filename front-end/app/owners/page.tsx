@@ -33,7 +33,6 @@ type Court = {
   numberOfCourts: number;
   status: string;
   userID: number;
-  price: string;
   images: Image[] | null;
   courtSchedules: string[] | null;
   rating: number;
@@ -217,8 +216,7 @@ function AdminPage() {
 
   // Hàm xử lý xem chi tiết (có thể mở modal hoặc chuyển trang)
   const handleViewDetails = (court: Court) => {
-    console.log("Xem chi tiết sân:", court);
-    // Có thể mở modal hoặc chuyển hướng tới trang chi tiết
+    router.push(`/owners/court-detail?courtID=${court.id}`);
   };
 
   // Hàm xử lý sửa (có thể mở form chỉnh sửa)
