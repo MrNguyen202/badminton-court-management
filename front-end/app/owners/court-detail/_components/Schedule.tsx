@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { scheduleApi } from "../../../api/court-services/scheduleAPI";
 import { getNextSevenDay } from "../_helps/OwnWeekTime";
+import editImage from "../../../../public/pencil-edit-02-stroke-rounded.svg";
+import addImage from "../../../../public/add-circle-stroke-rounded.svg";
+import deleteImage from "../../../../public/delete-02-stroke-rounded.svg";
+import AddScheduleSmart from "../_components/AddScheduleSmart";
 
 type CourtSchedule = {
     id: number;
@@ -11,12 +15,12 @@ type CourtSchedule = {
     indexCourt: number;
     price: number;
     status: string;
-}
+};
 
 function Schedule({ courtID }: { courtID: number }) {
-    const [schedule, setSchedule] = useState<Record<string, CourtSchedule[]>>({});
-    const [loading, setLoading] = useState(false);
+    const [schedule, setSchedule] = useState<Record<number, Record<string, CourtSchedule[]>>>({});
     const [timeFrame, setTimeFrame] = useState(new Date() > new Date(new Date().setHours(12, 0, 0, 0)) ? 'afternoon' : 'morning');
+    const [selectedCourt, setSelectedCourt] = useState<number | null>(null);
 
     // Date
     const [date, setDate] = useState(new Date());
@@ -39,6 +43,11 @@ function Schedule({ courtID }: { courtID: number }) {
                 if (!courtID) return;
                 const response = await scheduleApi.getScheduleByCourtId(courtID, date);
                 setSchedule(response);
+                // Đặt sân đầu tiên làm mặc định khi có dữ liệu
+                const courts = Object.keys(response).map(Number);
+                if (courts.length > 0 && selectedCourt === null) {
+                    setSelectedCourt(courts[0]);
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy danh lịch đặt:", error);
                 setSchedule({});
@@ -61,14 +70,42 @@ function Schedule({ courtID }: { courtID: number }) {
 
     const sevenDays = getSevenDays(date);
 
+    // Lấy danh sách các sân duy nhất
+    const courts = Object.keys(schedule).map(Number);
+
     return (
         <div className="w-full">
-            <h1 className="text-3xl font-bold mt-6">Lịch đặt sân</h1>
+            <div className="w-full flex items-center justify-between mt-6">
+                <div className="flex items-center">
+                    <h1 className="text-3xl font-bold">Lịch đặt sân</h1>
+                    {/* Render danh sách sân */}
+                    <div className="flex space-x-4 ml-4">
+                        {courts.map((courtNumber) => (
+                            <button
+                                key={courtNumber}
+                                onClick={() => setSelectedCourt(courtNumber)}
+                                className={`px-4 py-2 border rounded-lg shadow-md transition-all duration-200 ${selectedCourt === courtNumber
+                                    ? 'bg-slate-900 text-white border-primary-500'
+                                    : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-100'
+                                    }`}
+                            >
+                                <span className="text-lg font-semibold">Sân {courtNumber}</span>
+                            </button>
+                        ))}
+                        {courts.length === 0 && (
+                            <span className="text-lg text-gray-500 py-3">Không có dữ liệu sân</span>
+                        )}
+                    </div>
+                </div>
+                {JSON.parse(localStorage.getItem("user") || '{}')?.role === 'ADMIN' && (
+                    <AddScheduleSmart courtID={courtID}/>
+                )}
+            </div>
             <div className="w-full">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center justify-between px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-lg h-14 w-1/3 my-4">
                         <button
-                            className="text-xl font-bold text-white bg-green-600 hover:bg-green-700 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200"
+                            className="text-xl font-bold text-white bg-slate-700 hover:bg-slate-900 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200"
                             onClick={handlePrevWeek}
                         >
                             {'<'}
@@ -84,7 +121,7 @@ function Schedule({ courtID }: { courtID: number }) {
                             </span>
                         </div>
                         <button
-                            className="text-xl font-bold text-white bg-green-600 hover:bg-green-700 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200"
+                            className="text-xl font-bold text-white bg-slate-700 hover:bg-slate-900 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200"
                             onClick={handleNextDay}
                         >
                             {'>'}
@@ -101,29 +138,48 @@ function Schedule({ courtID }: { courtID: number }) {
                         </div>
                         <div className="flex items-center space-x-3">
                             <span className="bg-yellow-600 w-8 h-8"></span>
-                            <span>Quá hạn</span></div>
+                            <span>Quá hạn</span>
+                        </div>
                         <div className="flex items-center space-x-3">
                             <span className="bg-slate-500 w-8 h-8"></span>
                             <span>Tạm ngưng</span>
                         </div>
                     </div>
                     <div className="flex justify-between items-center">
-                        <button onClick={() => setTimeFrame('morning')} className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === 'morning' ? 'bg-primary-500 text-white' : null}`}>Khung sáng</button>
-                        <button onClick={() => setTimeFrame('afternoon')} className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === 'afternoon' ? 'bg-primary-500 text-white' : null}`}>Khung chiều</button>
+                        <button
+                            onClick={() => setTimeFrame('morning')}
+                            className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === 'morning' ? 'bg-primary-500 text-white' : null}`}
+                        >
+                            Khung sáng
+                        </button>
+                        <button
+                            onClick={() => setTimeFrame('afternoon')}
+                            className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === 'afternoon' ? 'bg-primary-500 text-white' : null}`}
+                        >
+                            Khung chiều
+                        </button>
                     </div>
                 </div>
             </div>
             <div className="w-full mt-2 bg-white rounded-lg shadow-lg py-3">
                 {sevenDays.map((day, index) => {
-                    const keyDate = day.toISOString().split('T')[0]; 
-                    const daySchedules = schedule[keyDate] || [];
+                    const keyDate = day.toISOString().split('T')[0];
+                    // Lấy tất cả lịch của các sân cho ngày hiện tại
+                    const daySchedules = courts
+                        .map(court => schedule[court]?.[keyDate] || [])
+                        .flat();
                     const filteredSchedules = timeFrame === 'morning'
                         ? daySchedules.filter(item => item.fromHour < '12:00')
                         : daySchedules.filter(item => item.fromHour >= '12:00');
 
+                    // Lọc theo sân được chọn nếu có
+                    const courtFilteredSchedules = selectedCourt !== null
+                        ? filteredSchedules.filter(item => item.indexCourt === selectedCourt)
+                        : filteredSchedules;
+
                     return (
-                        <div key={index} className="flex items-center justify-between w-full py-1">
-                            <div className="rounded-lg ml-2 w-1/12 justify-center items-center flex">
+                        <div key={index} className="flex items-center justify-between w-full py-3">
+                            <div className="rounded-lg ml-2 w-1/12 justify-evenly items-center flex">
                                 <div className={`text-center py-3 w-1/2 rounded-lg border-1 border-primary-500 ${day.toDateString() === new Date().toDateString() ? 'bg-primary-500' : null}`}>
                                     <span className={`text-lg font-bold ${day.toDateString() === new Date().toDateString() ? 'text-white' : 'text-black'}`}>
                                         {daysOfWeek[day.getDay()]}
@@ -132,17 +188,42 @@ function Schedule({ courtID }: { courtID: number }) {
                                         {day.getDate()}/{day.getMonth() + 1}
                                     </span>
                                 </div>
+                                {JSON.parse(localStorage.getItem("user") || '{}')?.role === 'ADMIN' && (
+                                    <button>
+                                        <img src={editImage.src} alt="Edit" />
+                                    </button>
+                                )}
                             </div>
-                            <div className="flex w-11/12 space-x-2 pl-2">
-                                {filteredSchedules.length > 0 ? (
-                                    filteredSchedules.map((item: CourtSchedule, idx: number) => (
-                                        <button key={idx} className="flex-col items-center justify-evenly p-2 px-3 border-b bg-primary-50 rounded-lg hover:bg-primary-100">
-                                            <span className="text-lg font-bold text-gray-900">{item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}</span>
-                                            <span className="block text-lg text-gray-500 text-center">{item.price}k/h</span>
+                            <div className="flex w-11/12 space-x-5 pl-2 items-center">
+                                {courtFilteredSchedules.length > 0 ? (
+                                    courtFilteredSchedules.map((item: CourtSchedule, idx: number) => (
+                                        <button
+                                            key={idx}
+                                            className="relative flex-col items-center justify-evenly p-2 px-3 border-b bg-primary-50 rounded-lg hover:bg-primary-100"
+                                        >
+                                            <span className="text-lg font-bold text-gray-900">
+                                                {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}
+                                            </span>
+                                            <span className="block text-lg text-gray-500 text-center">
+                                                {item.price}k/h
+                                            </span>
+                                            {JSON.parse(localStorage.getItem("user") || '{}')?.role === 'ADMIN' && (
+                                                <div
+                                                    className="absolute -top-2 -right-2 cursor-pointer"
+                                                    onClick={() => alert("Xóa lịch")}
+                                                >
+                                                    <img src={deleteImage.src} alt="Delete" />
+                                                </div>
+                                            )}
                                         </button>
                                     ))
                                 ) : (
                                     <div className="text-lg font-semibold text-gray-500">Không có lịch</div>
+                                )}
+                                {JSON.parse(localStorage.getItem("user") || '{}')?.role === 'ADMIN' && (
+                                    <div className="flex items-center justify-center p-2 px-3 border-b bg-primary-50 rounded-lg hover:bg-primary-100">
+                                        <img src={addImage.src} alt="Add" />
+                                    </div>
                                 )}
                             </div>
                         </div>

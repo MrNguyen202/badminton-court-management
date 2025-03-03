@@ -35,6 +35,7 @@ public class CourtController {
 
     @Autowired
     private AddressServiceImpl addressService;
+    private Long id;
 
     @GetMapping("/get-courts")
     public ResponseEntity<?> getAllCourts() {
@@ -105,5 +106,10 @@ public class CourtController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Create court failed");
         }
+    }
+
+    @GetMapping("/get-number-of-courts/{courtId}")
+    public ResponseEntity<?> getNumberOfCourtByCourtId(@PathVariable Long courtId) {
+        return ResponseEntity.ok(courtService.getNumberOfCourts(courtId));
     }
 }

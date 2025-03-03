@@ -32,4 +32,9 @@ export const courtApi = {
         const response = await axios.get(`${API_BASE_URL}/get-court/${courtID}`);
         return response.data;
     },
+    // Lấy số lượng sân
+    getNumberOfCourts: async (courtID: number) => {
+        const response = await axios.get(`${API_BASE_URL}/get-number-of-courts/${courtID}`);
+        return response.data;
+    }
 };

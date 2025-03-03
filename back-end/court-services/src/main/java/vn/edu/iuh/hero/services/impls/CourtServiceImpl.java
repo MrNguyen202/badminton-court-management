@@ -15,6 +15,7 @@ package vn.edu.iuh.hero.services.impls;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.iuh.hero.dtos.CourtDTO;
 import vn.edu.iuh.hero.enums.CourtStatus;
 import vn.edu.iuh.hero.models.Court;
 import vn.edu.iuh.hero.repositories.CourtRepository;
@@ -37,7 +38,7 @@ public class CourtServiceImpl implements IServices<Court, Long> {
 
     @Override
     public Optional<Court> findById(Long aLong) {
-        return courtRepository.findById(aLong).or(() -> Optional.empty());
+        return courtRepository.findById(aLong);
     }
 
     @Override
@@ -48,12 +49,8 @@ public class CourtServiceImpl implements IServices<Court, Long> {
     @Override
     public Court delete(Long aLong) {
         Court court = courtRepository.findById(aLong).get();
-        if (court != null) {
-            court.setStatus(CourtStatus.CLOSE);
-            return courtRepository.save(court);
-        } else {
-            return null;
-        }
+        court.setStatus(CourtStatus.CLOSE);
+        return courtRepository.save(court);
     }
 
     @Override
@@ -72,4 +69,8 @@ public class CourtServiceImpl implements IServices<Court, Long> {
                 .toList();
     }
 
+    public Integer getNumberOfCourts(Long courtId) {
+        Optional<Court> court = courtRepository.findById(courtId);
+        return court.map(value -> value.getNumberOfCourts()).orElse(0);
+    }
 }

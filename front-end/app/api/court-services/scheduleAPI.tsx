@@ -23,4 +23,15 @@ export const scheduleApi = {
             throw error; // Ném lỗi để xử lý ở nơi gọi API
         }
     },
+
+    // Tạo lịch sân mới
+    createSchedule: async (scheduleData: any) => {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/create-schedule`, scheduleData);
+            return response.data;
+        } catch (error) {
+            console.error("Error creating court schedule:", error);
+            throw error;
+        }
+    },
 };

@@ -62,5 +62,6 @@ public class Court {
     @OneToOne
     @JoinColumn(name = "address_id")
     @JsonManagedReference
+    @ToString.Exclude
     private Address address;
 }
