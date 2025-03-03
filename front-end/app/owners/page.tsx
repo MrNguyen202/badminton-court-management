@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import SignUpAdmin from "./_components/SignUpAdmin";
 import RecommendedItem from "../_components/RecommendedItem";
 import Footer from "../_components/Footer";
@@ -92,7 +91,9 @@ function AdminPage() {
       }
     };
     fetchCourts();
-  }, [user]);
+  }, [user, router]);
+
+  console.log("user", user);
 
   //create court function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -150,25 +151,6 @@ function AdminPage() {
   // Nếu chưa đăng nhập, hiển thị thông báo
   if (!user) return <p className="text-center mt-10">Bạn chưa đăng nhập</p>;
 
-  // Nếu là USER, hiển thị nút đăng ký làm Admin
-  const handleRegisterAsAdmin = async () => {
-    try {
-      const response = await axios.put("http://localhost:8080/api/users/update-role", {
-        email: user.email,
-        role: "ADMIN",
-      });
-
-      if (response.data.success) {
-        const updatedUser = { ...user, role: "ADMIN" };
-        localStorage.setItem("user", JSON.stringify(updatedUser)); // Cập nhật localStorage
-        setUser(updatedUser); // Cập nhật state để re-render
-        alert("Bạn đã trở thành Admin!");
-      }
-    } catch (error) {
-      alert("Có lỗi xảy ra khi cập nhật quyền Admin.");
-    }
-  };
-
   // Nếu chưa là ADMIN, không cho truy cập trang
   if (user.role !== "ADMIN") {
     return (
@@ -214,7 +196,7 @@ function AdminPage() {
     }
   };
 
-  // Hàm xử lý xem chi tiết (có thể mở modal hoặc chuyển trang)
+  // Hàm xử lý xem chi tiết (chuyển trang)
   const handleViewDetails = (court: Court) => {
     router.push(`/owners/court-detail?courtID=${court.id}`);
   };

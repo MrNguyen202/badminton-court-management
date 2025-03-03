@@ -9,7 +9,8 @@ import timeImage from "../../../public/time.svg";
 import courtImage from "../../../public/football-field.gif";
 import phoneImage from "../../../public/telephone-stroke-rounded.svg";
 import websiteImage from "../../../public/internet-stroke-rounded.svg";
-
+import Schedule from "./_components/Schedule";
+import Footer from "../../_components/Footer";
 
 type User = {
     name: string;
@@ -139,6 +140,8 @@ function page() {
                     </div>
                 </div>
             </div>
+            {courtID && <Schedule courtID={Number(courtID)} />}
+            <Footer/>
         </div>
     );
 }

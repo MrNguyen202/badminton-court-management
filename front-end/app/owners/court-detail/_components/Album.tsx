@@ -111,8 +111,8 @@ function Album({ items }: { items: AlbumProps[] }) {
                         <div className="relative flex items-center justify-center w-full h-2/3 bg-slate-100">
                             {/* Hình ảnh hiện tại */}
                             <img
-                                src={items[currentIndex].src}
-                                alt={items[currentIndex].alt}
+                                src={items[currentIndex]?.src}
+                                alt={items[currentIndex]?.alt}  
                                 className="rounded-lg"
                             />
 

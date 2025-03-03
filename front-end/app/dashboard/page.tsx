@@ -8,6 +8,7 @@ import calenderImage from "../../public/calendar.gif";
 import utilityImage from "../../public/utility.gif";
 import { courtApi } from "../api/court-services/courtAPI";
 import Footer from "../_components/Footer";
+import { useRouter } from "next/navigation";
 
 type Court = {
   id: number;
@@ -40,6 +41,7 @@ type Address = {
 }
 
 function BadmintonCourtList() {
+  const router = useRouter();
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [filter, setFilter] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -55,11 +57,7 @@ function BadmintonCourtList() {
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
-    alert(`Bạn đã chọn đặt sân: ${court.name}`);
-  };
-
-  const handleViewDetails = (court: Court) => {
-    alert(`Chi tiết sân: ${court.name} - ${court.address} - Giá: ${court.price}`);
+    router.push(`/owners/court-detail?courtID=${court.id}`);
   };
 
   const filteredCourts = courts.filter((court) =>
@@ -163,7 +161,7 @@ function BadmintonCourtList() {
           )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

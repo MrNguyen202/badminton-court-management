@@ -13,24 +13,48 @@ package vn.edu.iuh.hero.models;
  *
  */
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.*;
 import vn.edu.iuh.hero.enums.Status;
+import vn.edu.iuh.hero.enums.StatusSchedule;
 
+import java.sql.Time;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "court_schedule")
 public class CourtSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate toHour;
-    private LocalDate fromHour;
+
+    @Column(name = "to_hour")
+    private Time toHour;
+
+    @Column(name = "from_hour")
+    private Time fromHour;
+
+    @Column(name = "date")
+    private LocalDate date;
+
+    @Column(name = "price")
+    private double price;
+
+    @Column(name = "index_court", nullable = false)
     private int indexCourt;
+
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(name = "status")
+    private StatusSchedule status;
 
     @ManyToOne
     @JoinColumn(name = "court_id")
+    @JsonBackReference
     private Court court;
 }

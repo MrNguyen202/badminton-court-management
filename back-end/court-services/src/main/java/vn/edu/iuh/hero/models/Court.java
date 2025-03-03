@@ -51,10 +51,12 @@ public class Court {
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
+    @ToString.Exclude
     private Set<Image> images;
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
+    @ToString.Exclude
     private Set<CourtSchedule> courtSchedules;
 
     @OneToOne
