@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import SignUpAdmin from "./_components/SignUpAdmin";
 import RecommendedItem from "../_components/RecommendedItem";
 import Footer from "../_components/Footer";
@@ -11,6 +10,8 @@ import { DistrictSelector } from "./_components/LocationComponent";
 import { WardSelector } from "./_components/LocationComponent";
 import CourtAlbumUploader from "./_components/CourtAlbumUploader";
 import { courtApi } from "../api/court-services/courtAPI";
+import noImage from "../../public/no-product-image.jpg"
+import location from "../../public/location.png";
 
 
 type User = {
@@ -31,7 +32,6 @@ type Court = {
   numberOfCourts: number;
   status: string;
   userID: number;
-  price: string;
   images: Image[] | null;
   courtSchedules: string[] | null;
   rating: number;
@@ -46,9 +46,9 @@ type Image = {
 }
 
 type Address = {
-  province: number;
-  district: number;
-  ward: number;
+  province: string;
+  district: string;
+  ward: string;
   specificAddress: string;
 }
 
@@ -59,9 +59,12 @@ function AdminPage() {
   const [yourCourts, setYourCourts] = useState<Court[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   //address
-  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
-  const [selectedWard, setSelectedWard] = useState<number | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<{ name: string | null; code: number | null }>({
+    name: null,
+    code: null,
+  });
+  const [selectedWard, setSelectedWard] = useState<string | null>(null);
 
   const [images, setImages] = useState<File[]>([]);
 
@@ -88,7 +91,9 @@ function AdminPage() {
       }
     };
     fetchCourts();
-  }, [user]);
+  }, [user, router]);
+
+  console.log("user", user);
 
   //create court function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,7 +106,7 @@ function AdminPage() {
       phone: formData.get("businessPhone"),
       address: {
         province: selectedProvince,
-        district: selectedDistrict,
+        district: selectedDistrict.name,
         ward: selectedWard,
         specificAddress: formData.get("specificAddress"),
       },
@@ -145,25 +150,6 @@ function AdminPage() {
 
   // Nếu chưa đăng nhập, hiển thị thông báo
   if (!user) return <p className="text-center mt-10">Bạn chưa đăng nhập</p>;
-
-  // Nếu là USER, hiển thị nút đăng ký làm Admin
-  const handleRegisterAsAdmin = async () => {
-    try {
-      const response = await axios.put("http://localhost:8080/api/users/update-role", {
-        email: user.email,
-        role: "ADMIN",
-      });
-
-      if (response.data.success) {
-        const updatedUser = { ...user, role: "ADMIN" };
-        localStorage.setItem("user", JSON.stringify(updatedUser)); // Cập nhật localStorage
-        setUser(updatedUser); // Cập nhật state để re-render
-        alert("Bạn đã trở thành Admin!");
-      }
-    } catch (error) {
-      alert("Có lỗi xảy ra khi cập nhật quyền Admin.");
-    }
-  };
 
   // Nếu chưa là ADMIN, không cho truy cập trang
   if (user.role !== "ADMIN") {
@@ -210,10 +196,9 @@ function AdminPage() {
     }
   };
 
-  // Hàm xử lý xem chi tiết (có thể mở modal hoặc chuyển trang)
+  // Hàm xử lý xem chi tiết (chuyển trang)
   const handleViewDetails = (court: Court) => {
-    console.log("Xem chi tiết sân:", court);
-    // Có thể mở modal hoặc chuyển hướng tới trang chi tiết
+    router.push(`/owners/court-detail?courtID=${court.id}`);
   };
 
   // Hàm xử lý sửa (có thể mở form chỉnh sửa)
@@ -258,12 +243,24 @@ function AdminPage() {
                   key={court.id}
                   className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">{court.name}</h2>
-                  <p className="text-gray-600 mb-4">
-                    {court.address.specificAddress}, {court.address.ward}, {court.address.district},{" "}
-                    {court.address.province}
-                  </p>
-                  <div className="flex justify-between gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                    <img
+                      src={court.images?.[0]?.url || noImage.src}
+                      alt={court.name}
+                      className="object-cover rounded-md"
+                    />
+                    <div className="text-left">
+                      <h2 className="text-xl font-bold text-gray-800 mb-4 ">{court.name}</h2>
+                      <div className="flex">
+                        <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
+                        <p className="text-gray-600 mb-4">
+                          {court.address.specificAddress}, {court.address.ward}, {court.address.district},{" "}
+                          {court.address.province}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between gap-2 mt-4">
                     <button
                       onClick={() => handleViewDetails(court)}
                       className="flex-1 bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-300"
@@ -461,10 +458,10 @@ function AdminPage() {
                         <ProvinceSelector onProvinceChange={setSelectedProvince} />
                       </div>
                       <div className="w-full sm:w-1/3">
-                        <DistrictSelector provinceCode={selectedProvince} onDistrictChange={setSelectedDistrict} />
+                        <DistrictSelector provinceName={selectedProvince} onDistrictChange={setSelectedDistrict} />
                       </div>
                       <div className="w-full sm:w-1/3">
-                        <WardSelector districtCode={selectedDistrict} onWardChange={setSelectedWard} />
+                        <WardSelector district={selectedDistrict} onWardChange={setSelectedWard} />
                       </div>
                     </div>
 

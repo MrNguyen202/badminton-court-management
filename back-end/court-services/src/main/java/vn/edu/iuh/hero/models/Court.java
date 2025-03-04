@@ -51,14 +51,17 @@ public class Court {
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
+    @ToString.Exclude
     private Set<Image> images;
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
+    @ToString.Exclude
     private Set<CourtSchedule> courtSchedules;
 
     @OneToOne
     @JoinColumn(name = "address_id")
     @JsonManagedReference
+    @ToString.Exclude
     private Address address;
 }

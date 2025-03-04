@@ -25,25 +25,23 @@ type Province = {
   codename: string;
 };
 
-// WardSelector
 export function WardSelector({
-  districtCode,
+  district,
   onWardChange,
 }: {
-  districtCode: number | null;
-  onWardChange: (code: number | null) => void;
+  district: { name: string | null; code: number | null }; // Nhận cả name và code
+  onWardChange: (name: string | null) => void;
 }) {
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (districtCode) {
+    if (district?.code) {
       setLoading(true);
       const fetchWards = async () => {
         try {
-          const response = await locationApi.getWardByDistrictCode(districtCode);
-          // API trả về object với thuộc tính wards
+          const response = await locationApi.getWardByDistrictCode(district.code as number);
           const wardsData = Array.isArray(response.wards) ? response.wards : [];
           setWards(wardsData);
           setLoading(false);
@@ -57,7 +55,7 @@ export function WardSelector({
     } else {
       setWards([]);
     }
-  }, [districtCode]);
+  }, [district?.code]);
 
   if (loading) return <p className="text-gray-600 text-center">Đang tải...</p>;
   if (error) return <p className="text-red-500 text-center">{error}</p>;
@@ -67,12 +65,15 @@ export function WardSelector({
       <select
         name="ward"
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        onChange={(e) => onWardChange(e.target.value ? parseInt(e.target.value, 10) : null)}
+        onChange={(e) => {
+          const selectedName = e.target.value.trim();
+          onWardChange(selectedName || null);
+        }}
         required
       >
         <option value="">-- Phường/Xã --</option>
         {wards.map((ward) => (
-          <option key={ward.code} value={ward.code}>
+          <option key={ward.code} value={ward.name}>
             {ward.name}
           </option>
         ))}
@@ -81,27 +82,31 @@ export function WardSelector({
   );
 }
 
-// DistrictSelector
 export function DistrictSelector({
-  provinceCode,
+  provinceName,
   onDistrictChange,
 }: {
-  provinceCode: number | null;
-  onDistrictChange: (code: number | null) => void;
+  provinceName: string | null;
+  onDistrictChange: (district: { name: string | null; code: number | null }) => void; // Thay đổi để truyền cả name và code
 }) {
   const [districts, setDistricts] = useState<District[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (provinceCode) {
+    if (provinceName) {
       setLoading(true);
       const fetchDistricts = async () => {
         try {
-          const response = await locationApi.getDistrictByProvinceCode(provinceCode);
-          // API trả về object với thuộc tính districts
-          const districtsData = Array.isArray(response.districts) ? response.districts : [];
-          setDistricts(districtsData);
+          const provinces = await locationApi.getAllProvince();
+          const province = provinces.find((p: { name: string; }) => p.name === provinceName);
+          const provinceCode = province?.code;
+
+          if (provinceCode) {
+            const response = await locationApi.getDistrictByProvinceCode(provinceCode);
+            const districtsData = Array.isArray(response.districts) ? response.districts : [];
+            setDistricts(districtsData);
+          }
           setLoading(false);
         } catch (err) {
           setError("Không thể tải danh sách quận/huyện. Vui lòng thử lại.");
@@ -113,7 +118,7 @@ export function DistrictSelector({
     } else {
       setDistricts([]);
     }
-  }, [provinceCode]);
+  }, [provinceName]);
 
   if (loading) return <p className="text-gray-600 text-center">Đang tải...</p>;
   if (error) return <p className="text-red-500 text-center">{error}</p>;
@@ -123,12 +128,19 @@ export function DistrictSelector({
       <select
         name="district"
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        onChange={(e) => onDistrictChange(e.target.value ? parseInt(e.target.value, 10) : null)}
+        onChange={(e) => {
+          const selectedName = e.target.value.trim();
+          const selectedDistrict = districts.find((d) => d.name === selectedName);
+          onDistrictChange({
+            name: selectedName || null,
+            code: selectedDistrict ? selectedDistrict.code : null,
+          });
+        }}
         required
       >
         <option value="">-- Quận/Huyện --</option>
         {districts.map((district) => (
-          <option key={district.code} value={district.code}>
+          <option key={district.code} value={district.name}>
             {district.name}
           </option>
         ))}
@@ -137,27 +149,24 @@ export function DistrictSelector({
   );
 }
 
-// ProvinceSelector
 export function ProvinceSelector({
   onProvinceChange,
 }: {
-  onProvinceChange: (code: number | null) => void;
+  onProvinceChange: (name: string | null) => void;
 }) {
   const [provinces, setProvinces] = useState<Province[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
         const response = await locationApi.getAllProvince();
-        // API trả về mảng trực tiếp
         const provincesData = Array.isArray(response) ? response : [];
         setProvinces(provincesData);
-        setLoading(false);
-      } catch (err) {
+      } catch {
         setError("Không thể tải danh sách tỉnh/thành. Vui lòng thử lại.");
-        setProvinces([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -172,12 +181,15 @@ export function ProvinceSelector({
       <select
         name="province"
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        onChange={(e) => onProvinceChange(e.target.value ? parseInt(e.target.value, 10) : null)}
+        onChange={(e) => {
+          const selectedName = e.target.value.trim();
+          onProvinceChange(selectedName || null);
+        }}
         required
       >
         <option value="">-- Tỉnh/Thành phố --</option>
         {provinces.map((province) => (
-          <option key={province.code} value={province.code}>
+          <option key={province.code} value={province.name}>
             {province.name}
           </option>
         ))}

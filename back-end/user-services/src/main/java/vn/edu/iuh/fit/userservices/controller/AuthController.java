@@ -137,6 +137,7 @@ public class AuthController {
             User updatedUser = userService.updateRole(userDTO);
 
             Map<String, Object> response = new HashMap<>();
+            response.put("id", updatedUser.getId());
             response.put("status", "success");
             response.put("role", updatedUser.getRole());
             response.put("name", updatedUser.getName());
