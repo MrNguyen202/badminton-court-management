@@ -21,6 +21,12 @@ function Schedule({ courtID }: { courtID: number }) {
     const [schedule, setSchedule] = useState<Record<number, Record<string, CourtSchedule[]>>>({});
     const [timeFrame, setTimeFrame] = useState(new Date() > new Date(new Date().setHours(12, 0, 0, 0)) ? 'afternoon' : 'morning');
     const [selectedCourt, setSelectedCourt] = useState<number | null>(null);
+    const [reloadTrigger, setReloadTrigger] = useState(0); // Trigger để load lại dữ liệu
+
+    // Callback để reload lịch
+    const handleScheduleAdded = () => {
+        setReloadTrigger(prev => prev + 1); // Tăng giá trị để trigger useEffect
+    };
 
     // Date
     const [date, setDate] = useState(new Date());
@@ -55,7 +61,7 @@ function Schedule({ courtID }: { courtID: number }) {
             }
         };
         fetchSchedule();
-    }, [courtID, date]);
+    }, [courtID, date, reloadTrigger]);
 
     // Hàm tạo danh sách 7 ngày từ ngày bắt đầu
     const getSevenDays = (startDate: Date) => {
@@ -98,7 +104,7 @@ function Schedule({ courtID }: { courtID: number }) {
                     </div>
                 </div>
                 {JSON.parse(localStorage.getItem("user") || '{}')?.role === 'ADMIN' && (
-                    <AddScheduleSmart courtID={courtID}/>
+                    <AddScheduleSmart courtID={courtID} onScheduleAdded={handleScheduleAdded}/>
                 )}
             </div>
             <div className="w-full">

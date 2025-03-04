@@ -17,8 +17,12 @@ import { Time } from "@internationalized/date";
 import soonImage from "../../../../public/sun-03-stroke-rounded.svg";
 import moonImage from "../../../../public/moon-02-stroke-rounded.svg";
 import { Input } from "@nextui-org/input";
+interface AddScheduleSmartProps {
+    courtID: number;
+    onScheduleAdded: () => void; // Thêm prop callback
+}
 
-function AddScheduleSmart({ courtID }: { courtID: any }) {
+function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
     const [numberOfCourt, setNumberOfCourt] = useState(0);
     const [courtId, setCourtId] = useState(courtID);
 
@@ -199,6 +203,7 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
             }
 
             alert("Thêm lịch thành công!");
+            onScheduleAdded();
             onClose();
         } catch (error) {
             console.error("Lỗi khi thêm lịch:", error);
