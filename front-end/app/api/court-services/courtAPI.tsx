@@ -5,26 +5,36 @@ const API_BASE_URL = "http://localhost:8081/api/courts";
 export const courtApi = {
     // Lấy tất cả sân
     getAllCourt: async () => {
-        const response = await axios.get(`${API_BASE_URL}/all`);
-        console.log(response.data);
+        const response = await axios.get(`${API_BASE_URL}/get-courts`);
         return response.data;
     },
 
     // Lấy sân theo userID
     getCourtByUserID: async (userID: number) => {
-        const response = await axios.get(`${API_BASE_URL}/owner/${userID}`);
+        const response = await axios.get(`${API_BASE_URL}/get-courts-user/${userID}`);
         return response.data;
     },
 
     // Tạo sân mới
     createCourt: async (courtData: any) => {
-        const response = await axios.post(`${API_BASE_URL}/createCourt`, courtData);
+        const response = await axios.post(`${API_BASE_URL}/create-court`, courtData);
         return response.data;
     },
 
-  // Delete sân
-  deleteCourt: async (courtID: number) => {
-        const response = await axios.delete(`${API_BASE_URL}/deleteCourt/${courtID}`);
+    // Delete sân
+    deleteCourt: async (courtID: number) => {
+        const response = await axios.put(`${API_BASE_URL}/delete-court/${courtID}`);
+        return response.data;
+    },
+
+    //Lấy sân theo id
+    getCourtById: async (courtID: number) => {
+        const response = await axios.get(`${API_BASE_URL}/get-court/${courtID}`);
+        return response.data;
+    },
+    // Lấy số lượng sân
+    getNumberOfCourts: async (courtID: number) => {
+        const response = await axios.get(`${API_BASE_URL}/get-number-of-courts/${courtID}`);
         return response.data;
     }
 };

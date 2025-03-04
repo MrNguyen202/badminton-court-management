@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroui/modal": "^2.2.11",
+    "@heroui/radio": "^2.3.14",
+    "@heroui/react": "^2.7.4",
     "@heroui/scroll-shadow": "^2.3.6",
     "@heroui/system": "^2.4.7",
     "@heroui/theme": "^2.4.6",

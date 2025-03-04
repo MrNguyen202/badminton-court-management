@@ -23,6 +23,7 @@ function SignUpAdmin() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<RoleUser | null>(null);
   const [formData, setFormData] = useState({
+    id: 0,
     name: "",
     email: "",
     phone: "",

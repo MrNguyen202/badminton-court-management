@@ -35,8 +35,9 @@ public class CourtController {
 
     @Autowired
     private AddressServiceImpl addressService;
+    private Long id;
 
-    @GetMapping("/all")
+    @GetMapping("/get-courts")
     public ResponseEntity<?> getAllCourts() {
         return ResponseEntity.ok(courtService.findAll());
     }
@@ -46,17 +47,32 @@ public class CourtController {
         return ResponseEntity.ok(courtService.save(court));
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-court")
     public ResponseEntity<Court> updateCourt(@RequestBody Court court) {
         return ResponseEntity.ok(courtService.save(court));
     }
 
-    @GetMapping("/owner/{id}")
-    public ResponseEntity<?> getCourtById(@PathVariable Long id) {
+    @PutMapping("/delete-court/{id}")
+    public ResponseEntity<?> deleteCourt(@PathVariable Long id) {
+        return ResponseEntity.ok(courtService.delete(id));
+    }
+
+    @GetMapping("/get-courts-user/{id}")
+    public ResponseEntity<?> getCourtByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(courtService.getCourtByUserID(id));
     }
 
-    @PostMapping("/createCourt")
+    @GetMapping("/get-court/{id}")
+    public ResponseEntity<?> getCourtById(@PathVariable Long id) {
+        Optional<Court> court = courtService.findById(id);
+        if (court.isPresent()) {
+            return ResponseEntity.ok(court.get());
+        } else {
+            return ResponseEntity.badRequest().body("Court not found");
+        }
+    }
+
+    @PostMapping("/create-court")
     public ResponseEntity<?> createCourt(@RequestBody CourtDTO courtDTO) {
         try {
             // 1. Lấy address từ DTO
@@ -90,5 +106,10 @@ public class CourtController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Create court failed");
         }
+    }
+
+    @GetMapping("/get-number-of-courts/{courtId}")
+    public ResponseEntity<?> getNumberOfCourtByCourtId(@PathVariable Long courtId) {
+        return ResponseEntity.ok(courtService.getNumberOfCourts(courtId));
     }
 }
