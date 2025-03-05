@@ -12,6 +12,7 @@ import CourtAlbumUploader from "./_components/CourtAlbumUploader";
 import { courtApi } from "../api/court-services/courtAPI";
 import noImage from "../../public/no-product-image.jpg"
 import location from "../../public/location.png";
+import AddCourt from "./court-detail/_components/AddCourt";
 
 
 type User = {
@@ -23,50 +24,57 @@ type User = {
   role: string;
 };
 
+type SubCourt = {
+  id: number;
+  subName: string;
+  type: string;
+};
+
 type Court = {
   id: number;
   name: string;
   address: Address;
   phone: string;
   description: string;
-  numberOfCourts: number;
+  numberOfSubCourts: number;
   status: string;
   userID: number;
-  images: Image[] | null;
-  courtSchedules: string[] | null;
+  imageFiles: Image[] | null;
   rating: number;
   district: string;
   utilities: string;
+  openTime: string;
+  closeTime: string;
+  linkWeb: string;
+  linkMap: string;
+  subCourts: SubCourt[] | null;
+  createDate: string;
 };
 
 type Image = {
   id: number;
   url: string;
   courtID: number;
-}
+};
 
 type Address = {
   province: string;
   district: string;
   ward: string;
   specificAddress: string;
-}
+};
 
 
 function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const [yourCourts, setYourCourts] = useState<Court[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  //address
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<{ name: string | null; code: number | null }>({
-    name: null,
-    code: null,
-  });
-  const [selectedWard, setSelectedWard] = useState<string | null>(null);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
 
-  const [images, setImages] = useState<File[]>([]);
+  // Callback để reload lịch
+  const handleAddCourted = () => {
+    setReloadTrigger(prev => prev + 1); // Tăng giá trị để trigger useEffect
+};
 
 
   useEffect(() => {
@@ -91,62 +99,11 @@ function AdminPage() {
       }
     };
     fetchCourts();
-  }, [user, router]);
+  }, [user, router, reloadTrigger]);
 
   console.log("user", user);
 
-  //create court function
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    // Chuẩn bị dữ liệu gửi đến backend
-    const courtData = {
-      name: formData.get("businessName"),
-      phone: formData.get("businessPhone"),
-      address: {
-        province: selectedProvince,
-        district: selectedDistrict.name,
-        ward: selectedWard,
-        specificAddress: formData.get("specificAddress"),
-      },
-      numberOfCourts: Number(formData.get("businessNumberOfCourt")),
-      openTime: formData.get("businessOpenTime"),
-      closeTime: formData.get("businessCloseTime"),
-      utilities: [
-        formData.get("amenities[wifi]") ? "Wifi" : "",
-        formData.get("amenities[canteen]") ? "Căn tin" : "",
-        formData.get("amenities[parking]") ? "Bãi giữ xe" : "",
-        formData.get("amenities[lighting]") ? "Đèn chiếu sáng" : "",
-        formData.get("amenities[racketRental]") ? "Thuê vợt" : "",
-        formData.get("businessNew"),
-      ].filter(Boolean).join(", "),
-      description: formData.get("description"),
-      websiteLink: formData.get("websiteLink"),
-      mapLink: formData.get("mapLink"),
-      userID: user?.id,
-      images: images,
-    };
-
-    try {
-      console.log("courtData", courtData);
-      const response = await courtApi.createCourt(courtData);
-      if (response) {
-        alert("Tạo sân thành công!");
-        setYourCourts((prevCourts) => {
-          // Nếu prevCourts không phải mảng, khởi tạo lại
-          const updatedCourts = Array.isArray(prevCourts) ? prevCourts : [];
-          return [...updatedCourts, response];
-        });
-        setIsModalOpen(false);
-      } else {
-        alert("Tạo sân thất bại! Hãy thử lại.");
-      }
-    } catch (error) {
-      console.error("Lỗi khi tạo sân:", error);
-      alert("Có lỗi xảy ra khi tạo sân.");
-    }
-  };
+  
 
   // Nếu chưa đăng nhập, hiển thị thông báo
   if (!user) return <p className="text-center mt-10">Bạn chưa đăng nhập</p>;
@@ -163,24 +120,6 @@ function AdminPage() {
       </div>
     );
   }
-
-  //Mở modal đăng ký sân
-  const handleRegister = () => {
-    setIsModalOpen(true);
-  };
-
-  // Đóng modal đăng ký sân
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  // Xem chi tiết sân
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Chỉ đóng modal khi click vào overlay, không phải modal
-    if (e.target === e.currentTarget) {
-      handleCloseModal();
-    }
-  };
 
   // Hàm xử lý xóa sân
   const handleDelete = async (courtId: number) => {
@@ -229,12 +168,7 @@ function AdminPage() {
           {yourCourts.length === 0 ? (
             <div className="py-10 text-center">
               <p className="text-gray-500">Bạn chưa có sân nào</p>
-              <button
-                className="mt-3 bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-700 transition duration-500"
-                onClick={handleRegister}
-              >
-                Tạo sân mới
-              </button>
+              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted}/>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,7 +179,7 @@ function AdminPage() {
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                     <img
-                      src={court.images?.[0]?.url || noImage.src}
+                      src={court.imageFiles?.[0]?.url || noImage.src}
                       alt={court.name}
                       className="object-cover rounded-md"
                     />
@@ -282,271 +216,11 @@ function AdminPage() {
                   </div>
                 </div>
               ))}
-              <div className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <button
-                  className="w-full h-full flex items-center justify-center text-3xl text-gray-500 border-dashed border-4 border-gray-300 rounded-lg hover:border-gray-500 transition duration-300"
-                  onClick={handleRegister}
-                >
-                  <span className="text-6xl">+</span>
-                </button>
-              </div>
+              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted}/>
             </div>
           )}
         </div>
       </div>
-      {/* Modal */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center pointer-events-auto z-50"
-          onClick={handleOverlayClick}
-        >
-          <div className="bg-white pl-4 py-6 rounded-lg shadow-lg w-full max-w-4xl pointer-events-auto">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
-              Đăng ký sân mới
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="max-h-[80vh] overflow-y-auto scrollbar-default">
-                {/* Thông tin sân */}
-                <div className="w-full">
-                  <h3 className="text-lg font-bold text-green-600 mb-2">Thông tin sân</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="businessName" className="block text-gray-700">
-                        Tên sân
-                      </label>
-                      <input
-                        type="text"
-                        id="businessName"
-                        name="businessName"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-1/4">
-                        <label htmlFor="businessPhone" className="block text-gray-700">
-                          Số điện thoại
-                        </label>
-                        <input
-                          type="text"
-                          id="businessPhone"
-                          name="businessPhone"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          required
-                        />
-                      </div>
-                      <div className="w-full sm:w-1/4">
-                        <label htmlFor="businessNumberOfCourt" className="block text-gray-700">
-                          Số lượng sân
-                        </label>
-                        <input
-                          type="number"
-                          id="businessNumberOfCourt"
-                          name="businessNumberOfCourt"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          min="1"
-                          required
-                        />
-                      </div>
-                      <div className="w-full sm:w-2/4">
-                        <label className="block text-gray-700">Thời gian hoạt động</label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            id="businessOpenTime"
-                            name="businessOpenTime"
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                            required
-                          />
-                          <span className="text-gray-700">-</span>
-                          <input
-                            type="time"
-                            id="businessCloseTime"
-                            name="businessCloseTime"
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tiện ích sân */}
-                <div className="w-full">
-                  <h3 className="text-lg font-bold text-green-600 mb-2">Tiện ích của sân</h3>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                      {/* Wifi */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="wifi"
-                          name="amenities[wifi]"
-                          className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="wifi" className="ml-2 text-gray-700">Wifi</label>
-                      </div>
-
-                      {/* Căn tin */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="canteen"
-                          name="amenities[canteen]"
-                          className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="canteen" className="ml-2 text-gray-700">Căn tin</label>
-                      </div>
-
-                      {/* Bãi giữ xe */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="parking"
-                          name="amenities[parking]"
-                          className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="parking" className="ml-2 text-gray-700">Bãi giữ xe</label>
-                      </div>
-
-                      {/* Đèn chiếu sáng */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="lighting"
-                          name="amenities[lighting]"
-                          className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="lighting" className="ml-2 text-gray-700">Đèn chiếu sáng</label>
-                      </div>
-
-                      {/* Thuê vợt */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="racketRental"
-                          name="amenities[racketRental]"
-                          className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="racketRental" className="ml-2 text-gray-700">Thuê vợt</label>
-                      </div>
-                      {/* Khác */}
-                      <div className="flex items-center">
-                        <label htmlFor="businessNew" className="block text-gray-700">
-                          Khác:
-                        </label>
-                        <input
-                          type="text"
-                          id="businessNew"
-                          name="businessNew"
-                          className="w-full h-8 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ml-1 text-sm"
-                          placeholder="Ví dụ: thuốc, bia,..."
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Địa chỉ */}
-                <div>
-                  <h3 className="text-lg font-bold text-green-600 mb-2">Địa chỉ</h3>
-                  <div className="space-y-4">
-                    {/* Tỉnh/Thành phố, Quận/Huyện, Phường/Xã - xếp ngang trên màn lớn */}
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-1/3">
-                        <ProvinceSelector onProvinceChange={setSelectedProvince} />
-                      </div>
-                      <div className="w-full sm:w-1/3">
-                        <DistrictSelector provinceName={selectedProvince} onDistrictChange={setSelectedDistrict} />
-                      </div>
-                      <div className="w-full sm:w-1/3">
-                        <WardSelector district={selectedDistrict} onWardChange={setSelectedWard} />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      {/* Địa chỉ chi tiết */}
-                      <div className="w-full sm:w-1/2">
-                        <label htmlFor="specificAddress" className="block text-gray-700">
-                          Địa chỉ chi tiết
-                        </label>
-                        <input
-                          type="text"
-                          id="specificAddress"
-                          name="specificAddress"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          placeholder="12 - Nguyễn Văn Bảo"
-                          required
-                        />
-                      </div>
-
-                      {/* Link website */}
-                      <div className="w-full sm:w-1/2">
-                        <label htmlFor="websiteLink" className="block text-gray-700">
-                          Link website
-                        </label>
-                        <input
-                          type="url"
-                          id="websiteLink"
-                          name="websiteLink"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          placeholder="https://badminton.vn/"
-                        />
-                      </div>
-                    </div>
-                    {/* Link gg map */}
-                    <div>
-                      <label htmlFor="mapLink" className="block text-gray-700">
-                        Link google map
-                      </label>
-                      <input
-                        type="url"
-                        id="mapLink"
-                        name="mapLink"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="https://maps.app.goo.gl/6FBTRSJXuVsnPDfL7"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mô tả */}
-                <div>
-                  <h3 className="text-lg font-bold text-green-600 mb-2">Mô tả</h3>
-                  <textarea
-                    id="description"
-                    name="description"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 h-32" // Chiều cao 32px (8 rows ~ 200px), có thể điều chỉnh
-                    placeholder="Nhập mô tả chi tiết về sân..."
-                    required
-                  />
-                </div>
-
-                {/* Album */}
-                <div>
-                  <CourtAlbumUploader onChange={setImages} />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 pr-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
-                >
-                  Đăng ký
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

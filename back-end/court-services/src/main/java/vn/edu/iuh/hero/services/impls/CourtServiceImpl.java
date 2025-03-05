@@ -1,24 +1,27 @@
 /*
- * @ (#) CourtServiceImpl.java    1.0    2/24/2025
+ * @ (#) CourtServiceImpl.java    1.0    3/5/2025
  *
  *
  */
-
+ 
 package vn.edu.iuh.hero.services.impls;
 /*
- * @Description:
+ * @Description: 
  * @Author: Nguyen Thanh Thuan
- * @Date: 2/24/2025
+ * @Date: 3/5/2025
  * @Version: 1.0
  *
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vn.edu.iuh.hero.dtos.CourtDTO;
 import vn.edu.iuh.hero.enums.CourtStatus;
+import vn.edu.iuh.hero.models.Address;
 import vn.edu.iuh.hero.models.Court;
+import vn.edu.iuh.hero.repositories.AddressRepository;
 import vn.edu.iuh.hero.repositories.CourtRepository;
+import vn.edu.iuh.hero.repositories.ImageRepository;
+import vn.edu.iuh.hero.repositories.SubCourtRepository;
 import vn.edu.iuh.hero.services.IServices;
 
 import java.util.Collections;
@@ -58,7 +61,6 @@ public class CourtServiceImpl implements IServices<Court, Long> {
         return courtRepository.save(court);
     }
 
-
     public Iterable<Court> getCourtByUserID(Long aLong) {
         Iterable<Court> courts = courtRepository.getCourtByUserID(aLong);
         if (courts == null) {
@@ -67,10 +69,5 @@ public class CourtServiceImpl implements IServices<Court, Long> {
         return StreamSupport.stream(courts.spliterator(), false)
                 .filter(court -> court.getStatus() == CourtStatus.OPEN)
                 .toList();
-    }
-
-    public Integer getNumberOfCourts(Long courtId) {
-        Optional<Court> court = courtRepository.findById(courtId);
-        return court.map(value -> value.getNumberOfCourts()).orElse(0);
     }
 }

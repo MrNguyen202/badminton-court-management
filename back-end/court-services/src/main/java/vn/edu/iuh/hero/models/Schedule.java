@@ -1,5 +1,5 @@
 /*
- * @ (#) Address.java    1.0    2/27/2025
+ * @ (#) Schedule.java    1.0    2/24/2025
  *
  *
  */
@@ -8,16 +8,18 @@ package vn.edu.iuh.hero.models;
 /*
  * @Description:
  * @Author: Nguyen Thanh Thuan
- * @Date: 2/27/2025
+ * @Date: 2/24/2025
  * @Version: 1.0
  *
  */
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import vn.edu.iuh.hero.enums.StatusSchedule;
 
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -25,27 +27,20 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "addresses")
-public class Address {
+@Table(name = "schedule")
+public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
-    @Column(name = "province", nullable = false)
-    private String province; // Tên tỉnh/thành phố
 
-    @Column(name = "district", nullable = false)
-    private String district; // Tên quận/huyện
+    @Column(name = "to_hour")
+    private Time toHour;
 
-    @Column(name = "ward", nullable = false)
-    private String ward; // Tên phường/xã
+    @Column(name = "from_hour")
+    private Time fromHour;
 
-    @Column(name = "specific_address", nullable = false)
-    private String specificAddress; // Địa chỉ chi tiết
-
-    @OneToOne(mappedBy = "address")
-    @JsonBackReference
-    private Court court;
+    @Column(name = "date")
+    private LocalDate date;
 
     @Override
     public final boolean equals(Object o) {
@@ -54,8 +49,8 @@ public class Address {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Address address = (Address) o;
-        return getId() != null && Objects.equals(getId(), address.getId());
+        Schedule schedule = (Schedule) o;
+        return getId() != null && Objects.equals(getId(), schedule.getId());
     }
 
     @Override
