@@ -53,7 +53,7 @@ public class ScheduleServiceImpl implements IServices<Schedule, Long> {
         return scheduleRepository.save(schedule);
     }
 
-    public Optional<Schedule> findByDateAndFromHourAndToHour(LocalDate date, Time fromHour, Time toHour) {
-        return scheduleRepository.findByDateAndFromHourAndToHour(date, fromHour, toHour);
+    public Optional<Schedule> findByDateAndFromHourAndToHour(LocalDate date, Time fromHour) {
+        return scheduleRepository.findByDateAndFromHour(date, fromHour);
     }
 }

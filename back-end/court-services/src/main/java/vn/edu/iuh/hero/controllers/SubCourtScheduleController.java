@@ -67,8 +67,7 @@ public class SubCourtScheduleController {
             Schedule schedule = scheduleServiceImpl
                     .findByDateAndFromHourAndToHour(
                             subCourtScheduleRequestDTO.getDate(),
-                            subCourtScheduleRequestDTO.getFromHour(),
-                            subCourtScheduleRequestDTO.getToHour()
+                            subCourtScheduleRequestDTO.getFromHour()
                     )
                     .orElseGet(() -> {
                         Schedule newSchedule = new Schedule();

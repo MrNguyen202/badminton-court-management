@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     Optional<Schedule> findByDateAndFromHourAndToHour(LocalDate date, Time fromHour, Time toHour);
+
+    Optional<Schedule> findByDateAndFromHour(LocalDate date, Time fromHour);
 }
