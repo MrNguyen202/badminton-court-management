@@ -10,91 +10,79 @@ import {
     useDisclosure,
 } from "@nextui-org/modal";
 import courtImage from "../../../../public/football-field.gif";
-import { courtApi } from "../../../api/court-services/courtAPI";
-import { scheduleApi } from "../../../api/court-services/scheduleAPI";
+import { subCourtApi } from "@/app/api/court-services/subCourtAPI";
+import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
 import { TimeInput } from "@heroui/react";
 import { Time } from "@internationalized/date";
 import soonImage from "../../../../public/sun-03-stroke-rounded.svg";
 import moonImage from "../../../../public/moon-02-stroke-rounded.svg";
 import { Input } from "@nextui-org/input";
 
-function AddScheduleSmart({ courtID }: { courtID: any }) {
-    const [numberOfCourt, setNumberOfCourt] = useState(0);
+interface AddScheduleSmartProps {
+    courtID: number;
+    onScheduleAdded: () => void;
+}
+
+type SubCourt = {
+    id: number;
+    subName: string;
+    type: string;
+};
+
+function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
+    const [subCourts, setSubCourts] = useState<SubCourt[]>([]);
     const [courtId, setCourtId] = useState(courtID);
 
     useEffect(() => {
-        const fetchNumberOfCourts = async () => {
+        const fetchSubCourts = async () => {
             try {
-                const response = await courtApi.getNumberOfCourts(courtId);
-                setNumberOfCourt(response);
+                const response = await subCourtApi.getAllSubCourt(courtId);
+                setSubCourts(response);
             } catch (error) {
                 console.log(error);
             }
         };
-        fetchNumberOfCourts();
+        fetchSubCourts();
     }, [courtId]);
-    console.log("ID", courtId);
+
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-    // State cho các sân được chọn
     const [selectedCourts, setSelectedCourts] = useState<string[]>(["all"]);
-
-    // State cho khung giờ Sáng
     const [morningInterval, setMorningInterval] = useState<"owntime" | "part-own" | "twotime">("owntime");
     const [morningStartTime, setMorningStartTime] = useState<Time | null>(new Time(4, 0));
     const [morningEndTime, setMorningEndTime] = useState<Time | null>(new Time(12, 0));
-
-    // State cho khung giờ Tối
     const [eveningInterval, setEveningInterval] = useState<"owntime" | "part-own" | "twotime">("owntime");
     const [eveningStartTime, setEveningStartTime] = useState<Time | null>(new Time(13, 0));
     const [eveningEndTime, setEveningEndTime] = useState<Time | null>(new Time(22, 0));
-
-    // State cho phạm vi thời gian áp dụng
     const [duration, setDuration] = useState<"day" | "week" | "month" | "year">("day");
-
-    // State cho giá
     const [price, setPrice] = useState<string>("100");
 
-    // Tạo danh sách tất cả các sân (dùng để kiểm tra logic "Tất cả")
-    const allCourtValues = Array.from({ length: numberOfCourt }, (_, index) => `court-${index + 1}`);
+    const allCourtValues = subCourts.map((subCourt) => `subcourt-${subCourt.id}`);
 
-    // Hàm xử lý khi thay đổi trạng thái của checkbox
     const handleCourtSelectionChange = (newSelectedCourts: string[]) => {
-        // Lấy danh sách sân đã chọn, loại bỏ "all" để kiểm tra
-        const selectedWithoutAll = newSelectedCourts.filter(court => court !== "all");
-
-        // Kiểm tra nếu tất cả các sân riêng lẻ đều được chọn
-        const allCourtsSelected = allCourtValues.every(court => newSelectedCourts.includes(court));
+        const selectedWithoutAll = newSelectedCourts.filter((court) => court !== "all");
+        const allCourtsSelected = allCourtValues.every((court) => newSelectedCourts.includes(court));
 
         if (newSelectedCourts.includes("all")) {
-            // Nếu "Tất cả" được chọn
             if (!selectedCourts.includes("all")) {
-                // Nếu trước đó "Tất cả" chưa được chọn, tích tất cả các sân
                 setSelectedCourts([...allCourtValues, "all"]);
             } else {
-                // Nếu "Tất cả" đã được chọn trước đó, bỏ tích "Tất cả" nhưng giữ các sân đã chọn
                 setSelectedCourts(selectedWithoutAll);
             }
         } else {
-            // Nếu "Tất cả" không được chọn
             if (selectedCourts.includes("all")) {
-                // Nếu trước đó "Tất cả" đã được chọn, bỏ tích tất cả các sân
                 setSelectedCourts([]);
             } else {
-                // Nếu "Tất cả" không được chọn trước đó
                 if (allCourtsSelected) {
-                    // Nếu tất cả các sân riêng lẻ đều được chọn, tự động tích "Tất cả"
                     setSelectedCourts([...selectedWithoutAll, "all"]);
                 } else {
-                    // Nếu không phải tất cả sân đều được chọn, cập nhật danh sách sân đã chọn (không có "all")
                     setSelectedCourts(selectedWithoutAll);
                 }
             }
         }
     };
 
-    // Hàm tạo danh sách lịch dựa trên khoảng thời gian và interval
     const generateSchedules = (
         startTime: Time | null,
         endTime: Time | null,
@@ -109,7 +97,7 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
         const intervalMinutes =
             interval === "owntime" ? 60 :
                 interval === "part-own" ? 90 :
-                    120; // 2 tiếng
+                    120;
 
         while (
             (currentHour < endTime.hour) ||
@@ -135,23 +123,23 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
         return schedules;
     };
 
-    // Tạo danh sách lịch cho khung Sáng và Tối
     const morningSchedules = generateSchedules(morningStartTime, morningEndTime, morningInterval);
     const eveningSchedules = generateSchedules(eveningStartTime, eveningEndTime, eveningInterval);
 
-    // Hàm gửi dữ liệu lên backend
-    const handleAddSchedule = async () => {
+    const handleAddSubCourtSchedule = async () => {
         try {
             const today = new Date();
             const daysToAdd =
                 duration === "day" ? 1 :
                     duration === "week" ? 7 :
                         duration === "month" ? 30 :
-                            365; // year
+                            365;
 
-            const courtIndexes = selectedCourts.includes("all")
-                ? Array.from({ length: numberOfCourt }, (_, i) => i + 1)
-                : selectedCourts.map(court => parseInt(court.split("-")[1]));
+            const subCourtIds = selectedCourts.includes("all")
+                ? subCourts.map((subCourt) => subCourt.id)
+                : selectedCourts
+                    .filter((court) => court !== "all")
+                    .map((court) => parseInt(court.split("-")[1]));
 
             const schedulesToAdd = [];
             const priceValue = parseFloat(price) || 0;
@@ -159,32 +147,32 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
             for (let i = 0; i < daysToAdd; i++) {
                 const currentDate = new Date(today);
                 currentDate.setDate(today.getDate() + i);
-                const dateString = currentDate.toISOString().split("T")[0];
+                const dateString = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
                 // Thêm lịch khung Sáng
                 for (const schedule of morningSchedules) {
-                    for (const indexCourt of courtIndexes) {
+                    for (const subCourtId of subCourtIds) {
                         schedulesToAdd.push({
-                            courtId: courtId,
-                            indexCourt,
-                            date: dateString,
-                            fromHour: schedule.fromHour + ":00",
-                            toHour: schedule.toHour + ":00",
-                            price: priceValue,
-                            status: "AVAILABLE"
+                            courtId: courtId,           // ID của sân chính
+                            subCourtId: subCourtId,     // ID của sân phụ
+                            date: dateString,           // Ngày áp dụng lịch
+                            fromHour: `${schedule.fromHour}:00`, // HH:MM:SS
+                            toHour: `${schedule.toHour}:00`,     // HH:MM:SS
+                            price: priceValue,          // Giá
+                            status: "AVAILABLE"         // Trạng thái
                         });
                     }
                 }
 
                 // Thêm lịch khung Tối
                 for (const schedule of eveningSchedules) {
-                    for (const indexCourt of courtIndexes) {
+                    for (const subCourtId of subCourtIds) {
                         schedulesToAdd.push({
                             courtId: courtId,
-                            indexCourt,
+                            subCourtId: subCourtId,
                             date: dateString,
-                            fromHour: schedule.fromHour + ":00",
-                            toHour: schedule.toHour + ":00",
+                            fromHour: `${schedule.fromHour}:00`,
+                            toHour: `${schedule.toHour}:00`,
                             price: priceValue,
                             status: "AVAILABLE"
                         });
@@ -194,11 +182,13 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
 
             console.log("Schedules to add:", schedulesToAdd);
 
+            // Gửi từng lịch lên backend
             for (const schedule of schedulesToAdd) {
-                await scheduleApi.createSchedule(schedule);
+                await subCourtScheduleApi.createSubCourtSchedule(schedule);
             }
 
             alert("Thêm lịch thành công!");
+            onScheduleAdded();
             onClose();
         } catch (error) {
             console.error("Lỗi khi thêm lịch:", error);
@@ -238,15 +228,14 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
                             orientation="horizontal"
                             className="mb-4"
                         >
-                            {Array.from({ length: numberOfCourt }).map((_, index) => (
-                                <Checkbox key={index} value={`court-${index + 1}`}>
-                                    Sân {index + 1}
+                            {subCourts.map((subCourt) => (
+                                <Checkbox key={subCourt.id} value={`subcourt-${subCourt.id}`}>
+                                    {subCourt.subName}
                                 </Checkbox>
                             ))}
                             <Checkbox value="all">Tất cả</Checkbox>
                         </CheckboxGroup>
 
-                        {/* Khung giờ Sáng */}
                         <RadioGroup
                             label="Khung giờ sáng"
                             orientation="horizontal"
@@ -278,7 +267,6 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
                             />
                         </div>
 
-                        {/* Khung giờ Tối */}
                         <RadioGroup
                             label="Khung giờ tối"
                             orientation="horizontal"
@@ -310,7 +298,6 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
                             />
                         </div>
 
-                        {/* Trường giá */}
                         <Input
                             label="Giá (VND)"
                             type="number"
@@ -337,7 +324,6 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
                             <Radio value="year">Một năm</Radio>
                         </RadioGroup>
 
-                        {/* Xem trước danh sách lịch */}
                         {(morningSchedules.length > 0 || eveningSchedules.length > 0) && (
                             <div className="my-4">
                                 <p className="text-lg font-semibold">Xem trước lịch (Giá: {price} VND)</p>
@@ -389,7 +375,7 @@ function AddScheduleSmart({ courtID }: { courtID: any }) {
                         </button>
                         <button
                             className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
-                            onClick={handleAddSchedule}
+                            onClick={handleAddSubCourtSchedule}
                             disabled={
                                 (!morningStartTime || !morningEndTime || morningStartTime >= morningEndTime) &&
                                 (!eveningStartTime || !eveningEndTime || eveningStartTime >= eveningEndTime) ||

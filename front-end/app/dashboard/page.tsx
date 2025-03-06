@@ -10,35 +10,45 @@ import { courtApi } from "../api/court-services/courtAPI";
 import Footer from "../_components/Footer";
 import { useRouter } from "next/navigation";
 
+type SubCourt = {
+  id: number;
+  subName: string;
+  type: string;
+};
+
 type Court = {
   id: number;
   name: string;
   address: Address;
   phone: string;
   description: string;
-  numberOfCourts: number;
+  numberOfSubCourts: number;
   status: string;
   userID: number;
-  price: string;
-  images: Image[] | null;
-  courtSchedules: string[] | null;
+  imageFiles: Image[] | null;
   rating: number;
   district: string;
   utilities: string;
+  openTime: string;
+  closeTime: string;
+  linkWeb: string;
+  linkMap: string;
+  subCourts: SubCourt[] | null;
+  createDate: string;
 };
 
 type Image = {
   id: number;
   url: string;
   courtID: number;
-}
+};
 
 type Address = {
-  province: number;
-  district: number;
-  ward: number;
+  province: string;
+  district: string;
+  ward: string;
   specificAddress: string;
-}
+};
 
 function BadmintonCourtList() {
   const router = useRouter();
@@ -62,8 +72,8 @@ function BadmintonCourtList() {
 
   const filteredCourts = courts.filter((court) =>
     court.name.toLowerCase().includes(filter.toLowerCase()) &&
-    (selectedDistrict ? court.numberOfCourts === Number(selectedDistrict) : true) &&
-    (selectedRating ? Math.floor(court.numberOfCourts) === Number(selectedRating) : true)
+    (selectedDistrict ? court.numberOfSubCourts === Number(selectedDistrict) : true) &&
+    (selectedRating ? Math.floor(court.numberOfSubCourts) === Number(selectedRating) : true)
   );
 
   const indexOfLastCourt = currentPage * courtsPerPage;
@@ -110,7 +120,7 @@ function BadmintonCourtList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentCourts.map((court) => (
               <div key={court.id} className="border p-4 rounded-lg shadow-md bg-white">
-                <img src={court.images && court.images[0] ? court.images[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
+                <img src={court.imageFiles && court.imageFiles[0] ? court.imageFiles[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
                 <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
@@ -119,14 +129,14 @@ function BadmintonCourtList() {
                 <div className="flex justify-between">
                   <div className="flex items-center">
                     <img src={courtImage.src} alt="location" className="w-5 h-5 mr-1" />
-                    <p className="text-gray-600">Số sân: {court.numberOfCourts}</p>
+                    <p className="text-gray-600">Số sân: {court.numberOfSubCourts}</p>
                   </div>
                   <p className="text-yellow-500 font-semibold">
-                    {Array.from({ length: Math.floor(court.numberOfCourts) }, (_, i) => (
+                    {Array.from({ length: Math.floor(court.numberOfSubCourts) }, (_, i) => (
                       <span key={i}>⭐</span>
                     ))}
-                    {court.numberOfCourts % 1 !== 0 && <span>⭐</span>}
-                    ({court.numberOfCourts})
+                    {court.numberOfSubCourts % 1 !== 0 && <span>⭐</span>}
+                    ({court.numberOfSubCourts})
                   </p>
                 </div>
                 <div className="flex items-center">

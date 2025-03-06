@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8081/api/court-schedules";
+const API_BASE_URL = "http://localhost:8081/api/sub-court-schedules";
 
-export const scheduleApi = {
+export const subCourtScheduleApi = {
     // Lấy lịch sân theo courtID và startDate (tùy chọn)
     getScheduleByCourtId: async (courtID: number, startDate?: Date) => {
         try {
@@ -13,8 +13,8 @@ export const scheduleApi = {
 
             // Nếu có startDate thì thêm vào query string, không thì chỉ dùng courtID
             const url = formattedDate
-                ? `${API_BASE_URL}/get-schedules/${courtID}?startDate=${formattedDate}`
-                : `${API_BASE_URL}/get-schedules/${courtID}`;
+                ? `${API_BASE_URL}/by-sub-court/${courtID}?startDate=${formattedDate}`
+                : `${API_BASE_URL}/by-sub-court/${courtID}`;
 
             const response = await axios.get(url);
             return response.data;
@@ -23,14 +23,15 @@ export const scheduleApi = {
             throw error; // Ném lỗi để xử lý ở nơi gọi API
         }
     },
-
-    // Tạo lịch sân mới
-    createSchedule: async (scheduleData: any) => {
+    
+    // Create new sub court schedule
+    createSubCourtSchedule: async (subCourtScheduleData: any) => {
         try {
-            const response = await axios.post(`${API_BASE_URL}/create-schedule`, scheduleData);
+            const response = await axios.post(`${API_BASE_URL}/create`, subCourtScheduleData);
+            console.log("response", response);
             return response.data;
         } catch (error) {
-            console.error("Error creating court schedule:", error);
+            console.error("Error creating sub court schedule:", error);
             throw error;
         }
     },

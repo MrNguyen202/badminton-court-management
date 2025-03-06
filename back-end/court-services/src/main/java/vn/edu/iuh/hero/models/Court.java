@@ -13,21 +13,20 @@ package vn.edu.iuh.hero.models;
  *
  */
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 import vn.edu.iuh.hero.enums.CourtStatus;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "court")
 public class Court {
@@ -37,17 +36,23 @@ public class Court {
     private String name;
     private String phone;
     private String description;
-    @Column(name = "number_of_courts")
-    private int numberOfCourts;
+    @Column(name = "number_of_sub_courts")
+    private int numberOfSubCourts;
     @Enumerated(EnumType.STRING)
     private CourtStatus status;
     @Column(name = "user_id")
     private Long userID;
     private String utilities;
+    @Column(name = "link_web")
     private String linkWeb;
+    @Column(name = "link_map")
     private String linkMap;
+    @Column(name = "open_time")
     private String openTime;
+    @Column(name = "close_time")
     private String closeTime;
+    @Column(name = "create_date")
+    private LocalDate createDate;
 
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
@@ -57,11 +62,27 @@ public class Court {
     @OneToMany(mappedBy = "court")
     @JsonManagedReference
     @ToString.Exclude
-    private Set<CourtSchedule> courtSchedules;
+    private Set<SubCourt> subCourts;
 
     @OneToOne
     @JoinColumn(name = "address_id")
     @JsonManagedReference
     @ToString.Exclude
     private Address address;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Court court = (Court) o;
+        return getId() != null && Objects.equals(getId(), court.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

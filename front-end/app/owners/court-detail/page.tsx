@@ -19,37 +19,45 @@ type User = {
     address: string;
 };
 
+type SubCourt = {
+    id: number;
+    subName: string;
+    type: string;
+};
+
 type Court = {
     id: number;
     name: string;
     address: Address;
     phone: string;
     description: string;
-    numberOfCourts: number;
+    numberOfSubCourts: number;
     status: string;
     userID: number;
-    images: Image[] | null;
-    openTime: string;
-    closeTime: string;
-    linkWeb: string;
-    courtSchedules: string[] | null;
+    imageFiles: Image[] | null;
     rating: number;
     district: string;
     utilities: string;
+    openTime: string;
+    closeTime: string;
+    linkWeb: string;
+    linkMap: string;
+    subCourts: SubCourt[] | null;
+    createDate: string;
 };
 
 type Image = {
     id: number;
     url: string;
     courtID: number;
-}
+};
 
 type Address = {
     province: string;
     district: string;
     ward: string;
     specificAddress: string;
-}
+};
 
 function page() {
     const router = useRouter();
@@ -90,11 +98,11 @@ function page() {
                     <img src={locationImage.src} alt="Location" className="w-8 h-8" />
                     <h2 className="text-xl font-sans">{court?.address.specificAddress} - {court?.address.ward}, {court?.address.district}, {court?.address.province}</h2>
                 </div>
-                <span className="text-xl font-sans">Đánh giá: {court?.numberOfCourts.toFixed(1)}⭐ ({court?.numberOfCourts} lượt)</span>
+                <span className="text-xl font-sans">Đánh giá: {court?.numberOfSubCourts.toFixed(1)}⭐ ({court?.numberOfSubCourts} lượt)</span>
             </div>
             <div className="flex gap-4 mt-4">
                 <div className="w-2/3 h-96">
-                    <Album items={court?.images?.map(image => ({ src: image.url, alt: `Image ${image.id}` })) ?? []} />
+                    <Album items={court?.imageFiles?.map(image => ({ src: image.url, alt: `Image ${image.id}` })) ?? []} />
                 </div>
                 <div className="w-1/3 border border-gray-300 rounded-md m-2 shadow-xl">
                     <h2 className="text-xl font-bold border-l-4 border-orange-300 m-3 pl-3">Thông tin sân</h2>
@@ -111,7 +119,7 @@ function page() {
                                 <img src={courtImage.src} alt="" className="w-6 h-6" />
                                 <span>Số sân thi đấu:</span>
                             </div>
-                            <span className="font-bold">{court?.numberOfCourts} sân</span>
+                            <span className="font-bold">{court?.numberOfSubCourts} sân</span>
                         </div>
                         <div className="flex justify-between items-center text-lg mt-2">
                             <div className="flex items-center gap-2">
