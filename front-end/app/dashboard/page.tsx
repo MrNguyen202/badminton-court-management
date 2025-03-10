@@ -25,7 +25,7 @@ type Court = {
   numberOfSubCourts: number;
   status: string;
   userID: number;
-  imageFiles: Image[] | null;
+  images: Image[] | null;
   rating: number;
   district: string;
   utilities: string;
@@ -39,8 +39,10 @@ type Court = {
 
 type Image = {
   id: number;
+  fileName: string;
   url: string;
-  courtID: number;
+  upLoadDate: string;
+  upLoadBy: string;
 };
 
 type Address = {
@@ -120,7 +122,7 @@ function BadmintonCourtList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentCourts.map((court) => (
               <div key={court.id} className="border p-4 rounded-lg shadow-md bg-white">
-                <img src={court.imageFiles && court.imageFiles[0] ? court.imageFiles[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
+                <img src={court.images && court.images[0] ? court.images[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
                 <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />

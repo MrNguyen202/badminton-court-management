@@ -39,7 +39,7 @@ type Court = {
   numberOfSubCourts: number;
   status: string;
   userID: number;
-  imageFiles: Image[] | null;
+  images: Image[] | null;
   rating: number;
   district: string;
   utilities: string;
@@ -53,8 +53,10 @@ type Court = {
 
 type Image = {
   id: number;
+  fileName: string;
   url: string;
-  courtID: number;
+  upLoadDate: string;
+  upLoadBy: string;
 };
 
 type Address = {
@@ -101,7 +103,7 @@ function AdminPage() {
     fetchCourts();
   }, [user, router, reloadTrigger]);
 
-  console.log("user", user);
+  console.log("Danh sách sân của bạn:", yourCourts);
 
   
 
@@ -179,7 +181,7 @@ function AdminPage() {
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                     <img
-                      src={court.imageFiles?.[0]?.url || noImage.src}
+                      src={court.images?.[0]?.url || noImage.src}
                       alt={court.name}
                       className="object-cover rounded-md"
                     />
