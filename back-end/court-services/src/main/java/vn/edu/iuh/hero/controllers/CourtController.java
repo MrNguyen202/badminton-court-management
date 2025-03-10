@@ -135,4 +135,9 @@ public class CourtController {
     public ResponseEntity<?> getCourtByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(courtService.getCourtByUserID(id));
     }
+
+    @GetMapping("/get-not-courts-user/{id}")
+    public ResponseEntity<?> getNotCourtByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(courtService.getNotApprovedCourts(id));
+    }
 }

@@ -76,7 +76,7 @@ function AdminPage() {
   // Callback để reload lịch
   const handleAddCourted = () => {
     setReloadTrigger(prev => prev + 1); // Tăng giá trị để trigger useEffect
-};
+  };
 
 
   useEffect(() => {
@@ -105,7 +105,7 @@ function AdminPage() {
 
   console.log("Danh sách sân của bạn:", yourCourts);
 
-  
+
 
   // Nếu chưa đăng nhập, hiển thị thông báo
   if (!user) return <p className="text-center mt-10">Bạn chưa đăng nhập</p>;
@@ -170,22 +170,24 @@ function AdminPage() {
           {yourCourts.length === 0 ? (
             <div className="py-10 text-center">
               <p className="text-gray-500">Bạn chưa có sân nào</p>
-              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted}/>
+              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted} />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {yourCourts.map((court) => (
                 <div
                   key={court.id}
-                  className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300"
+                  className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 max-h-72 justify-between flex-row"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                    <img
-                      src={court.images?.[0]?.url || noImage.src}
-                      alt={court.name}
-                      className="object-cover rounded-md"
-                    />
-                    <div className="text-left">
+                    <div className="h-48 w-48 rounded-md bg-slate-200">
+                      <img
+                        src={court.images?.[0]?.url || noImage.src}
+                        alt={court.name}
+                        className="object-cover rounded-md w-full h-full"
+                      />
+                    </div>
+                    <div className="text-left justify-start h-full">
                       <h2 className="text-xl font-bold text-gray-800 mb-4 ">{court.name}</h2>
                       <div className="flex">
                         <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
@@ -218,7 +220,7 @@ function AdminPage() {
                   </div>
                 </div>
               ))}
-              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted}/>
+              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted} />
             </div>
           )}
         </div>

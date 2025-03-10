@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.stream;
+
 @Service
 public class CourtServiceImpl implements IServices<Court, Long> {
 
@@ -67,6 +69,12 @@ public class CourtServiceImpl implements IServices<Court, Long> {
             return Collections.emptyList();
         }
         return StreamSupport.stream(courts.spliterator(), false)
+                .filter(court -> court.getStatus() == CourtStatus.OPEN)
+                .toList();
+    }
+
+    public Iterable<Court> getNotApprovedCourts(Long id) {
+        return StreamSupport.stream(courtRepository.findAllByUserIDNot(id).spliterator(), false)
                 .filter(court -> court.getStatus() == CourtStatus.OPEN)
                 .toList();
     }

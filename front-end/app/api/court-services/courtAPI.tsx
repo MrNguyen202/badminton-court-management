@@ -15,6 +15,12 @@ export const courtApi = {
         return response.data;
     },
 
+    // Lấy sân không phải của userID và OPEN
+    getNotCourtByUserID: async (userID: number) => {
+        const response = await axios.get(`${API_BASE_URL}/get-not-courts-user/${userID}`);
+        return response.data;
+    },
+
     // Tạo sân mới
     createCourt: async (formData: FormData) => {
         return axios.post(`${API_BASE_URL}/create-court`, formData, {

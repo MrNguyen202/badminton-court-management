@@ -52,6 +52,16 @@ type Address = {
   specificAddress: string;
 };
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  role: string;
+};
+
+
 function BadmintonCourtList() {
   const router = useRouter();
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
@@ -61,11 +71,20 @@ function BadmintonCourtList() {
   const [currentPage, setCurrentPage] = useState(1);
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
+  const user = JSON.parse(localStorage.getItem("user") || 'null') as User | null;
 
   //get all courts tu api
   useEffect(() => {
-    courtApi.getAllCourt().then((data) => setCourts(data));
-  }, []);
+    if (user === null) {
+      courtApi.getAllCourt().then((data) => {
+        setCourts(data);
+      });
+    }else{
+      courtApi.getNotCourtByUserID(user.id).then((data) => {
+        setCourts(data);
+      });
+    }
+  }, [user]);
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
@@ -126,7 +145,7 @@ function BadmintonCourtList() {
                 <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Khu vực: {court.address.district} - {court.address.province}</p>
+                  <p className="text-gray-600">Khu vực: {court.address.district.replace(/^(Huyện|Thành phố|Thị xã)/, "")} - {court.address.province.replace(/^(Tỉnh|Thành phố)/, "")}</p>
                 </div>
                 <div className="flex justify-between">
                   <div className="flex items-center">
