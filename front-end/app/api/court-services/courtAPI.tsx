@@ -16,9 +16,10 @@ export const courtApi = {
     },
 
     // Tạo sân mới
-    createCourt: async (courtData: any) => {
-        const response = await axios.post(`${API_BASE_URL}/create-court`, courtData);
-        return response.data;
+    createCourt: async (formData: FormData) => {
+        return axios.post(`${API_BASE_URL}/create-court`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
     },
 
     // Delete sân

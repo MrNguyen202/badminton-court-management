@@ -238,7 +238,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
                   <Radio value="part-own">1,5 tiếng</Radio>
                   <Radio value="twotime">2 tiếng</Radio>
                 </RadioGroup>
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-4 mb-2">
                   <TimeInput
                     label="Thời gian bắt đầu"
                     value={morningStartTime as any}
@@ -271,7 +271,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
                   <Radio value="part-own">1,5 tiếng</Radio>
                   <Radio value="twotime">2 tiếng</Radio>
                 </RadioGroup>
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-4 mb-2">
                   <TimeInput
                     label="Thời gian bắt đầu"
                     value={eveningStartTime as any}
@@ -307,9 +307,6 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
                     }
                   }}
                 />
-                <div className="text-sm text-gray-600">
-                  Ngày bắt đầu: {selectedDate.day}/{selectedDate.month}/{selectedDate.year}
-                </div>
               </div>
               <div className="flex-1 max-w-md">
                 <RadioGroup
@@ -329,7 +326,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
             </div>
 
             <Input
-              label="Giá (VND)"
+              label="Giá (VND/h)"
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
@@ -342,7 +339,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
 
             {(morningSchedules.length > 0 || eveningSchedules.length > 0) && (
               <div className="my-4">
-                <p className="text-lg font-semibold">Xem trước lịch (Giá: {price} VND)</p>
+                <p className="text-lg font-semibold">Xem trước lịch (Giá: {price} VND/h)</p>
                 {morningSchedules.length > 0 && (
                   <div className="mt-4">
                     <div className="flex items-center gap-2 mb-2">

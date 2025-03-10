@@ -14,8 +14,10 @@ package vn.edu.iuh.hero.controllers;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vn.edu.iuh.hero.dtos.AddressDTO;
 import vn.edu.iuh.hero.dtos.CourtDTO;
 import vn.edu.iuh.hero.enums.CourtStatus;
@@ -23,14 +25,10 @@ import vn.edu.iuh.hero.models.Address;
 import vn.edu.iuh.hero.models.Court;
 import vn.edu.iuh.hero.models.Image;
 import vn.edu.iuh.hero.models.SubCourt;
-import vn.edu.iuh.hero.services.impls.AddressServiceImpl;
-import vn.edu.iuh.hero.services.impls.CourtServiceImpl;
-import vn.edu.iuh.hero.services.impls.SubCourtServiceImpl;
+import vn.edu.iuh.hero.services.impls.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -44,6 +42,13 @@ public class CourtController {
 
     @Autowired
     private SubCourtServiceImpl subCourtService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private ImageService imageService;
+
 
     //Get all courts
     @GetMapping("/get-courts")
@@ -63,9 +68,19 @@ public class CourtController {
     }
 
     //Create a new court
-    @PostMapping("/create-court")
-    public ResponseEntity<?> createCourt(@RequestBody CourtDTO courtDTO) {
+    @PostMapping(value = "/create-court", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> createCourt(@RequestPart("courtDTO") CourtDTO courtDTO,
+                                         @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles) {
         try {
+            //Push images to cloudinary
+            List<String> imageUrls = new ArrayList<>();
+            if (imageFiles != null && !imageFiles.isEmpty()) {
+                for (MultipartFile file : imageFiles) {
+                    String imageUrl = cloudinaryService.uploadFile(file); // Upload ảnh lên Cloudinary
+                    imageUrls.add(imageUrl);
+                }
+            }
+
             //Create a new address
             Address address = new Address();
             AddressDTO addressDTO = courtDTO.getAddress();
@@ -93,6 +108,14 @@ public class CourtController {
 
                 //Save the court
                 courtService.save(court);
+
+                // Lưu ảnh vào bảng "images"
+                for (String url : imageUrls) {
+                    Image image = new Image();
+                    image.setUrl(url);
+                    image.setCourt(court);
+                    imageService.save(image);
+                }
 
                 courtDTO.getSubCourts().forEach(subCourtDTO -> {
                     SubCourt subCourt = new SubCourt();

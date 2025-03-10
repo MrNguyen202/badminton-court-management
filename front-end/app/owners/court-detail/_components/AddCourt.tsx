@@ -87,7 +87,7 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
     const handleNumberOfCourtsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(e.target.value);
         setNumberOfSubCourts(value);
-        
+
         setSubCourts(Array(value).fill(null).map((_, index) => ({
             id: 0, // Temporary ID, will be assigned by backend
             subName: `Sân ${index + 1}`,
@@ -124,11 +124,7 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
             numberOfSubCourts: numberOfSubCourts,
             status: "pending", // Default status, adjust as needed
             userID: user?.id || 0,
-            imageFiles: images.map((file, index) => ({
-                id: 0, // Temporary ID, will be assigned by backend
-                url: "", // URL will be set after upload
-                courtID: 0 // Will be set after court creation
-            })),
+            imageFiles: undefined,
             rating: 0, // Default rating
             district: selectedDistrict.name || "",
             utilities: [
@@ -147,15 +143,19 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
             createDate: new Date().toISOString() // Current date
         };
 
+        // Append toSendCourt to form data
+        const formDataToSend = new FormData();
+        formDataToSend.append("courtDTO", new Blob([JSON.stringify(courtData)], { type: "application/json" }));
+
+        // Append images to form data
+        images.forEach((image) => {
+            formDataToSend.append("images", image);
+        });
+
         try {
-            console.log("courtData", courtData);
-            const response = await courtApi.createCourt(courtData);
+            const response = await courtApi.createCourt(formDataToSend);
             if (response) {
                 alert("Tạo sân thành công!");
-                setYourCourts((prevCourts) => {
-                    const updatedCourts = Array.isArray(prevCourts) ? prevCourts : [];
-                    return [...updatedCourts, response];
-                });
                 onAddCourted();
                 onClose();
             }
@@ -248,49 +248,51 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
                                         {numberOfSubCourts > 0 && (
                                             <div className="mt-4">
                                                 <h4 className="text-md font-semibold text-gray-700 mb-2">Thông tin các sân con</h4>
-                                                {subCourts.map((subCourt, index) => (
-                                                    <div key={index} className="border p-4 rounded-md mb-4">
-                                                        <div className="flex flex-col gap-4">
-                                                            <div>
-                                                                <label className="block text-gray-700">Tên sân con</label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={subCourt.subName}
-                                                                    onChange={(e) => handleSubCourtChange(index, 'subName', e.target.value)}
-                                                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                                                    required
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-gray-700 mb-2">Loại sân</label>
-                                                                <div className="flex gap-4">
-                                                                    <label className="flex items-center">
-                                                                        <input
-                                                                            type="radio"
-                                                                            name={`subCourtType-${index}`}
-                                                                            value="SINGLE"
-                                                                            checked={subCourt.type === 'SINGLE'}
-                                                                            onChange={() => handleSubCourtChange(index, 'type', 'SINGLE')}
-                                                                            className="mr-2"
-                                                                        />
-                                                                        Đơn
-                                                                    </label>
-                                                                    <label className="flex items-center">
-                                                                        <input
-                                                                            type="radio"
-                                                                            name={`subCourtType-${index}`}
-                                                                            value="DOUBLE"
-                                                                            checked={subCourt.type === 'DOUBLE'}
-                                                                            onChange={() => handleSubCourtChange(index, 'type', 'DOUBLE')}
-                                                                            className="mr-2"
-                                                                        />
-                                                                        Đôi
-                                                                    </label>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                    {subCourts.map((subCourt, index) => (
+                                                        <div key={index} className="border p-4 rounded-md">
+                                                            <div className="space-y-2">
+                                                                <div>
+                                                                    <label className="block text-gray-700 text-sm">Tên sân con</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={subCourt.subName}
+                                                                        onChange={(e) => handleSubCourtChange(index, 'subName', e.target.value)}
+                                                                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-gray-700 text-sm mb-1">Loại sân</label>
+                                                                    <div className="flex gap-2">
+                                                                        <label className="flex items-center text-sm">
+                                                                            <input
+                                                                                type="radio"
+                                                                                name={`subCourtType-${index}`}
+                                                                                value="SINGLE"
+                                                                                checked={subCourt.type === 'SINGLE'}
+                                                                                onChange={() => handleSubCourtChange(index, 'type', 'SINGLE')}
+                                                                                className="mr-1"
+                                                                            />
+                                                                            Đơn
+                                                                        </label>
+                                                                        <label className="flex items-center text-sm">
+                                                                            <input
+                                                                                type="radio"
+                                                                                name={`subCourtType-${index}`}
+                                                                                value="DOUBLE"
+                                                                                checked={subCourt.type === 'DOUBLE'}
+                                                                                onChange={() => handleSubCourtChange(index, 'type', 'DOUBLE')}
+                                                                                className="mr-1"
+                                                                            />
+                                                                            Đôi
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
