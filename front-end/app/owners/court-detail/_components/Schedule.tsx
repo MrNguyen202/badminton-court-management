@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
 import { getNextSevenDay } from "../_helps/OwnWeekTime";

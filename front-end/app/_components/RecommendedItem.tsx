@@ -33,7 +33,7 @@ const features = [
     desc: "Hoạt động tốt trên điện thoại di động, laptop, PC...",
     icon: (
       <Image
-        src="/phone-tablet-and-laptop.png"
+        src="/pc-tablet-phone.gif"
         alt="badminton"
         width={100}
         height={100}

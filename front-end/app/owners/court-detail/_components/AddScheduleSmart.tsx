@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { RadioGroup, Radio } from "@heroui/react";
-import { CheckboxGroup, Checkbox } from "@heroui/checkbox";
 import {
     Modal,
     ModalContent,
@@ -12,11 +10,11 @@ import {
 import courtImage from "../../../../public/football-field.gif";
 import { subCourtApi } from "@/app/api/court-services/subCourtAPI";
 import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
-import { TimeInput } from "@heroui/react";
 import { Time } from "@internationalized/date";
 import soonImage from "../../../../public/sun-03-stroke-rounded.svg";
 import moonImage from "../../../../public/moon-02-stroke-rounded.svg";
 import { Input } from "@nextui-org/input";
+import { Checkbox, CheckboxGroup, Radio, RadioGroup, TimeInput } from "@nextui-org/react";
 
 interface AddScheduleSmartProps {
     courtID: number;
