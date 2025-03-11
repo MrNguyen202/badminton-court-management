@@ -248,7 +248,7 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
                                         {numberOfSubCourts > 0 && (
                                             <div className="mt-4">
                                                 <h4 className="text-md font-semibold text-gray-700 mb-2">Thông tin các sân con</h4>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                                                     {subCourts.map((subCourt, index) => (
                                                         <div key={index} className="border p-4 rounded-md">
                                                             <div className="space-y-2">

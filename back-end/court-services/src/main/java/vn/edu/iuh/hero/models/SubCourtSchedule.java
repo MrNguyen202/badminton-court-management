@@ -16,7 +16,7 @@ package vn.edu.iuh.hero.models;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-import vn.edu.iuh.hero.enums.Status;
+import vn.edu.iuh.hero.enums.StatusSchedule;
 import vn.edu.iuh.hero.ids.SubCourtScheduleID;
 
 import java.util.Objects;
@@ -47,9 +47,9 @@ public class SubCourtSchedule {
     private double price;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusSchedule status;
 
-    public SubCourtSchedule(SubCourt subCourt, Schedule schedule, double price, Status status) {
+    public SubCourtSchedule(SubCourt subCourt, Schedule schedule, double price, StatusSchedule status) {
         this.subCourtScheduleID = new SubCourtScheduleID(subCourt.getId(), schedule.getId());
         this.subCourt = subCourt;
         this.schedule = schedule;

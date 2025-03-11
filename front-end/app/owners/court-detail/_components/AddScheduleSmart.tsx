@@ -13,8 +13,8 @@ import { Input } from "@nextui-org/input"
 import { Checkbox, CheckboxGroup, Radio, RadioGroup, DatePicker } from "@nextui-org/react"
 
 interface AddScheduleSmartProps {
-  courtID: number
-  onScheduleAdded: () => void
+  courtID: number;
+  onScheduleAdded: (newDate: Date) => void;
 }
 
 type SubCourt = {
@@ -22,6 +22,7 @@ type SubCourt = {
   subName: string
   type: string
 }
+
 
 function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
   const [subCourts, setSubCourts] = useState<SubCourt[]>([])
@@ -115,44 +116,41 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
   const handleAddSubCourtSchedule = async () => {
     try {
       // Đảm bảo sử dụng đúng ngày được chọn
-      const startDate = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day)
+      const startDate = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
+      startDate.setHours(12, 0, 0, 0);
 
-      // Log để kiểm tra ngày
-      console.log("Ngày được chọn:", selectedDate)
-      console.log("Ngày bắt đầu tạo lịch:", startDate.toISOString())
-
-      const daysToAdd = duration === "day" ? 1 : duration === "week" ? 7 : duration === "month" ? 30 : 365
+      const daysToAdd = duration === "day" ? 1 : duration === "week" ? 7 : duration === "month" ? 30 : 365;
 
       const subCourtIds = selectedCourts.includes("all")
         ? subCourts.map((subCourt) => subCourt.id)
-        : selectedCourts.filter((court) => court !== "all").map((court) => Number.parseInt(court.split("-")[1]))
+        : selectedCourts.filter((court) => court !== "all").map((court) => Number.parseInt(court.split("-")[1]));
 
-      const schedulesToAdd = []
-      const priceValue = Number.parseFloat(price) || 0
+      const schedulesToAdd = [];
+      const priceValue = Number.parseFloat(price) || 0;
 
       for (let i = 0; i < daysToAdd; i++) {
         // Tạo một bản sao mới của ngày bắt đầu để tránh thay đổi ngày gốc
-        const currentDate = new Date(startDate)
-        currentDate.setDate(startDate.getDate() + i)
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
 
         // Format ngày theo định dạng YYYY-MM-DD
-        const dateString = currentDate.toISOString().split("T")[0]
+        const dateString = currentDate.toISOString().split("T")[0];
 
         // Log để kiểm tra từng ngày được tạo
-        console.log(`Ngày thứ ${i + 1}:`, dateString)
+        console.log(`Ngày thứ ${i + 1}:`, dateString);
 
         // Thêm lịch khung Sáng
         for (const schedule of morningSchedules) {
           for (const subCourtId of subCourtIds) {
             schedulesToAdd.push({
-              courtId: courtId, // ID của sân chính
-              subCourtId: subCourtId, // ID của sân phụ
-              date: dateString, // Ngày áp dụng lịch
-              fromHour: `${schedule.fromHour}:00`, // HH:MM:SS
-              toHour: `${schedule.toHour}:00`, // HH:MM:SS
-              price: priceValue, // Giá
-              status: "AVAILABLE", // Trạng thái
-            })
+              courtId: courtId,
+              subCourtId: subCourtId,
+              date: dateString,
+              fromHour: `${schedule.fromHour}:00`,
+              toHour: `${schedule.toHour}:00`,
+              price: priceValue,
+              status: "AVAILABLE",
+            });
           }
         }
 
@@ -167,26 +165,25 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
               toHour: `${schedule.toHour}:00`,
               price: priceValue,
               status: "AVAILABLE",
-            })
+            });
           }
         }
       }
 
-      console.log("Schedules to add:", schedulesToAdd)
 
       // Gửi từng lịch lên backend
       for (const schedule of schedulesToAdd) {
-        await subCourtScheduleApi.createSubCourtSchedule(schedule)
+        await subCourtScheduleApi.createSubCourtSchedule(schedule);
       }
 
-      alert("Thêm lịch thành công!")
-      onScheduleAdded()
-      onClose()
+      alert("Thêm lịch thành công!");
+      onScheduleAdded(selectedDate.toDate("UTC"));
+      onClose();
     } catch (error) {
-      console.error("Lỗi khi thêm lịch:", error)
-      alert("Có lỗi xảy ra khi thêm lịch.")
+      console.error("Lỗi khi thêm lịch:", error);
+      alert("Có lỗi xảy ra khi thêm lịch.");
     }
-  }
+  };
 
   return (
     <>

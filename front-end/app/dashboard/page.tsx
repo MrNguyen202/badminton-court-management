@@ -84,7 +84,7 @@ function BadmintonCourtList() {
         setCourts(data);
       });
     }
-  }, [user]);
+  }, []);
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
