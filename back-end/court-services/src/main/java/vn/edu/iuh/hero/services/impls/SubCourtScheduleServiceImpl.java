@@ -84,7 +84,7 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
 
     @Override
     public Optional<SubCourtSchedule> findById(SubCourtScheduleID subCourtScheduleID) {
-        return Optional.empty();
+        return subCourtScheduleRepository.findById(subCourtScheduleID);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
 
     @Override
     public SubCourtSchedule update(SubCourtSchedule subCourtSchedule) {
-        return null;
+        return subCourtScheduleRepository.save(subCourtSchedule);
     }
 }

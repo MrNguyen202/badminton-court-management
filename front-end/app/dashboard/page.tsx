@@ -25,7 +25,7 @@ type Court = {
   numberOfSubCourts: number;
   status: string;
   userID: number;
-  imageFiles: Image[] | null;
+  images: Image[] | null;
   rating: number;
   district: string;
   utilities: string;
@@ -39,8 +39,10 @@ type Court = {
 
 type Image = {
   id: number;
+  fileName: string;
   url: string;
-  courtID: number;
+  upLoadDate: string;
+  upLoadBy: string;
 };
 
 type Address = {
@@ -49,6 +51,16 @@ type Address = {
   ward: string;
   specificAddress: string;
 };
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  role: string;
+};
+
 
 function BadmintonCourtList() {
   const router = useRouter();
@@ -59,10 +71,19 @@ function BadmintonCourtList() {
   const [currentPage, setCurrentPage] = useState(1);
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
+  const user = JSON.parse(localStorage.getItem("user") || 'null') as User | null;
 
   //get all courts tu api
   useEffect(() => {
-    courtApi.getAllCourt().then((data) => setCourts(data));
+    if (user === null) {
+      courtApi.getAllCourt().then((data) => {
+        setCourts(data);
+      });
+    }else{
+      courtApi.getNotCourtByUserID(user.id).then((data) => {
+        setCourts(data);
+      });
+    }
   }, []);
 
   const handleBooking = (court: Court) => {
@@ -120,11 +141,11 @@ function BadmintonCourtList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentCourts.map((court) => (
               <div key={court.id} className="border p-4 rounded-lg shadow-md bg-white">
-                <img src={court.imageFiles && court.imageFiles[0] ? court.imageFiles[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
+                <img src={court.images && court.images[0] ? court.images[0].url : noImage.src} alt={"No image"} className="w-full h-52 object-cover rounded-md mb-2" />
                 <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Khu vực: {court.address.district} - {court.address.province}</p>
+                  <p className="text-gray-600">Khu vực: {court.address.district.replace(/^(Huyện|Thành phố|Thị xã)/, "")} - {court.address.province.replace(/^(Tỉnh|Thành phố)/, "")}</p>
                 </div>
                 <div className="flex justify-between">
                   <div className="flex items-center">

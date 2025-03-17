@@ -18,7 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleDTO;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleRequestDTO;
-import vn.edu.iuh.hero.enums.Status;
+import vn.edu.iuh.hero.enums.StatusSchedule;
+import vn.edu.iuh.hero.ids.SubCourtScheduleID;
 import vn.edu.iuh.hero.models.Schedule;
 import vn.edu.iuh.hero.models.SubCourt;
 import vn.edu.iuh.hero.models.SubCourtSchedule;
@@ -82,7 +83,7 @@ public class SubCourtScheduleController {
                     subCourt,
                     schedule,
                     subCourtScheduleRequestDTO.getPrice(),
-                    Status.AVAILABLE
+                    StatusSchedule.AVAILABLE
             );
 
             //Lưu vào database
@@ -94,4 +95,30 @@ public class SubCourtScheduleController {
         }
     }
 
+    //Update status of sub court schedule
+    @PutMapping("/update-status/{subCourtScheduleId}/{subCourtId}")
+    public ResponseEntity<?> updateStatus(@PathVariable("subCourtScheduleId") Long subCourtScheduleId, @PathVariable("subCourtId") Long subCourtId, @RequestBody Map<String, String> statusPayload) {
+        try {
+            SubCourtScheduleID id = new SubCourtScheduleID(subCourtId, subCourtScheduleId);
+            Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleService.findById(id);
+            if (!subCourtScheduleOpt.isPresent()) {
+                return ResponseEntity.badRequest().body("Sub court schedule not found");
+            }else {
+                SubCourtSchedule subCourtSchedule = subCourtScheduleOpt.get();
+                String status = statusPayload.get("status");
+
+                StatusSchedule newStatus = switch (status) {
+                    case "AVAILABLE" -> StatusSchedule.AVAILABLE;
+                    case "BOOKED" -> StatusSchedule.BOOKED;
+                    case "EXPIRED" -> StatusSchedule.EXPIRED;
+                    default -> StatusSchedule.MAINTENANCE;
+                };
+                subCourtSchedule.setStatus(newStatus);
+                subCourtScheduleService.update(subCourtSchedule);
+                return ResponseEntity.ok("Update success");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

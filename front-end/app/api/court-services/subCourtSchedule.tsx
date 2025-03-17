@@ -35,4 +35,26 @@ export const subCourtScheduleApi = {
             throw error;
         }
     },
+
+    //Delete sub court schedule
+    deleteSubCourtSchedule: async (subCourtScheduleID: number) => {
+        try {
+            const response = await axios.delete(`${API_BASE_URL}/delete/${subCourtScheduleID}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error deleting sub court schedule:", error);
+            throw error;
+        }
+    },
+
+    //Update status sub court schedule
+    updateStatusSubCourtSchedule: async (subCourtScheduleID: number, subCourtId: number, status: string) => {
+        try {
+            const response = await axios.put(`${API_BASE_URL}/update-status/${subCourtScheduleID}/${subCourtId}`, {status});
+            return response.data;
+        } catch (error) {
+            console.error("Error updating status sub court schedule:", error);
+            throw error;
+        }
+    },
 };

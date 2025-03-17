@@ -34,7 +34,7 @@ type Court = {
     numberOfSubCourts: number;
     status: string;
     userID: number;
-    imageFiles: Image[] | null;
+    images: Image[] | null;
     rating: number;
     district: string;
     utilities: string;
@@ -48,9 +48,11 @@ type Court = {
 
 type Image = {
     id: number;
+    fileName: string;
     url: string;
-    courtID: number;
-};
+    upLoadDate: string;
+    upLoadBy: string;
+  };
 
 type Address = {
     province: string;
@@ -102,7 +104,7 @@ function page() {
             </div>
             <div className="flex gap-4 mt-4">
                 <div className="w-2/3 h-96">
-                    <Album items={court?.imageFiles?.map(image => ({ src: image.url, alt: `Image ${image.id}` })) ?? []} />
+                    <Album items={court?.images?.map(image => ({ src: image.url, alt: `Image ${image.id}` })) ?? []} />
                 </div>
                 <div className="w-1/3 border border-gray-300 rounded-md m-2 shadow-xl">
                     <h2 className="text-xl font-bold border-l-4 border-orange-300 m-3 pl-3">Thông tin sân</h2>
