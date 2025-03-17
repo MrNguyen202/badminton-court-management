@@ -37,9 +37,9 @@ export const subCourtScheduleApi = {
     },
 
     //Delete sub court schedule
-    deleteSubCourtSchedule: async (subCourtScheduleID: number) => {
+    deleteSubCourtSchedule: async (scheduleId: number, subCourtId: number) => {
         try {
-            const response = await axios.delete(`${API_BASE_URL}/delete/${subCourtScheduleID}`);
+            const response = await axios.delete(`${API_BASE_URL}/delete/${scheduleId}/${subCourtId}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting sub court schedule:", error);
