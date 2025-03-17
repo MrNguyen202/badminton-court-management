@@ -140,17 +140,10 @@ function Schedule({ courtID }: { courtID: number }) {
           const startTime = new Date(year, month - 1, day, startHours, startMinutes);
           const endTime = new Date(year, month - 1, day, endHours, endMinutes);
 
-          if (now > endTime && item.status !== "EXPIRED" && item.status !== "BOOKED") {
+          if (endTime < now  && item.status !== "EXPIRED" && item.status !== "BOOKED") {
             try {
               await subCourtScheduleApi.updateStatusSubCourtSchedule(item.scheduleId, item.subCourtId, "EXPIRED");
               item.status = "EXPIRED";
-            } catch (error) {
-              console.error("Error updating schedule status:", error);
-            }
-          } else if (startTime < now && now < endTime && item.status !== "ONGOING") {
-            try {
-              await subCourtScheduleApi.updateStatusSubCourtSchedule(item.scheduleId, item.subCourtId, "ONGOING");
-              item.status = "ONGOING";
             } catch (error) {
               console.error("Error updating schedule status:", error);
             }
@@ -161,7 +154,7 @@ function Schedule({ courtID }: { courtID: number }) {
       setSchedule(updatedSchedule);
     };
 
-    const interval = setInterval(checkExpiredSchedules, 60000);
+    const interval = setInterval(checkExpiredSchedules, 10000);
     return () => clearInterval(interval);
   }, [schedule, selectedSubCourt]);
 
@@ -184,11 +177,12 @@ function Schedule({ courtID }: { courtID: number }) {
   }
 
   // Delete schedule
-  const handleDeleteSchedule = async (scheduleId: number) => {
+  const handleDeleteSchedule = async (scheduleId: number, subCourtId: number) => {
     try {
-      // await subCourtScheduleApi.deleteSubCourtSchedule(scheduleId)
-      // alert("Schedule deleted successfully")
-      // setReloadTrigger((prev) => prev + 1)
+      //Viết xử lý xóa lịch ở đây
+      await subCourtScheduleApi.deleteSubCourtSchedule(scheduleId, subCourtId)
+      alert("Schedule deleted successfully")
+      setReloadTrigger((prev) => prev + 1)
       alert(`Delete schedule with ID: ${scheduleId}`);
     } catch (error) {
       console.error("Error deleting schedule:", error)
@@ -200,6 +194,18 @@ function Schedule({ courtID }: { courtID: number }) {
   const formatDateToISOString = (date: Date) => {
     return date.toISOString().split("T")[0]
   }
+
+  //Đặt lịch
+  const handleBookSchedule = async (scheduleId: number) => {
+    try {
+      //Viết xử lý đặt lịch ở đây
+      alert(`Đặt lịch thành công, ${scheduleId}`);
+    } catch (error) {
+      console.error("Error booking schedule:", error)
+      alert("An error occurred while booking the schedule.")
+    }
+  }
+
 
   return (
     <div className="w-full">
@@ -342,7 +348,8 @@ function Schedule({ courtID }: { courtID: number }) {
                       className={`relative flex-col items-center justify-evenly p-2 px-3 border-b rounded-lg hover:bg-opacity-75 ${getStatusColor(
                         item.status,
                       )}`}
-                      disabled={item.status !== "AVAILABLE"}
+                      disabled={(item.status !== "AVAILABLE")}
+                      onClick={() => handleBookSchedule(item.scheduleId)}
                     >
                       <span className="text-lg font-bold text-gray-900">
                         {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}
@@ -351,7 +358,7 @@ function Schedule({ courtID }: { courtID: number }) {
                       {JSON.parse(localStorage.getItem("user") || "{}")?.role === "ADMIN" && (
                         <div
                           className="absolute -top-2 -right-2 cursor-pointer"
-                          onClick={() => handleDeleteSchedule(item.scheduleId)}
+                          onClick={() => handleDeleteSchedule(item.scheduleId, item.subCourtId)}
                         >
                           <img src={DeleteImage.src} />
                         </div>
