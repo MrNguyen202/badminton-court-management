@@ -70,11 +70,10 @@
 //}
 
 
-
-
 package vn.edu.iuh.fit.userservices.services;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -132,11 +131,15 @@ public class JwtService {
 
     // Giải mã toàn bộ claims từ token
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            throw new RuntimeException("Invalid JWT token: " + e.getMessage());
+        }
     }
 
     // Kiểm tra xem token có hợp lệ không

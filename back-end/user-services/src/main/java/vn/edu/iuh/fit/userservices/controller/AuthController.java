@@ -83,31 +83,6 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(404).body("User not found"));
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<Map<String, Object>> getLogin(@RequestBody User user) {
-
-        System.out.println("Nhận yêu cầu đăng nhập với email: " + user.getEmail() + " và password: " + user.getPassword());
-
-        Optional<User> userOptional = userService.authenticateUser(user.getEmail() , user.getPassword());
-        if (userOptional.isPresent()) {
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("id", userOptional.get().getId());
-            response.put("name", userOptional.get().getName());
-            response.put("email", userOptional.get().getEmail());
-            response.put("password", userOptional.get().getPassword());
-            response.put("phone", userOptional.get().getPhone());
-            response.put("address", userOptional.get().getAddress());
-            response.put("role", userOptional.get().getRole());
-
-            return ResponseEntity.ok(response);
-        } else {
-            System.out.println("Sai email hoặc password!");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Sai thông tin đăng nhập"));
-        }
-    }
-
     @PostMapping("/update-user")
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
         try {
@@ -181,7 +156,6 @@ public class AuthController {
             response.put("id", user.get().getId());
             response.put("name", user.get().getName());
             response.put("email", user.get().getEmail());
-            response.put("password", user.get().getPassword());
             response.put("phone", user.get().getPhone());
             response.put("address", user.get().getAddress());
             response.put("role", user.get().getRole());
@@ -190,5 +164,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Không tìm thấy người dùng"));
         }
     }
-
 }
