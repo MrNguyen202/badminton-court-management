@@ -17,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000") // Chỉ định domain frontend
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -32,6 +30,7 @@ public class AuthController {
     private final UserRepository userRepository;
 
     public AuthController(JwtService jwtService, UserRepository userRepository) {
+        System.out.println("oke");
         this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
@@ -45,6 +44,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+
         System.out.println("Nhận được yêu cầu đăng nhập từ email: " + user.getEmail());
         System.out.println("Password: " + user.getPassword());
 
@@ -83,27 +83,23 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(404).body("User not found"));
     }
 
-
-
     @GetMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(
-            @RequestParam String email,
-            @RequestParam String password) {
+    public ResponseEntity<Map<String, Object>> getLogin(@RequestBody User user) {
 
-        System.out.println("Nhận yêu cầu đăng nhập với email: " + email + " và password: " + password);
+        System.out.println("Nhận yêu cầu đăng nhập với email: " + user.getEmail() + " và password: " + user.getPassword());
 
-        Optional<User> user = userService.authenticateUser(email, password);
-        if (user.isPresent()) {
+        Optional<User> userOptional = userService.authenticateUser(user.getEmail() , user.getPassword());
+        if (userOptional.isPresent()) {
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("id", user.get().getId());
-            response.put("name", user.get().getName());
-            response.put("email", user.get().getEmail());
-            response.put("password", user.get().getPassword());
-            response.put("phone", user.get().getPhone());
-            response.put("address", user.get().getAddress());
-            response.put("role", user.get().getRole());
+            response.put("id", userOptional.get().getId());
+            response.put("name", userOptional.get().getName());
+            response.put("email", userOptional.get().getEmail());
+            response.put("password", userOptional.get().getPassword());
+            response.put("phone", userOptional.get().getPhone());
+            response.put("address", userOptional.get().getAddress());
+            response.put("role", userOptional.get().getRole());
 
             return ResponseEntity.ok(response);
         } else {
