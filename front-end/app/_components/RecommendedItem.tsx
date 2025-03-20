@@ -12,6 +12,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -25,6 +26,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -38,6 +40,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -51,6 +54,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -64,6 +68,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -77,6 +82,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -90,6 +96,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },
@@ -103,6 +110,7 @@ const features = [
         width={100}
         height={100}
         className="mx-auto"
+        unoptimized={true}
       />
     ),
   },

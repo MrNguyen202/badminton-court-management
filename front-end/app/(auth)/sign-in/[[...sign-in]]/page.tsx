@@ -32,7 +32,7 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", formData);
+      const response = await axios.post("http://localhost:8080/api/auth/login", formData, {withCredentials: true});
 
       if (response.data.status === "success") {
         const token = response.data.token;
@@ -47,6 +47,7 @@ const SignIn = () => {
         // Lấy thông tin user với token
         const userInfoResponse = await axios.get("http://localhost:8080/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` }, // Đính kèm token
+          withCredentials: true,
         });
 
         const userData = userInfoResponse.data;

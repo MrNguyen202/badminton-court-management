@@ -26,6 +26,7 @@ function Hero() {
               width={300}
               height={300}
               className="mx-auto"
+              unoptimized={true}
             />
           </div>
         </div>
