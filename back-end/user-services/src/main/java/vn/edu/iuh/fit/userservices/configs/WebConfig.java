@@ -7,44 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-//@Configuration
-//@EnableWebSecurity
-//public class WebConfig {
-//   @Bean
-//   public WebMvcConfigurer corsConfigurer() {
-//       return new WebMvcConfigurer() {
-//           @Override
-//           public void addCorsMappings(CorsRegistry registry) {
-//               registry.addMapping("/api/**") // Chỉ áp dụng cho các API có đường dẫn bắt đầu bằng /api/
-//                       .allowedOrigins("http://localhost:3000") // Cho phép frontend gọi API
-//                       .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
-//                       .allowedHeaders("*") // Cho phép tất cả headers
-//                       .allowCredentials(true); // Hỗ trợ gửi cookies (nếu có)
-//           }
-//       };
-//   }
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable()) // Tắt CSRF nếu cần
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/**").permitAll() // Cho phép truy cập API
-//                        .anyRequest().authenticated() // Các API khác yêu cầu đăng nhập
-//                )
-//                .formLogin().disable(); // Tắt trang login mặc định của Spring
-//
-//        return http.build();
-//    }
-//
-//    @Bean
-//    public PasswordEncoder encoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-//}
 
 @Configuration
 @EnableWebSecurity

@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -29,38 +29,24 @@ const SignIn = () => {
     router.push("/sign-up");
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", formData, {withCredentials: true});
+      // Gọi API đăng nhập
+      const loginData = await userApi.login(formData.email, formData.password);
+      localStorage.setItem("token", loginData.token); // Lưu token
 
-      if (response.data.status === "success") {
-        const token = response.data.token;
+      // Gọi API lấy thông tin user
+      const userInfo = await userApi.getMe();
+      localStorage.setItem("user", JSON.stringify(userInfo)); // Lưu thông tin user
 
-        if (!token) {
-          alert("Token không tồn tại. Kiểm tra lại API login!");
-          return;
-        }
-
-        localStorage.setItem("token", token);
-
-        // Lấy thông tin user với token
-        const userInfoResponse = await axios.get("http://localhost:8080/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` }, // Đính kèm token
-          withCredentials: true,
-        });
-
-        const userData = userInfoResponse.data;
-        localStorage.setItem("user", JSON.stringify(userData));
-        setUser(userData);
-
-        alert(`Chào mừng ${userData.email}!`);
-        router.push("/");
-        setTimeout(() => window.location.reload(), 500);
-      }
-    } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
-      alert("Đăng nhập thất bại! Kiểm tra lại thông tin.");
+      alert("Đăng nhập thành công!");
+      router.push("/");
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 

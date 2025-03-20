@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 interface User {
   name: string;
@@ -50,43 +51,77 @@ export default function UpdateProfile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   const nameError = validateName(formData.name);
+  //   if (nameError !== "Tên hợp lệ") {
+  //     setError(nameError);
+  //     return;
+  //   }
+  //   setError(null);
+
+  //   if (!/^\d{10}$/.test(formData.phone)) {
+  //     alert("Số điện thoại không hợp lệ!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       alert("Bạn chưa đăng nhập! Vui lòng đăng nhập lại.");
+  //       router.push("/sign-in");
+  //       return;
+  //     }
+
+  //     const response = await axios.post(
+  //       "http://localhost:8080/api/auth/update-user",
+  //       formData,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         withCredentials: true,
+  //       }
+  //     );
+
+  //     if (response.status === 200) {
+  //       alert("Cập nhật thành công!");
+  //       localStorage.setItem("user", JSON.stringify(response.data));
+  //       setUser(response.data);
+  //       onOpenChange();
+  //       setTimeout(() => window.location.reload(), 500);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Lỗi cập nhật:", error);
+  //     alert(error.response?.data?.error || "Không thể kết nối đến server!");
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Kiểm tra tên
     const nameError = validateName(formData.name);
     if (nameError !== "Tên hợp lệ") {
-      setError(nameError);  // Hiển thị lỗi nếu tên không hợp lệ
+      setError(nameError);
       return;
     }
-    setError(null);  // Nếu tên hợp lệ, reset lỗi
+    setError(null);
 
-    // Kiểm tra số điện thoại
     if (!/^\d{10}$/.test(formData.phone)) {
       alert("Số điện thoại không hợp lệ!");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/update-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        localStorage.setItem("user", JSON.stringify(data));
-        setUser(data);
-        onOpenChange();
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        alert(data.error || "Có lỗi xảy ra khi cập nhật");
-      }
-    } catch (error) {
-      console.error("Lỗi cập nhật:", error);
-      alert("Không thể kết nối đến server!");
+      const data = await userApi.updateProfile(formData);
+      alert("Cập nhật thành công!");
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+      onOpenChange();
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
@@ -158,7 +193,7 @@ export default function UpdateProfile() {
 
 function validateName(name: string): string {
   // Kiểm tra tên không được rỗng
-  if (name.trim() === '') {
+  if (name.trim() === "") {
     return "Tên không được để trống";
   }
 
