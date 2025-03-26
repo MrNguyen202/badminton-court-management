@@ -1,0 +1,75 @@
+#server.port=8080
+#spring.application.name=api-gateway
+#spring.cloud.gateway.routes[0].id=user-service
+#spring.cloud.gateway.routes[0].uri=http://localhost:8081/
+#spring.cloud.gateway.routes[0].predicates[0]=Path=/api/auth/**
+#spring.cloud.gateway.routes[0].filters[0]=StripPrefix=0
+#
+#spring.cloud.gateway.routes[1].id=court-services
+#spring.cloud.gateway.routes[1].uri=http://localhost:8082/
+#spring.cloud.gateway.routes[1].predicates[0]=Path=/api/courts/**
+#spring.cloud.gateway.routes[1].predicates[1]=Path=/api/sub-courts/**
+#spring.cloud.gateway.routes[1].predicates[2]=Path=/api/sub-court-schedules/**
+#spring.cloud.gateway.routes[1].filters[0]=StripPrefix=0
+#
+#spring.cloud.gateway.globalcors.cors-configurations.[/**].allowed-origins=http://localhost:3000
+#spring.cloud.gateway.globalcors.cors-configurations.[/**].allowed-methods=GET,POST,PUT,DELETE,OPTIONS
+#spring.cloud.gateway.globalcors.cors-configurations.[/**].allowed-headers=*
+#spring.cloud.gateway.globalcors.cors-configurations.[/**].allow-credentials=true
+#logging.level.org.springframework.web=DEBUG
+#logging.level.org.springframework.cloud.gateway=DEBUG
+#jwt.secret=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+        - id: court-service
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/api/courts/**
+          filters:
+            - StripPrefix=0
+        - id: sub-court-service
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/api/sub-courts/**
+          filters:
+            - StripPrefix=0
+        - id: sub-court-schedule-service
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/api/sub-court-schedules/**
+          filters:
+            - StripPrefix=0
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+
+jwt:
+  secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c

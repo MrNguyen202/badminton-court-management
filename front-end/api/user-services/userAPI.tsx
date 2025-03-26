@@ -1,9 +1,7 @@
 import axios from "axios";
 
-// Định nghĩa base URL cho API Gateway
 const API_GATEWAY = `${process.env.NEXT_PUBLIC_API_GATEWAY}auth`;
 
-// Tạo instance của axios với cấu hình mặc định
 const apiClient = axios.create({
   baseURL: API_GATEWAY,
   headers: {
@@ -12,7 +10,6 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
-// Interceptor để thêm token vào header Authorization
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -24,7 +21,6 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor để xử lý lỗi toàn cục (ví dụ: token hết hạn)
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -37,7 +33,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Định nghĩa các API liên quan đến user
 export const userApi = {
   // API đăng ký
   register: async (userData: {
@@ -81,6 +76,7 @@ export const userApi = {
     }
   },
 
+  // API lấy thông tin user theo id
   getUserInfo: async (userId: string) => {
     try {
       const response = await apiClient.get(`/auth/${userId}`);

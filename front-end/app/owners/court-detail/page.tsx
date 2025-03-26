@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { courtApi } from "../../api/court-services/courtAPI";
+import { courtApi } from "../../../api/court-services/courtAPI";
 import MenuFocus from "./_components/MenuFocus";
 import locationImage from "../../../public/location.png";
 import Album from "./_components/Album";

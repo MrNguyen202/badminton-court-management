@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/courts")
 public class CourtController {
     @Autowired

@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter implements GatewayFilter {
 
-    @Value("${jwt.secret}") // Lấy từ application.properties
+    @Value("${jwt.secret}") // Lấy từ application.yml
     private String secret;
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/api/auth/login",

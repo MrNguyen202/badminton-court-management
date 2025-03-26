@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule"
+import { subCourtScheduleApi } from "@/api/court-services/subCourtSchedule"
 import { getNextSevenDay } from "../_helps/OwnWeekTime"
 import AddScheduleSmart from "../_components/AddScheduleSmart"
-import { subCourtApi } from "@/app/api/court-services/subCourtAPI"
+import { subCourtApi } from "@/api/court-services/subCourtAPI"
 import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg"
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg"
 import AddImage from "@/public/add-circle-stroke-rounded.svg"

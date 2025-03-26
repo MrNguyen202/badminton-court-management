@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.hero.services.impls.SubCourtServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/sub-courts")
 public class SubCourtController {
     @Autowired

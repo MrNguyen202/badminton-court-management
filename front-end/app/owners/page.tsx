@@ -9,11 +9,10 @@ import { ProvinceSelector } from "./_components/LocationComponent";
 import { DistrictSelector } from "./_components/LocationComponent";
 import { WardSelector } from "./_components/LocationComponent";
 import CourtAlbumUploader from "./_components/CourtAlbumUploader";
-import { courtApi } from "../api/court-services/courtAPI";
-import noImage from "../../public/no-product-image.jpg"
+import { courtApi } from "../../api/court-services/courtAPI";
+import noImage from "../../public/no-product-image.jpg";
 import location from "../../public/location.png";
 import AddCourt from "./court-detail/_components/AddCourt";
-
 
 type User = {
   id: number;
@@ -66,7 +65,6 @@ type Address = {
   specificAddress: string;
 };
 
-
 function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
@@ -75,9 +73,8 @@ function AdminPage() {
 
   // Callback để reload lịch
   const handleAddCourted = () => {
-    setReloadTrigger(prev => prev + 1); // Tăng giá trị để trigger useEffect
+    setReloadTrigger((prev) => prev + 1); // Tăng giá trị để trigger useEffect
   };
-
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -86,26 +83,65 @@ function AdminPage() {
     }
   }, []);
 
+  console.log("User:", user);
+
+  // Lấy danh sách sân của chủ sân
+  // useEffect(() => {
+  //   const fetchCourts = async () => {
+  //     try {
+  //       if (user?.id !== undefined) {
+  //         const response = await courtApi.getCourtByUserID(user.id);
+  //         setYourCourts(response);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy danh sách sân:", error);
+  //       setYourCourts([]);
+  //       alert("Có lỗi xảy ra khi lấy danh sách sân.");
+  //     }
+  //   };
+  //   fetchCourts();
+  // }, [user, router, reloadTrigger]);
+
+  // console.log("Danh sách sân của bạn:", yourCourts);
+
   // Lấy danh sách sân của chủ sân
   useEffect(() => {
     const fetchCourts = async () => {
       try {
-        if (user?.id !== undefined) {
-          const response = await courtApi.getCourtByUserID(user.id);
-          setYourCourts(response);
+        if (!user || !user.id) {
+          console.log("User hoặc user.id không tồn tại:", user);
+          setYourCourts([]);
+          return;
         }
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách sân:", error);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.log("Token không tồn tại, chuyển hướng về đăng nhập");
+          router.push("/sign-in");
+          return;
+        }
+
+        const userId = Number(user.id);
+        if (isNaN(userId)) {
+          console.log("user.id không phải là số hợp lệ:", user.id);
+          setYourCourts([]);
+          return;
+        }
+
+        console.log("Gọi API với userID:", userId);
+        const response = await courtApi.getCourtByUserID(userId);
+        setYourCourts(response);
+      } catch (error: any) {
+        console.error("Lỗi khi lấy danh sách sân:", error.message);
         setYourCourts([]);
-        alert("Có lỗi xảy ra khi lấy danh sách sân.");
+        alert("Có lỗi xảy ra khi lấy danh sách sân: " + error.message);
       }
     };
+
     fetchCourts();
   }, [user, router, reloadTrigger]);
 
   console.log("Danh sách sân của bạn:", yourCourts);
-
-
 
   // Nếu chưa đăng nhập, hiển thị thông báo
   if (!user) return <p className="text-center mt-10">Bạn chưa đăng nhập</p>;
@@ -116,7 +152,9 @@ function AdminPage() {
       <div className="text-center mt-10">
         <h1 className="text-2xl font-bold">Bạn không phải Admin</h1>
         <p className="mt-2">Bạn cần đăng ký làm Admin để truy cập trang này.</p>
-        <div className="mt-2 mb-20"><SignUpAdmin /></div>
+        <div className="mt-2 mb-20">
+          <SignUpAdmin />
+        </div>
         <RecommendedItem />
         <Footer />
       </div>
@@ -128,7 +166,9 @@ function AdminPage() {
     if (window.confirm("Bạn có chắc muốn xóa sân này?")) {
       try {
         await courtApi.deleteCourt(courtId); // Giả sử có API deleteCourt
-        setYourCourts((prevCourts) => prevCourts.filter((court) => court.id !== courtId));
+        setYourCourts((prevCourts) =>
+          prevCourts.filter((court) => court.id !== courtId)
+        );
         alert("Xóa sân thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa sân:", error);
@@ -149,17 +189,27 @@ function AdminPage() {
   };
 
   return (
-    <div className="px-5 flex w-full mt-9" >
+    <div className="px-5 flex w-full mt-9">
       {/* Thông tin chủ sân */}
       <div className="w-1/4 px-6">
         <h1 className="text-2xl font-bold mb-3">Thông tin chủ sân</h1>
         <div className="border border-gray-300 p-4 rounded-lg shadow-md text-center">
-          <img src={userImage.src} alt="Owner" className="w-24 h-24 rounded-full mx-auto" />
+          <img
+            src={userImage.src}
+            alt="Owner"
+            className="w-24 h-24 rounded-full mx-auto"
+          />
           <h2 className="text-xl font-bold mt-4">{user.name}</h2>
           <div className="mt-10 text-left">
-            <p className="mb-3"><span className="font-bold">Email:</span> {user.email}</p>
-            <p className="mb-3"><span className="font-bold">Số điện thoại:</span> {user.phone}</p>
-            <p className="mb-3"><span className="font-bold">Địa chỉ:</span> {user.address}</p>
+            <p className="mb-3">
+              <span className="font-bold">Email:</span> {user.email}
+            </p>
+            <p className="mb-3">
+              <span className="font-bold">Số điện thoại:</span> {user.phone}
+            </p>
+            <p className="mb-3">
+              <span className="font-bold">Địa chỉ:</span> {user.address}
+            </p>
           </div>
         </div>
       </div>
@@ -170,7 +220,11 @@ function AdminPage() {
           {yourCourts.length === 0 ? (
             <div className="py-10 text-center">
               <p className="text-gray-500">Bạn chưa có sân nào</p>
-              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted} />
+              <AddCourt
+                length={yourCourts.length}
+                initialUser={user}
+                onAddCourted={handleAddCourted}
+              />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,12 +242,18 @@ function AdminPage() {
                       />
                     </div>
                     <div className="text-left justify-start h-full">
-                      <h2 className="text-xl font-bold text-gray-800 mb-4 ">{court.name}</h2>
+                      <h2 className="text-xl font-bold text-gray-800 mb-4 ">
+                        {court.name}
+                      </h2>
                       <div className="flex">
-                        <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
+                        <img
+                          src={location.src}
+                          alt="location"
+                          className="w-5 h-5 mr-1"
+                        />
                         <p className="text-gray-600 mb-4">
-                          {court.address.specificAddress}, {court.address.ward}, {court.address.district},{" "}
-                          {court.address.province}
+                          {court.address.specificAddress}, {court.address.ward},{" "}
+                          {court.address.district}, {court.address.province}
                         </p>
                       </div>
                     </div>
@@ -220,7 +280,11 @@ function AdminPage() {
                   </div>
                 </div>
               ))}
-              <AddCourt length={yourCourts.length} initialUser={user} onAddCourted={handleAddCourted} />
+              <AddCourt
+                length={yourCourts.length}
+                initialUser={user}
+                onAddCourted={handleAddCourted}
+              />
             </div>
           )}
         </div>

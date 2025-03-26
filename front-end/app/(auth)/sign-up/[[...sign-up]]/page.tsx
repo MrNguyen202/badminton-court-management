@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { userApi } from "@/app/api/user-services/userAPI";
+import { userApi } from "@/api/user-services/userAPI";
 
 const SignIn = () => {
   const router = useRouter();
