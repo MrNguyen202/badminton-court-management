@@ -73,7 +73,6 @@ function AddCourt({ length, initialUser, onAddCourted }: AddCourtProps) {
     const [user, setUser] = useState<User | null>(initialUser);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [images, setImages] = useState<File[]>([]);
-    const [yourCourts, setYourCourts] = useState<Court[]>([]);
     const [numberOfSubCourts, setNumberOfSubCourts] = useState<number>(0);
     const [subCourts, setSubCourts] = useState<SubCourt[]>([]);
 

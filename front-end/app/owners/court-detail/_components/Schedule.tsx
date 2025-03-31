@@ -122,41 +122,41 @@ function Schedule({ courtID }: { courtID: number }) {
     return days
   }
 
-  useEffect(() => {
-    const checkExpiredSchedules = async () => {
-      if (!selectedSubCourt || !schedule[selectedSubCourt]) return;
+  // useEffect(() => {
+  //   const checkExpiredSchedules = async () => {
+  //     if (!selectedSubCourt || !schedule[selectedSubCourt]) return;
 
-      const now = new Date();
-      const updatedSchedule = { ...schedule };
+  //     const now = new Date();
+  //     const updatedSchedule = { ...schedule };
 
-      for (const dateKey in schedule[selectedSubCourt]) {
-        const daySchedules = schedule[selectedSubCourt][dateKey];
-        for (const item of daySchedules) {
-          // Parse date and time correctly
-          const [year, month, day] = dateKey.split("-").map(Number);
-          const [startHours, startMinutes] = item.fromHour.split(":").map(Number);
-          const [endHours, endMinutes] = item.toHour.split(":").map(Number);
+  //     for (const dateKey in schedule[selectedSubCourt]) {
+  //       const daySchedules = schedule[selectedSubCourt][dateKey];
+  //       for (const item of daySchedules) {
+  //         // Parse date and time correctly
+  //         const [year, month, day] = dateKey.split("-").map(Number);
+  //         const [startHours, startMinutes] = item.fromHour.split(":").map(Number);
+  //         const [endHours, endMinutes] = item.toHour.split(":").map(Number);
 
-          const startTime = new Date(year, month - 1, day, startHours, startMinutes);
-          const endTime = new Date(year, month - 1, day, endHours, endMinutes);
+  //         const startTime = new Date(year, month - 1, day, startHours, startMinutes);
+  //         const endTime = new Date(year, month - 1, day, endHours, endMinutes);
 
-          if (endTime < now  && item.status !== "EXPIRED" && item.status !== "BOOKED") {
-            try {
-              await subCourtScheduleApi.updateStatusSubCourtSchedule(item.scheduleId, item.subCourtId, "EXPIRED");
-              item.status = "EXPIRED";
-            } catch (error) {
-              console.error("Error updating schedule status:", error);
-            }
-          }
-        }
-        updatedSchedule[selectedSubCourt][dateKey] = [...daySchedules];
-      }
-      setSchedule(updatedSchedule);
-    };
+  //         if (endTime < now  && item.status !== "EXPIRED" && item.status !== "BOOKED") {
+  //           try {
+  //             await subCourtScheduleApi.updateStatusSubCourtSchedule(item.scheduleId, item.subCourtId, "EXPIRED");
+  //             item.status = "EXPIRED";
+  //           } catch (error) {
+  //             console.error("Error updating schedule status:", error);
+  //           }
+  //         }
+  //       }
+  //       updatedSchedule[selectedSubCourt][dateKey] = [...daySchedules];
+  //     }
+  //     setSchedule(updatedSchedule);
+  //   };
 
-    const interval = setInterval(checkExpiredSchedules, 10000);
-    return () => clearInterval(interval);
-  }, [schedule, selectedSubCourt]);
+  //   const interval = setInterval(checkExpiredSchedules, 10000);
+  //   return () => clearInterval(interval);
+  // }, [schedule, selectedSubCourt]);
 
 
   const sevenDays = getSevenDays(date)

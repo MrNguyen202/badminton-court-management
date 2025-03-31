@@ -139,4 +139,16 @@ public class CourtController {
     public ResponseEntity<?> getNotCourtByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(courtService.getNotApprovedCourts(id));
     }
+
+    @PutMapping("/delete-court/{id}")
+    public ResponseEntity<?> deleteCourtById(@PathVariable Long id) {
+        try {
+            Court court = courtService.findById(id).get();
+            court.setStatus(CourtStatus.CLOSE);
+            courtService.save(court);
+            return ResponseEntity.ok("Delete success");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
