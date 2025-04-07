@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
-import { userApi } from "@/api/user-services/userAPI";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 interface User {
   email: string;

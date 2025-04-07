@@ -9,7 +9,7 @@ import { ProvinceSelector } from "./_components/LocationComponent";
 import { DistrictSelector } from "./_components/LocationComponent";
 import { WardSelector } from "./_components/LocationComponent";
 import CourtAlbumUploader from "./_components/CourtAlbumUploader";
-import { courtApi } from "../../api/court-services/courtAPI";
+import { courtApi } from "../api/court-services/courtAPI";
 import noImage from "../../public/no-product-image.jpg";
 import location from "../../public/location.png";
 import AddCourt from "./court-detail/_components/AddCourt";

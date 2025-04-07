@@ -6,7 +6,7 @@ import location from "../../public/location.png";
 import courtImage from "../../public/football-field.gif";
 import calenderImage from "../../public/calendar.gif";
 import utilityImage from "../../public/utility.gif";
-import { courtApi } from "../../api/court-services/courtAPI";
+import { courtApi } from "../api/court-services/courtAPI";
 import Footer from "../_components/Footer";
 import { useRouter } from "next/navigation";
 

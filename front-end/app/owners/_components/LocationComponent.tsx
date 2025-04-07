@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { locationApi } from "../../../api/location/locationAPI";
+import { locationApi } from "../../api/location/locationAPI";
 
 type Ward = {
   code: number;
