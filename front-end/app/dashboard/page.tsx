@@ -79,7 +79,7 @@ function BadmintonCourtList() {
       courtApi.getAllCourt().then((data) => {
         setCourts(data);
       });
-    }else{
+    } else {
       courtApi.getNotCourtByUserID(user.id).then((data) => {
         setCourts(data);
       });

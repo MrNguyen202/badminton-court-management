@@ -13,15 +13,20 @@ package vn.edu.iuh.hero.services.impls;
  *
  */
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleDTO;
+import vn.edu.iuh.hero.enums.StatusSchedule;
 import vn.edu.iuh.hero.ids.SubCourtScheduleID;
 import vn.edu.iuh.hero.models.SubCourtSchedule;
 import vn.edu.iuh.hero.repositories.SubCourtScheduleRepository;
 import vn.edu.iuh.hero.services.IServices;
 
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,5 +105,14 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
     @Override
     public SubCourtSchedule update(SubCourtSchedule subCourtSchedule) {
         return subCourtScheduleRepository.save(subCourtSchedule);
+    }
+
+    // Kiem tra va cap nhat trang thai ham nay chaỵ liên tục
+    @Scheduled(fixedRate = 60000) // mỗi phút
+    @Transactional
+    public void updateStatus() {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+        subCourtScheduleRepository.expireSchedulesBefore(today, Time.valueOf(now));
     }
 }

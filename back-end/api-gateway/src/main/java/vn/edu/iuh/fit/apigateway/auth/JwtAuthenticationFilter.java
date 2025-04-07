@@ -23,7 +23,11 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     private String secret;
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/api/auth/login",
-            "/api/auth/register"
+            "/api/auth/register",
+            "/api/courts/get-courts",
+            "/api/get-court/",
+            "/api/sub-courts",
+            "/api/sub-court-schedules/by-sub-court/"
     );
 
     private Key getSigningKey() {
