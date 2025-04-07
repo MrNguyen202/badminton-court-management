@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
             "/api/auth/login",
             "/api/auth/register",
             "/api/courts/get-courts",
-            "/api/get-court/",
+            "/api/courts/get-court/",
             "/api/sub-courts",
             "/api/sub-court-schedules/by-sub-court/"
     );
