@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 interface RoleUser {
   name: string;
@@ -22,8 +23,7 @@ interface RoleUser {
 function SignUpAdmin() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<RoleUser | null>(null);
-  const [formData, setFormData] = useState({
-    id: 0,
+  const [formData, setFormData] = useState<RoleUser>({
     name: "",
     email: "",
     phone: "",
@@ -58,28 +58,14 @@ function SignUpAdmin() {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/auth/update-role",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Đăng kí ADMIN thành công!");
-
-        localStorage.setItem("user", JSON.stringify(data));
-        setUser(data);
-        onOpenChange();
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        alert(data.error || "Đăng kí thất bại!");
-      }
-    } catch (error) {
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
+      const data = await userApi.updateRole(formData);
+      alert("Cập nhật thành công!");
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+      onOpenChange();
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 

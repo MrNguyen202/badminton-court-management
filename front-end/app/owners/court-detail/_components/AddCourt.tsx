@@ -7,7 +7,7 @@ import {
     ModalFooter,
     useDisclosure,
 } from "@nextui-org/modal";
-import { courtApi } from "../../../../api/court-services/courtAPI";
+import { courtApi } from "../../../api/court-services/courtAPI";
 import { ProvinceSelector } from "../../_components/LocationComponent";
 import { DistrictSelector } from "../../_components/LocationComponent";
 import { WardSelector } from "../../_components/LocationComponent";

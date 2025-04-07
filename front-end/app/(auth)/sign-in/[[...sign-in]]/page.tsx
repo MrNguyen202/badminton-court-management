@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { userApi } from "@/api/user-services/userAPI";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
