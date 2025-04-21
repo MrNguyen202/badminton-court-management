@@ -40,7 +40,7 @@
         document.getElementById("status").innerText = "Processing payment...";
 
         try {
-            let response = await fetch("http://localhost:8083/paypal/pay?amount=" + amount, {
+            let response = await fetch("http://localhost:8083/api/paypal/pay?amount=" + amount, {
                 method: "POST"
             });
 

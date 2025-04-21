@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.fit.bookingservices.services.PaypalService;
 
 @RestController
-@RequestMapping("/paypal")
+@RequestMapping("/api/paypal")
 @CrossOrigin("http://localhost:63342")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class PaypalController {
 
     @Autowired
     private PaypalService paypalService;
 
-    private static final String SUCCESS_URL = "http://localhost:8083/paypal/success";
-    private static final String CANCEL_URL = "http://localhost:8083/paypal/cancel";
+    private static final String SUCCESS_URL = "http://localhost:8083/api/paypal/success";
+    private static final String CANCEL_URL = "http://localhost:8083/api/paypal/cancel";
 
     @PostMapping("/pay")
     public String makePayment(@RequestParam double amount) {
