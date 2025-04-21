@@ -122,43 +122,6 @@ function Schedule({ courtID }: { courtID: number }) {
     return days
   }
 
-  // useEffect(() => {
-  //   const checkExpiredSchedules = async () => {
-  //     if (!selectedSubCourt || !schedule[selectedSubCourt]) return;
-
-  //     const now = new Date();
-  //     const updatedSchedule = { ...schedule };
-
-  //     for (const dateKey in schedule[selectedSubCourt]) {
-  //       const daySchedules = schedule[selectedSubCourt][dateKey];
-  //       for (const item of daySchedules) {
-  //         // Parse date and time correctly
-  //         const [year, month, day] = dateKey.split("-").map(Number);
-  //         const [startHours, startMinutes] = item.fromHour.split(":").map(Number);
-  //         const [endHours, endMinutes] = item.toHour.split(":").map(Number);
-
-  //         const startTime = new Date(year, month - 1, day, startHours, startMinutes);
-  //         const endTime = new Date(year, month - 1, day, endHours, endMinutes);
-
-  //         if (endTime < now  && item.status !== "EXPIRED" && item.status !== "BOOKED") {
-  //           try {
-  //             await subCourtScheduleApi.updateStatusSubCourtSchedule(item.scheduleId, item.subCourtId, "EXPIRED");
-  //             item.status = "EXPIRED";
-  //           } catch (error) {
-  //             console.error("Error updating schedule status:", error);
-  //           }
-  //         }
-  //       }
-  //       updatedSchedule[selectedSubCourt][dateKey] = [...daySchedules];
-  //     }
-  //     setSchedule(updatedSchedule);
-  //   };
-
-  //   const interval = setInterval(checkExpiredSchedules, 10000);
-  //   return () => clearInterval(interval);
-  // }, [schedule, selectedSubCourt]);
-
-
   const sevenDays = getSevenDays(date)
 
   const getStatusColor = (status: string) => {
@@ -196,10 +159,10 @@ function Schedule({ courtID }: { courtID: number }) {
   }
 
   //Đặt lịch
-  const handleBookSchedule = async (scheduleId: number) => {
+  const handleBookSchedule = async (scheduleId: any) => {
     try {
       //Viết xử lý đặt lịch ở đây
-      alert(`Đặt lịch thành công, ${scheduleId}`);
+      alert(`Đặt lịch thành công, ${JSON.stringify(scheduleId)}`);
     } catch (error) {
       console.error("Error booking schedule:", error)
       alert("An error occurred while booking the schedule.")
@@ -349,7 +312,7 @@ function Schedule({ courtID }: { courtID: number }) {
                         item.status,
                       )}`}
                       disabled={(item.status !== "AVAILABLE")}
-                      onClick={() => handleBookSchedule(item.scheduleId)}
+                      onClick={() => handleBookSchedule(item)}
                     >
                       <span className="text-lg font-bold text-gray-900">
                         {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}
@@ -358,7 +321,10 @@ function Schedule({ courtID }: { courtID: number }) {
                       {JSON.parse(localStorage.getItem("user") || "{}")?.role === "ADMIN" && (
                         <div
                           className="absolute -top-2 -right-2 cursor-pointer"
-                          onClick={() => handleDeleteSchedule(item.scheduleId, item.subCourtId)}
+                          onClick={(event) => {
+                            event.stopPropagation(); // Ngăn sự kiện lan truyền lên button cha
+                            handleDeleteSchedule(item.scheduleId, item.subCourtId);
+                          }}
                         >
                           <img src={DeleteImage.src} />
                         </div>

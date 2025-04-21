@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleDTO;
-import vn.edu.iuh.hero.enums.StatusSchedule;
 import vn.edu.iuh.hero.ids.SubCourtScheduleID;
 import vn.edu.iuh.hero.models.SubCourtSchedule;
 import vn.edu.iuh.hero.repositories.SubCourtScheduleRepository;
@@ -98,9 +97,17 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
     }
 
     @Override
+    @Transactional
     public SubCourtSchedule delete(SubCourtScheduleID subCourtScheduleID) {
-        return null;
+        Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleRepository.findById(subCourtScheduleID);
+        if (!subCourtScheduleOpt.isPresent()) {
+            throw new RuntimeException("SubCourtSchedule not found with ID: " + subCourtScheduleID);
+        }
+        SubCourtSchedule entity = subCourtScheduleOpt.get();
+        subCourtScheduleRepository.deleteById(subCourtScheduleID);
+        return entity;
     }
+
 
     @Override
     public SubCourtSchedule update(SubCourtSchedule subCourtSchedule) {

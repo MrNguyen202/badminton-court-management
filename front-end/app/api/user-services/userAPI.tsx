@@ -43,6 +43,7 @@ export const userApi = {
     address: string;
   }) => {
     try {
+      console.log("userData", userData);
       const response = await apiClient.post("/register", userData);
       return response.data;
     } catch (error: any) {

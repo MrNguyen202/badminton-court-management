@@ -13,6 +13,7 @@ package vn.edu.iuh.hero.controllers;
  *
  */
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -116,6 +117,24 @@ public class SubCourtScheduleController {
                 subCourtScheduleService.update(subCourtSchedule);
                 return ResponseEntity.ok("Update success");
             }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete/{scheduleId}/{subCourtId}")
+    @Transactional
+    public ResponseEntity<?> delete(@PathVariable Long scheduleId, @PathVariable Long subCourtId) {
+        System.out.println("Delete scheduleId: " + scheduleId + ", subCourtId: " + subCourtId);
+        try {
+            SubCourtScheduleID id = new SubCourtScheduleID(subCourtId, scheduleId);
+            System.out.println("SubCourtScheduleID: " + id);
+            Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleService.findById(id);
+            if (!subCourtScheduleOpt.isPresent()) {
+                return ResponseEntity.badRequest().body("Sub court schedule not found");
+            }
+            subCourtScheduleService.delete(id);
+            return ResponseEntity.ok("Delete success");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

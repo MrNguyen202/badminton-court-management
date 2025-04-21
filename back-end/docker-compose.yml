@@ -1,0 +1,90 @@
+services:
+  user-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user_password
+      POSTGRES_DB: user-services
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init-db/user:/docker-entrypoint-initdb.d  # Mount thư mục khởi tạo dữ liệu
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  court-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: court_user
+      POSTGRES_PASSWORD: court_password
+      POSTGRES_DB: court-services
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./init-db/court:/docker-entrypoint-initdb.d  # Mount thư mục khởi tạo dữ liệu
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U court_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-services:
+    build:
+      context: ./user-services
+      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user-services
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=user_password
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./user-services:/app  # Mount thư mục code
+
+  court-service:
+    build:
+      context: ./court-services
+      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://court-db:5432/court-services
+      - SPRING_DATASOURCE_USERNAME=court_user
+      - SPRING_DATASOURCE_PASSWORD=court_password
+    depends_on:
+      court-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./court-services:/app  # Mount thư mục code
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-services
+      - court-service
+    networks:
+      - my-network
+    volumes:
+      - ./api-gateway:/app  # Mount thư mục code
+
+networks:
+  my-network:
+    driver: bridge

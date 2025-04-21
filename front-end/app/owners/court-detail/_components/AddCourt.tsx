@@ -12,7 +12,6 @@ import { ProvinceSelector } from "../../_components/LocationComponent";
 import { DistrictSelector } from "../../_components/LocationComponent";
 import { WardSelector } from "../../_components/LocationComponent";
 import CourtAlbumUploader from "../../_components/CourtAlbumUploader";
-import { on } from "events";
 
 type User = {
     id: number;
