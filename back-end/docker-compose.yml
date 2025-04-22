@@ -12,7 +12,7 @@ services:
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
+      test: ["CMD-SHELL", "pg_isready -U user -d user-services"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -30,7 +30,25 @@ services:
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U court_user"]
+      test: ["CMD-SHELL", "pg_isready -U court_user -d court-services"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  booking-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: booking_user
+      POSTGRES_PASSWORD: booking_password
+      POSTGRES_DB: booking-services
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./init-db/booking:/docker-entrypoint-initdb.d  # Mount thư mục khởi tạo dữ liệu
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booking_user -d booking-services"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -53,7 +71,7 @@ services:
     volumes:
       - ./user-services:/app  # Mount thư mục code
 
-  court-service:
+  court-services:
     build:
       context: ./court-services
       dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
@@ -71,6 +89,24 @@ services:
     volumes:
       - ./court-services:/app  # Mount thư mục code
 
+  booking-services:
+    build:
+      context: ./booking-services
+      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://booking-db:5432/booking-services
+      - SPRING_DATASOURCE_USERNAME=booking_user
+      - SPRING_DATASOURCE_PASSWORD=booking_password
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./booking-services:/app  # Mount thư mục code
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -79,7 +115,7 @@ services:
       - "8080:8080"
     depends_on:
       - user-services
-      - court-service
+      - court-services
     networks:
       - my-network
     volumes:
