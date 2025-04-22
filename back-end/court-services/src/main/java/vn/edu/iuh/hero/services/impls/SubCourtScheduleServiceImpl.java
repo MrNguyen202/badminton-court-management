@@ -120,6 +120,7 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
     public void updateStatus() {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
+        System.out.println("Updating status of schedules..." +  today + "---" + Time.valueOf(now));
         subCourtScheduleRepository.expireSchedulesBefore(today, Time.valueOf(now));
     }
 }

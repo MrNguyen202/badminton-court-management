@@ -159,10 +159,10 @@ function Schedule({ courtID }: { courtID: number }) {
   }
 
   //Đặt lịch
-  const handleBookSchedule = async (scheduleId: number) => {
+  const handleBookSchedule = async (scheduleId: any) => {
     try {
       //Viết xử lý đặt lịch ở đây
-      alert(`Đặt lịch thành công, ${scheduleId}`);
+      alert(`Đặt lịch thành công, ${JSON.stringify(scheduleId)}`);
     } catch (error) {
       console.error("Error booking schedule:", error)
       alert("An error occurred while booking the schedule.")
@@ -312,7 +312,7 @@ function Schedule({ courtID }: { courtID: number }) {
                         item.status,
                       )}`}
                       disabled={(item.status !== "AVAILABLE")}
-                      onClick={() => handleBookSchedule(item.scheduleId)}
+                      onClick={() => handleBookSchedule(item)}
                     >
                       <span className="text-lg font-bold text-gray-900">
                         {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}

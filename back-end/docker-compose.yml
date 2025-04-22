@@ -8,11 +8,11 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./init-db/user:/docker-entrypoint-initdb.d  # Mount thư mục khởi tạo dữ liệu
+      - ./init-db/user:/docker-entrypoint-initdb.d
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
+      test: ["CMD-SHELL", "pg_isready -U user -d testdb"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,11 +26,11 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - ./init-db/court:/docker-entrypoint-initdb.d  # Mount thư mục khởi tạo dữ liệu
+      - ./init-db/court:/docker-entrypoint-initdb.d
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U court_user"]
+      test: ["CMD-SHELL", "pg_isready -U court_user -d court-services"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -38,43 +38,47 @@ services:
   user-services:
     build:
       context: ./user-services
-      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+      dockerfile: Dockerfile.dev
     ports:
       - "8081:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/testdb
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
     depends_on:
       user-db:
         condition: service_healthy
     networks:
       - my-network
     volumes:
-      - ./user-services:/app  # Mount thư mục code
+      - ./user-services:/app
 
   court-service:
     build:
       context: ./court-services
-      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+      dockerfile: Dockerfile.dev
     ports:
       - "8082:8082"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://court-db:5432/court-services
       - SPRING_DATASOURCE_USERNAME=court_user
       - SPRING_DATASOURCE_PASSWORD=court_password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - TZ=Asia/Ho_Chi_Minh
+      - JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Ho_Chi_Minh
     depends_on:
       court-db:
         condition: service_healthy
     networks:
       - my-network
     volumes:
-      - ./court-services:/app  # Mount thư mục code
+      - ./court-services:/app
 
   api-gateway:
     build:
       context: ./api-gateway
-      dockerfile: Dockerfile.dev  # Sử dụng Dockerfile cho hot-reload
+      dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
     depends_on:
@@ -83,7 +87,23 @@ services:
     networks:
       - my-network
     volumes:
-      - ./api-gateway:/app  # Mount thư mục code
+      - ./api-gateway:/app
+
+  chatbot-service:
+    build:
+      context: ./chatbot_service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5001"
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      court-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./chatbot_service:/app
 
 networks:
   my-network:
