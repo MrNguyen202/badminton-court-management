@@ -14,19 +14,19 @@ spring:
           filters:
             - StripPrefix=0
         - id: court-service
-          uri: http://court-service:8082
+          uri: http://court-services:8082
           predicates:
             - Path=/api/courts/**
           filters:
             - StripPrefix=0
         - id: sub-court-service
-          uri: http://court-service:8082
+          uri: http://court-services:8082
           predicates:
             - Path=/api/sub-courts/**
           filters:
             - StripPrefix=0
         - id: sub-court-schedule-service
-          uri: http://court-service:8082
+          uri: http://court-services:8082
           predicates:
             - Path=/api/sub-court-schedules/**
           filters:

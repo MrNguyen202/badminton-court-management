@@ -145,7 +145,7 @@ function BadmintonCourtList() {
                 <h2 className="text-lg font-semibold mb-4 truncate pr-4">{court.name}</h2>
                 <div className="flex items-center">
                   <img src={location.src} alt="location" className="w-5 h-5 mr-1" />
-                  <p className="text-gray-600">Khu vực: {court.address.district.replace(/^(Huyện|Thành phố|Thị xã)/, "")} - {court.address.province.replace(/^(Tỉnh|Thành phố)/, "")}</p>
+                  <p className="text-gray-600 truncate">Khu vực: {court.address.district.replace(/^(Huyện|Thành phố|Thị xã)/, "")} - {court.address.province.replace(/^(Tỉnh|Thành phố)/, "")}</p>
                 </div>
                 <div className="flex justify-between">
                   <div className="flex items-center">
