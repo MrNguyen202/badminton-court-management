@@ -7,7 +7,7 @@ import AddScheduleSmart from "../_components/AddScheduleSmart"
 import { subCourtApi } from "@/app/api/court-services/subCourtAPI"
 import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg"
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg"
-import AddImage from "@/public/add-circle-stroke-rounded.svg"
+import AddScheduleSingle from "../_components/AddScheduleSingle"
 
 // Types to match API data
 type SubCourtSchedule = {
@@ -335,9 +335,7 @@ function Schedule({ courtID }: { courtID: number }) {
                   <div className="text-lg font-semibold text-gray-500">Không có lịch</div>
                 )}
                 {JSON.parse(localStorage.getItem("user") || "{}")?.role === "ADMIN" && (
-                  <div className="flex items-center justify-center p-2 px-3 border-b bg-primary-50 rounded-lg hover:bg-primary-100">
-                    <img src={AddImage.src} alt="" />
-                  </div>
+                  <AddScheduleSingle subcourt={selectedSubCourt} date={day} filteredSchedules={filteredSchedules}/>
                 )}
               </div>
             </div>
