@@ -7,39 +7,33 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: user-service
+        - id: user-services
           uri: http://user-services:8081
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=0
         - id: court-service
-          uri: http://court-services:8082
+          uri: http://court-service:8082
           predicates:
             - Path=/api/courts/**
           filters:
             - StripPrefix=0
         - id: sub-court-service
-          uri: http://court-services:8082
+          uri: http://court-service:8082
           predicates:
             - Path=/api/sub-courts/**
           filters:
             - StripPrefix=0
         - id: sub-court-schedule-service
-          uri: http://court-services:8082
+          uri: http://court-service:8082
           predicates:
             - Path=/api/sub-court-schedules/**
           filters:
             - StripPrefix=0
-        - id: booking-service
-          uri: http://localhost:8083/
-          predicates:
-            - Path=/api/bookings/**
-          filters:
-            - StripPrefix=0
       globalcors:
         cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins: "http://localhost:3000"
             allowedMethods:
               - GET
