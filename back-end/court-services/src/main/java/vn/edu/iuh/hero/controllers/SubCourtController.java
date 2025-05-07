@@ -29,4 +29,10 @@ public class SubCourtController {
     public ResponseEntity<?> getSubCourtsByCourtId(@PathVariable Long courtId) {
         return ResponseEntity.ok(subCourtService.findAllByCourtId(courtId));
     }
+
+    //Get a sub court by id
+    @GetMapping("/get-sub-court-by-id/{id}")
+    public ResponseEntity<?> getSubCourtById(@PathVariable Long id) {
+        return ResponseEntity.ok(subCourtService.findById(id));
+    }
 }
