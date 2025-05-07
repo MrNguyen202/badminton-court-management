@@ -8,6 +8,8 @@ import { subCourtApi } from "@/app/api/court-services/subCourtAPI"
 import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg"
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg"
 import AddScheduleSingle from "../_components/AddScheduleSingle"
+import { useDisclosure } from '@nextui-org/react'
+import BookModal from "../_components/BookModal"
 
 // Types to match API data
 type SubCourtSchedule = {
@@ -37,6 +39,9 @@ function Schedule({ courtID }: { courtID: number }) {
   const [reloadTrigger, setReloadTrigger] = useState(0)
   const [date, setDate] = useState(new Date())
   const [subCourts, setSubCourts] = useState<SubCourt[]>([])
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [bookedSchedule, setBookedSchedule] = useState<SubCourtSchedule | null>(null)
 
   // Calculate next seven days from current date
   const nextSevenDay = getNextSevenDay(date)
@@ -169,6 +174,11 @@ function Schedule({ courtID }: { courtID: number }) {
     }
   }
 
+  // Handle booking modal open
+  const handleOpenBookingModal = (schedule: SubCourtSchedule) => {
+    setBookedSchedule(schedule)
+    onOpen()
+  }
 
   return (
     <div className="w-full">
@@ -311,8 +321,8 @@ function Schedule({ courtID }: { courtID: number }) {
                       className={`relative flex-col items-center justify-evenly p-2 px-3 border-b rounded-lg hover:bg-opacity-75 ${getStatusColor(
                         item.status,
                       )}`}
-                      disabled={(item.status !== "AVAILABLE")}
-                      onClick={() => handleBookSchedule(item)}
+                      disabled={(item.status !== "AVAILABLE" || JSON.parse(localStorage.getItem("user") || "{}")?.role === "ADMIN")}
+                      onClick={() => handleOpenBookingModal(item)}
                     >
                       <span className="text-lg font-bold text-gray-900">
                         {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}
@@ -335,13 +345,20 @@ function Schedule({ courtID }: { courtID: number }) {
                   <div className="text-lg font-semibold text-gray-500">Không có lịch</div>
                 )}
                 {JSON.parse(localStorage.getItem("user") || "{}")?.role === "ADMIN" && (
-                  <AddScheduleSingle subcourt={selectedSubCourt} date={day} filteredSchedules={filteredSchedules}/>
+                  <AddScheduleSingle subcourt={selectedSubCourt} date={day} filteredSchedules={filteredSchedules} />
                 )}
               </div>
             </div>
           )
         })}
       </div>
+      <BookModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        courtId={courtID}
+        subCourtSelected={selectedSubCourt}
+        bookedSchedule={bookedSchedule}
+      />
     </div>
   )
 }
