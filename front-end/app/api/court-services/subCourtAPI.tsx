@@ -43,4 +43,10 @@ export const subCourtApi = {
     const response = await apiClient.get(`/get-sub-courts/${courtID}`);
     return response.data;
   },
+
+  // Lấy sân phụ theo ID
+  getSubCourtById: async (subCourtID: number) => {
+    const response = await apiClient.get(`/get-sub-court-by-id/${subCourtID}`);
+    return response.data;
+  },
 };
