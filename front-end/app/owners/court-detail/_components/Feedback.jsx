@@ -62,7 +62,7 @@ function Feedback() {
                             <h2 className="text-2xl font-bold mb-6 text-center">Trung bình</h2>
                             <div className="mb-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-4xl font-bold text-orange-500">
+                                    <span className="text-4xl font-bold">
                                         {averageRating}
                                     </span>
                                     <div className="flex">
@@ -70,12 +70,12 @@ function Feedback() {
                                             <Star
                                                 key={index}
                                                 className={`size-6 ${index < Math.round(averageRating)
-                                                        ? "text-orange-400"
+                                                        ? "text-yellow-400"
                                                         : "text-gray-300"
                                                     }`}
                                                 fill={
                                                     index < Math.round(averageRating)
-                                                        ? "orange"
+                                                        ? "yellow"
                                                         : "none"
                                                 }
                                             />
@@ -96,7 +96,7 @@ function Feedback() {
                                             <span className="w-16">{star} sao</span>
                                             <div className="w-full bg-gray-200 rounded-full h-2.5">
                                                 <div
-                                                    className="bg-orange-400 h-2.5 rounded-full"
+                                                    className="bg-primary-400 h-2.5 rounded-full"
                                                     style={{ width: `${percentage}%` }}
                                                 ></div>
                                             </div>
@@ -123,12 +123,12 @@ function Feedback() {
                                                     <Star
                                                         key={index}
                                                         className={`size-6 ${index < feedback.rating
-                                                                ? "text-orange-400"
+                                                                ? "text-yellow-400"
                                                                 : "text-gray-300"
                                                             }`}
                                                         fill={
                                                             index < feedback.rating
-                                                                ? "orange"
+                                                                ? "yellow"
                                                                 : "none"
                                                         }
                                                     />
@@ -165,12 +165,12 @@ function Feedback() {
                                     >
                                         <Star
                                             className={`size-6 ${ratingValue <= (hoverRating || newRating)
-                                                    ? "text-orange-400"
-                                                    : "text-gray-300"
+                                                    ? "text-yellow-400"
+                                                    : "text-yellow-300"
                                                 }`}
                                             fill={
                                                 ratingValue <= (hoverRating || newRating)
-                                                    ? "orange"
+                                                    ? "yellow"
                                                     : "none"
                                             }
                                         />
@@ -194,7 +194,7 @@ function Feedback() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-orange-400 text-white px-6 py-2 rounded-md hover:bg-orange-500 transition-colors"
+                        className="bg-teal-500 text-white px-6 py-2 rounded-md hover:bg-teal-400 transition-colors"
                     >
                         Gửi nhận xét
                     </button>
