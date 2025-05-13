@@ -11,6 +11,7 @@ import phoneImage from "../../../public/telephone-stroke-rounded.svg";
 import websiteImage from "../../../public/internet-stroke-rounded.svg";
 import Schedule from "./_components/Schedule";
 import Footer from "../../_components/Footer";
+import Feedback from "./_components/Feedback";
 
 type User = {
     name: string;
@@ -52,7 +53,7 @@ type Image = {
     url: string;
     upLoadDate: string;
     upLoadBy: string;
-  };
+};
 
 type Address = {
     province: string;
@@ -151,7 +152,8 @@ function page() {
                 </div>
             </div>
             {courtID && <Schedule courtID={Number(courtID)} />}
-            <Footer/>
+            <Feedback />
+            <Footer />
         </div>
     );
 }
