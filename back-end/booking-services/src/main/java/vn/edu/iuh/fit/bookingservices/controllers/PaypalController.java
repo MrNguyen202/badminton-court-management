@@ -30,13 +30,13 @@ public class PaypalController {
     @Autowired
     private BookingRepository bookingRepository;
 
-    private static final String SUCCESS_URL = "http://localhost:3000/dashboard";
-    private static final String CANCEL_URL = "http://localhost:8083/api/paypal/cancel";
+    private static final String SUCCESS_URL = "http://localhost:3000//owners/court-detail?courtID=";
+    private static final String CANCEL_URL = "http://localhost:3000/owners/court-detail?courtID=";
 
     @PostMapping("/pay")
-    public ResponseEntity<String> makePayment(@RequestParam("bookingId") Long bookingId) {
+    public ResponseEntity<String> makePayment(@RequestParam("courtId") Long courtId, @RequestParam("subCourtId") Long subCourtId, @RequestParam("scheduleId") Long scheduleId) {
         try {
-            Booking booking = bookingService.getBooking(bookingId);
+            Booking booking = bookingService.getBooking(subCourtId);
             if (booking == null) {
                 return ResponseEntity.badRequest().body("Booking không tồn tại");
             }
@@ -63,9 +63,9 @@ public class PaypalController {
                     "USD",
                     "paypal",
                     "sale",
-                    "Thanh toán đặt sân #" + bookingId,
-                    CANCEL_URL + "?bookingId=" + bookingId,
-                    SUCCESS_URL,
+                    "Thanh toán đặt sân #" + subCourtId,
+                    CANCEL_URL + courtId,
+                    SUCCESS_URL + courtId + "&message=success",
                     false);
 
             for (Links links : payment.getLinks()) {

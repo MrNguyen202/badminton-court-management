@@ -145,7 +145,10 @@ export default function BookModal({
         phone: user ? user.phone : userPhoneBooking,
         email: user?.email || "",
       },
+      bookedScheduleId: bookedSchedule?.scheduleId
     };
+
+    console.log("Booking data:", bookingData);
 
     // Lưu thông tin vào localStorage để có thể truy cập ở trang booking
     localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
