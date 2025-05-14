@@ -79,21 +79,6 @@ public class SubCourtScheduleController {
                         return scheduleServiceImpl.save(newSchedule);
                     });
 
-            // Kiểm tra SubCourtSchedule đã tồn tại chưa
-            SubCourtScheduleID id = new SubCourtScheduleID(subCourt.getId(), schedule.getId());
-            Optional<SubCourtSchedule> existingSubCourtScheduleOpt = subCourtScheduleService.findById(id);
-            if (existingSubCourtScheduleOpt.isPresent()) {
-                return ResponseEntity.badRequest().body("Sub court schedule already exists");
-            } else {
-                // Nếu không tồn tại, tạo mới SubCourtSchedule
-                SubCourtSchedule newSubCourtSchedule = new SubCourtSchedule();
-                newSubCourtSchedule.setSubCourt(subCourt);
-                newSubCourtSchedule.setSchedule(schedule);
-                newSubCourtSchedule.setPrice(subCourtScheduleRequestDTO.getPrice());
-                newSubCourtSchedule.setStatus(StatusSchedule.AVAILABLE);
-                subCourtScheduleService.save(newSubCourtSchedule);
-            }
-
             // Tạo SubCourtSchedule với constructor mới
             SubCourtSchedule subCourtSchedule = new SubCourtSchedule(
                     subCourt,

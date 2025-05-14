@@ -1,49 +1,62 @@
-import React, { useState } from "react";
-import { Star } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Delete, Star } from "lucide-react";
+import { feedbackAPI } from "@/app/api/court-services/feedbackAPI";
+import { toast } from "react-toastify";
 
-function Feedback() {
-    const [feedbacks, setFeedbacks] = useState([
-        {
-            id: 1,
-            userName: "Nguyen Van A",
-            rating: 4,
-            comment: "Sân rất đẹp, dịch vụ tốt nhưng giá hơi cao.",
-            date: "2025-05-10",
-        },
-        {
-            id: 2,
-            userName: "Tran Thi B",
-            rating: 5,
-            comment: "Trải nghiệm tuyệt vời, nhân viên thân thiện!",
-            date: "2025-05-08",
-        },
-    ]);
-
+function Feedback({ courtID }: any) {
+    const user = localStorage.getItem("user");
+    const [feedbacks, setFeedbacks] = useState([]);
     const [newRating, setNewRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [newComment, setNewComment] = useState("");
 
+    useEffect(() => {
+        const fetchFeedbacks = async () => {
+            try {
+                const response = await feedbackAPI.getFeedbacks(courtID);
+                setFeedbacks(response);
+            } catch (error) {
+                console.error("Error fetching feedbacks:", error);
+            }
+        };
+
+        fetchFeedbacks();
+    }, [courtID]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (newRating === 0 || !newComment.trim()) {
-            alert("Vui lòng chọn số sao và nhập nhận xét!");
+            toast.warning("Vui lòng chọn số sao và nhập nhận xét!");
+            return;
+        }
+
+        //kiểm tra xem người dùng đã đăng nhập hay chưa
+        if (!user) {
+            toast.warning("Vui lòng đăng nhập để gửi nhận xét!");
             return;
         }
 
         const newFeedback = {
-            id: feedbacks.length + 1,
-            userName: "Anonymous",
-            rating: newRating,
-            comment: newComment,
-            date: new Date().toISOString().split("T")[0],
+            userName: user ? JSON.parse(user).name : "Người dùng",
+            numberStar: newRating,
+            content: newComment,
+            userId: user ? JSON.parse(user).id : 0,
+            courtId: courtID
         };
 
-        setFeedbacks([...feedbacks, newFeedback]);
+        feedbackAPI.createFeedback(newFeedback)
+            .then((createdFeedback) => {
+                setFeedbacks([...feedbacks, createdFeedback]); // Use API response
+            })
+            .catch((error) => {
+                console.error("Error creating feedback:", error);
+            });
+
         setNewRating(0);
         setNewComment("");
     };
 
-    const totalRatings = feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0);
+    const totalRatings = feedbacks.reduce((sum, feedback) => sum + feedback.numberStar, 0);
     const averageRating = feedbacks.length > 0 ? (totalRatings / feedbacks.length).toFixed(1) : 0;
     const totalReviews = feedbacks.length;
 
@@ -57,7 +70,6 @@ function Feedback() {
                     <p className="text-gray-500">Chưa có nhận xét nào.</p>
                 ) : (
                     <div className="flex flex-col md:flex-row gap-6">
-                        {/* Rating Summary */}
                         <div className="w-full md:w-1/4 bg-white p-6 rounded-lg border border-gray-200 max-h-96">
                             <h2 className="text-2xl font-bold mb-6 text-center">Trung bình</h2>
                             <div className="mb-4">
@@ -70,8 +82,8 @@ function Feedback() {
                                             <Star
                                                 key={index}
                                                 className={`size-6 ${index < Math.round(averageRating)
-                                                        ? "text-yellow-400"
-                                                        : "text-gray-300"
+                                                    ? "text-yellow-400"
+                                                    : "text-gray-300"
                                                     }`}
                                                 fill={
                                                     index < Math.round(averageRating)
@@ -86,7 +98,7 @@ function Feedback() {
                             </div>
                             <div className="space-y-2">
                                 {[5, 4, 3, 2, 1].map((star) => {
-                                    const count = feedbacks.filter((f) => f.rating === star).length;
+                                    const count = feedbacks.filter((f) => f.numberStar === star).length;
                                     const percentage =
                                         totalReviews > 0
                                             ? ((count / totalReviews) * 100).toFixed(0)
@@ -106,11 +118,10 @@ function Feedback() {
                                 })}
                             </div>
                         </div>
-                        {/* Feedback List with Scroll */}
                         <div className="w-full md:w-3/4 space-y-4 max-h-[500px] overflow-y-auto">
                             {feedbacks.map((feedback) => (
                                 <div
-                                    key={feedback.id}
+                                    key={feedback.id} // Assume id is present and unique
                                     className="border-b border-gray-200 pb-4 last:border-b-0"
                                 >
                                     <div className="flex items-center justify-between">
@@ -122,12 +133,12 @@ function Feedback() {
                                                 {[...Array(5)].map((_, index) => (
                                                     <Star
                                                         key={index}
-                                                        className={`size-6 ${index < feedback.rating
-                                                                ? "text-yellow-400"
-                                                                : "text-gray-300"
+                                                        className={`size-6 ${index < feedback.numberStar
+                                                            ? "text-yellow-400"
+                                                            : "text-gray-300"
                                                             }`}
                                                         fill={
-                                                            index < feedback.rating
+                                                            index < feedback.numberStar
                                                                 ? "yellow"
                                                                 : "none"
                                                         }
@@ -135,11 +146,14 @@ function Feedback() {
                                                 ))}
                                             </div>
                                         </div>
-                                        <span className="text-sm text-gray-500">
-                                            {feedback.date}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            {feedback.userId === JSON.parse(user)?.id && (<button><Delete className="text-red-500" /></button>)}
+                                            <span className="text-sm text-gray-500">
+                                                {feedback.date}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p className="mt-2 text-gray-700">{feedback.comment}</p>
+                                    <p className="mt-2 text-gray-700">{feedback.content}</p>
                                 </div>
                             ))}
                         </div>
@@ -165,8 +179,8 @@ function Feedback() {
                                     >
                                         <Star
                                             className={`size-6 ${ratingValue <= (hoverRating || newRating)
-                                                    ? "text-yellow-400"
-                                                    : "text-yellow-300"
+                                                ? "text-yellow-400"
+                                                : "text-yellow-300"
                                                 }`}
                                             fill={
                                                 ratingValue <= (hoverRating || newRating)
@@ -180,11 +194,11 @@ function Feedback() {
                         </div>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="comment" className="block text-lg font-medium mb-2">
+                        <label htmlFor="content" className="block text-lg font-medium mb-2">
                             Nhận xét
                         </label>
                         <textarea
-                            id="comment"
+                            id="content"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
