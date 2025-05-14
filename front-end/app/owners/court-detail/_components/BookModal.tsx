@@ -20,11 +20,11 @@ export default function BookModal({
     courtId,
     subCourtSelected,
     bookedSchedule
-}) {
+}: any) {
 
     const [court, setCourt] = useState(null);
     const [subCourt, setSubCourt] = useState(null);
-    const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+    const user = JSON.parse(localStorage.getItem("user") || "null");
     const [userNameBooking, setUserNameBooking] = useState(user?.name || "");
     const [userPhoneBooking, setUserPhoneBooking] = useState(user?.phone || "");
     const [error, setError] = useState({ name: "", phone: "" });
@@ -70,7 +70,7 @@ export default function BookModal({
     }, [subCourtSelected]);
 
     // Hàm xử lý thay đổi input
-    const handleNameChange = (e) => {
+    const handleNameChange = (e: any) => {
         const value = e.target.value;
         setUserNameBooking(value);
         // Kiểm tra validation
@@ -81,7 +81,7 @@ export default function BookModal({
         }
     };
 
-    const handlePhoneChange = (e) => {
+    const handlePhoneChange = (e: any) => {
         const value = e.target.value;
         setUserPhoneBooking(value);
         // Kiểm tra validation
@@ -94,7 +94,7 @@ export default function BookModal({
     };
 
     // Hàm xử lý khi nhấn nút Đặt sân
-    const handleBooking = (onClose) => {
+    const handleBooking = (onClose: any) => {
         // Kiểm tra nếu không có user và các trường input không hợp lệ
         if (!user && (!userNameBooking || !userPhoneBooking)) {
             setError({
