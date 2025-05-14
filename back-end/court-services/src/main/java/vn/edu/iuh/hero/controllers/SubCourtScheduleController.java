@@ -103,7 +103,7 @@ public class SubCourtScheduleController {
             Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleService.findById(id);
             if (!subCourtScheduleOpt.isPresent()) {
                 return ResponseEntity.badRequest().body("Sub court schedule not found");
-            }else {
+            } else {
                 SubCourtSchedule subCourtSchedule = subCourtScheduleOpt.get();
                 String status = statusPayload.get("status");
 

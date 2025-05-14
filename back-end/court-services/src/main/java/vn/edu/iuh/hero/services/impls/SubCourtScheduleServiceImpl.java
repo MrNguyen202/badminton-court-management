@@ -123,4 +123,5 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
         System.out.println("Updating status of schedules..." +  today + "---" + Time.valueOf(now));
         subCourtScheduleRepository.expireSchedulesBefore(today, Time.valueOf(now));
     }
+
 }

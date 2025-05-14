@@ -41,6 +41,19 @@ public class PaypalController {
                 return ResponseEntity.badRequest().body("Booking không tồn tại");
             }
 
+            // Kiểm tra trạng thái booking
+            if (booking.getStatus() == BookingStatus.PAID) {
+                return ResponseEntity.badRequest().body("Booking này đã được thanh toán");
+            }
+
+            // Cho phép thanh toán lại nếu trạng thái là NEW hoặc PAYMENT_FAILED
+            // Đặt booking về trạng thái NEW nếu đang ở trạng thái CANCEL
+            if (booking.getStatus() == BookingStatus.CANCELLED) {
+                booking.setStatus(BookingStatus.NEW);
+                bookingRepository.save(booking);
+            }
+
+
             double totalInVND = booking.getTotalAmount().doubleValue();
             double totalInUSD = Math.max(0.01, totalInVND / 25.0);
             System.out.println("Total in VND: " + totalInVND + ", Total in USD: " + totalInUSD);
@@ -72,6 +85,28 @@ public class PaypalController {
         return ResponseEntity.badRequest().body("Không thể tạo thanh toán");
     }
 
+//    @GetMapping("/success")
+//    public ResponseEntity<Map<String, String>> paymentSuccess(
+//            @RequestParam("paymentId") String paymentId,
+//            @RequestParam("PayerID") String payerId,
+//            @RequestParam("bookingId") Long bookingId) {
+//        try {
+//            Payment payment = paypalService.executePayment(paymentId, payerId);
+//            if (payment.getState().equals("approved")) {
+//                Booking booking = bookingService.getBooking(bookingId);
+//                booking.setStatus(BookingStatus.PAID);
+//                bookingRepository.save(booking);
+//
+//                Map<String, String> response = new HashMap<>();
+//                response.put("redirectUrl", "http://localhost:3000/dashboard?message=Thanh toán thành công cho booking #" + bookingId);
+//                return ResponseEntity.ok(response);
+//            }
+//        } catch (PayPalRESTException e) {
+//            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Lỗi khi xử lý thanh toán: " + e.getMessage()));
+//        }
+//        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Thanh toán thất bại"));
+//    }
+
     @GetMapping("/success")
     public ResponseEntity<Map<String, String>> paymentSuccess(
             @RequestParam("paymentId") String paymentId,
@@ -85,22 +120,51 @@ public class PaypalController {
                 bookingRepository.save(booking);
 
                 Map<String, String> response = new HashMap<>();
-                response.put("redirectUrl", "http://localhost:3000/dashboard?message=Thanh toán thành công cho booking #" + bookingId);
+                response.put("status", "success");
+                response.put("message", "Bạn đã thanh toán thành công cho booking #" + bookingId);
+                response.put("bookingId", String.valueOf(bookingId));
+                response.put("subCourtId", String.valueOf(booking.getSubCourtId()));
+                response.put("startTime", booking.getStartTime().toString());
+                response.put("endTime", booking.getEndTime().toString());
                 return ResponseEntity.ok(response);
             }
         } catch (PayPalRESTException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Lỗi khi xử lý thanh toán: " + e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Error: " + e.getMessage()));
         }
         return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Thanh toán thất bại"));
     }
 
+    // @GetMapping("/cancel")
+    // public String paymentCancel(@RequestParam("bookingId") Long bookingId) {
+    //     try {
+    //         Booking booking = bookingService.cancelBooking(bookingId);
+    //         return "Thanh toán bị hủy cho booking " + bookingId;
+    //     } catch (Exception e) {
+    //         return "Lỗi khi hủy thanh toán: " + e.getMessage();
+    //     }
+    // }
+
     @GetMapping("/cancel")
     public String paymentCancel(@RequestParam("bookingId") Long bookingId) {
+        System.out.println("Cancel payment for booking ID: " + bookingId);
         try {
-            Booking booking = bookingService.cancelBooking(bookingId);
-            return "Thanh toán bị hủy cho booking #" + bookingId;
+            // Thay vì hủy booking, ta chỉ đánh dấu thanh toán thất bại/hủy
+            Booking booking = bookingService.getBooking(bookingId);
+            System.out.println("Booking found: " + booking);
+            if (booking != null) {
+                // Đặt trạng thái là PAYMENT_FAILED thay vì CANCEL
+                booking.setStatus(BookingStatus.PAYMENT_FAILED);
+                booking.setPaymentId(null); // Xóa PaymentId cũ
+                bookingRepository.save(booking);
+
+                return "redirect:http://localhost:3000/booking?bookingId=" + bookingId + "&status=payment_cancelled";
+            }
+            // return "Không tìm thấy booking #" + bookingId;
+            return "redirect:http://localhost:3000/dashboard?message=Thanh toán bị hủy cho booking #" + bookingId;
         } catch (Exception e) {
-            return "Lỗi khi hủy thanh toán: " + e.getMessage();
+            return "Lỗi khi xử lý hủy thanh toán: " + e.getMessage();
         }
     }
 }
