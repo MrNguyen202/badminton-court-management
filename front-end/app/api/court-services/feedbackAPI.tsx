@@ -44,6 +44,7 @@ export const feedbackAPI = {
     getFeedbacks: async (courtID: number) => {
         try {
             const response = await apiClient.get(`/get-feedbacks-by-court-id/${courtID}`);
+            console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             console.error("Error fetching feedbacks:", error);

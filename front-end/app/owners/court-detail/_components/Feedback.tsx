@@ -14,7 +14,9 @@ function Feedback({ courtID }: any) {
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {
+                console.log("Fetching feedbacks for court ID:", courtID);
                 const response = await feedbackAPI.getFeedbacks(courtID);
+                console.log("Fetched feedbacks:", response);
                 setFeedbacks(response);
             } catch (error) {
                 console.error("Error fetching feedbacks:", error);
