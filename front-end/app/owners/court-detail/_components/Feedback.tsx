@@ -9,6 +9,7 @@ function Feedback({ courtID }: any) {
     const [newRating, setNewRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [newComment, setNewComment] = useState("");
+    const [visibleFeedbacks, setVisibleFeedbacks] = useState(5); // State to control visible feedbacks
 
     useEffect(() => {
         const fetchFeedbacks = async () => {
@@ -30,7 +31,6 @@ function Feedback({ courtID }: any) {
             return;
         }
 
-        //kiểm tra xem người dùng đã đăng nhập hay chưa
         if (!user) {
             toast.warning("Vui lòng đăng nhập để gửi nhận xét!");
             return;
@@ -41,12 +41,13 @@ function Feedback({ courtID }: any) {
             numberStar: newRating,
             content: newComment,
             userId: user ? JSON.parse(user).id : 0,
-            courtId: courtID
+            courtId: courtID,
         };
 
-        feedbackAPI.createFeedback(newFeedback)
+        feedbackAPI
+            .createFeedback(newFeedback)
             .then((createdFeedback) => {
-                setFeedbacks([...feedbacks, createdFeedback]); // Use API response
+                setFeedbacks([...feedbacks, createdFeedback]);
             })
             .catch((error) => {
                 console.error("Error creating feedback:", error);
@@ -56,9 +57,18 @@ function Feedback({ courtID }: any) {
         setNewComment("");
     };
 
-    const totalRatings = feedbacks.reduce((sum, feedback) => sum + feedback.numberStar, 0);
-    const averageRating = feedbacks.length > 0 ? (totalRatings / feedbacks.length).toFixed(1) : 0;
+    const totalRatings = feedbacks.reduce(
+        (sum, feedback) => sum + feedback.numberStar,
+        0
+    );
+    const averageRating =
+        feedbacks.length > 0 ? (totalRatings / feedbacks.length).toFixed(1) : 0;
     const totalReviews = feedbacks.length;
+
+    // Handle "View More" button click
+    const handleViewMore = () => {
+        setVisibleFeedbacks(feedbacks.length); // Show all feedbacks
+    };
 
     return (
         <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-lg">
@@ -74,21 +84,17 @@ function Feedback({ courtID }: any) {
                             <h2 className="text-2xl font-bold mb-6 text-center">Trung bình</h2>
                             <div className="mb-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-4xl font-bold">
-                                        {averageRating}
-                                    </span>
+                                    <span className="text-4xl font-bold">{averageRating}</span>
                                     <div className="flex">
                                         {[...Array(5)].map((_, index) => (
                                             <Star
                                                 key={index}
                                                 className={`size-6 ${index < Math.round(averageRating)
-                                                    ? "text-yellow-400"
-                                                    : "text-gray-300"
+                                                        ? "text-yellow-400"
+                                                        : "text-gray-300"
                                                     }`}
                                                 fill={
-                                                    index < Math.round(averageRating)
-                                                        ? "yellow"
-                                                        : "none"
+                                                    index < Math.round(averageRating) ? "yellow" : "none"
                                                 }
                                             />
                                         ))}
@@ -98,7 +104,9 @@ function Feedback({ courtID }: any) {
                             </div>
                             <div className="space-y-2">
                                 {[5, 4, 3, 2, 1].map((star) => {
-                                    const count = feedbacks.filter((f) => f.numberStar === star).length;
+                                    const count = feedbacks.filter(
+                                        (f) => f.numberStar === star
+                                    ).length;
                                     const percentage =
                                         totalReviews > 0
                                             ? ((count / totalReviews) * 100).toFixed(0)
@@ -118,44 +126,61 @@ function Feedback({ courtID }: any) {
                                 })}
                             </div>
                         </div>
-                        <div className="w-full md:w-3/4 space-y-4 max-h-[500px] overflow-y-auto">
-                            {feedbacks.map((feedback) => (
-                                <div
-                                    key={feedback.id} // Assume id is present and unique
-                                    className="border-b border-gray-200 pb-4 last:border-b-0"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-lg">
-                                                {feedback.userName}
-                                            </span>
-                                            <div className="flex">
-                                                {[...Array(5)].map((_, index) => (
-                                                    <Star
-                                                        key={index}
-                                                        className={`size-6 ${index < feedback.numberStar
-                                                            ? "text-yellow-400"
-                                                            : "text-gray-300"
-                                                            }`}
-                                                        fill={
-                                                            index < feedback.numberStar
-                                                                ? "yellow"
-                                                                : "none"
-                                                        }
-                                                    />
-                                                ))}
+                        <div className="w-full md:w-3/4 space-y-4">
+                            <div
+                                className={`space-y-4 ${visibleFeedbacks >= feedbacks.length
+                                        ? "max-h-[500px] overflow-y-auto"
+                                        : ""
+                                    }`}
+                            >
+                                {feedbacks.slice(0, visibleFeedbacks).map((feedback) => (
+                                    <div
+                                        key={feedback.id}
+                                        className="border-b border-gray-200 pb-4 last:border-b-0"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-semibold text-lg">
+                                                    {feedback.userName}
+                                                </span>
+                                                <div className="flex">
+                                                    {[...Array(5)].map((_, index) => (
+                                                        <Star
+                                                            key={index}
+                                                            className={`size-6 ${index < feedback.numberStar
+                                                                    ? "text-yellow-400"
+                                                                    : "text-gray-300"
+                                                                }`}
+                                                            fill={
+                                                                index < feedback.numberStar ? "yellow" : "none"
+                                                            }
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {feedback.userId === JSON.parse(user)?.id && (
+                                                    <button>
+                                                        <Delete className="text-red-500" />
+                                                    </button>
+                                                )}
+                                                <span className="text-sm text-gray-500">
+                                                    {feedback.date}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {feedback.userId === JSON.parse(user)?.id && (<button><Delete className="text-red-500" /></button>)}
-                                            <span className="text-sm text-gray-500">
-                                                {feedback.date}
-                                            </span>
-                                        </div>
+                                        <p className="mt-2 text-gray-700">{feedback.content}</p>
                                     </div>
-                                    <p className="mt-2 text-gray-700">{feedback.content}</p>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            {visibleFeedbacks < feedbacks.length && (
+                                <button
+                                    onClick={handleViewMore}
+                                    className="mt-4 text-teal-500 hover:text-teal-600 font-medium"
+                                >
+                                    Xem thêm
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
@@ -165,7 +190,9 @@ function Feedback({ courtID }: any) {
                 <h3 className="text-xl font-semibold mb-4">Viết nhận xét của bạn</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block text-lg font-medium mb-2">Đánh giá của bạn</label>
+                        <label className="block text-lg font-medium mb-2">
+                            Đánh giá của bạn
+                        </label>
                         <div className="flex gap-1">
                             {[...Array(5)].map((_, index) => {
                                 const ratingValue = index + 1;
@@ -179,8 +206,8 @@ function Feedback({ courtID }: any) {
                                     >
                                         <Star
                                             className={`size-6 ${ratingValue <= (hoverRating || newRating)
-                                                ? "text-yellow-400"
-                                                : "text-yellow-300"
+                                                    ? "text-yellow-400"
+                                                    : "text-yellow-300"
                                                 }`}
                                             fill={
                                                 ratingValue <= (hoverRating || newRating)
