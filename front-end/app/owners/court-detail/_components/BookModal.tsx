@@ -148,7 +148,7 @@ export default function BookModal({
       bookedScheduleId: bookedSchedule?.scheduleId
     };
 
-    console.log("Booking data:", bookingData);
+    console.log("Booking data in modal:", bookingData);
 
     // Lưu thông tin vào localStorage để có thể truy cập ở trang booking
     localStorage.setItem("pendingBooking", JSON.stringify(bookingData));

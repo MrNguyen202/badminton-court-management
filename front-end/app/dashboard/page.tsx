@@ -9,8 +9,6 @@ import utilityImage from "../../public/utility.gif";
 import { courtApi } from "../api/court-services/courtAPI";
 import Footer from "../_components/Footer";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 type SubCourt = {
   id: number;
@@ -75,22 +73,6 @@ function BadmintonCourtList() {
   const user = JSON.parse(
     localStorage.getItem("user") || "null"
   ) as User | null;
-
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const message = searchParams.get("message");
-    if (message) {
-      toast.success(message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    }
-  }, [searchParams]);
 
   //get all courts tu api
   useEffect(() => {
@@ -272,7 +254,6 @@ function BadmintonCourtList() {
         </div>
       </div>
       <Footer />
-      <ToastContainer />
     </div>
   );
 }
