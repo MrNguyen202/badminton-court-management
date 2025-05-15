@@ -49,7 +49,7 @@ export default function BookingPage() {
       const requestBody = {
         courtId: bookingData.courtId,
         subCourtId: bookingData.subCourtId,
-        scheduleId: bookingData.scheduleId,
+        scheduleId: bookingData.bookedScheduleId,
         date: bookingData.date,
         fromHour: formattedFromHour,
         toHour: formattedToHour,
@@ -81,8 +81,12 @@ export default function BookingPage() {
       const bookingId = bookingDataResult;
       console.log("Booking ID:", bookingId);
 
+      console.log("courtId:", bookingData.courtId);
+      console.log("subCourtId:", bookingData.subCourtId);
+      console.log("bookedScheduleId:", bookingData.bookedScheduleId);
+
       const paymentResponse = await fetch(
-        `http://localhost:8083/api/paypal/pay?courtId=${bookingData.courtId}&&subCourtId=${bookingData.subCourtId}&scheduleId=${bookingData.scheduleId}`,
+        `http://localhost:8083/api/paypal/pay?courtId=${bookingData.courtId}&subCourtId=${bookingData.subCourtId}&bookedScheduleId=${bookingData.bookedScheduleId}&bookingId=${bookingId}`,
         {
           method: "POST",
         }
