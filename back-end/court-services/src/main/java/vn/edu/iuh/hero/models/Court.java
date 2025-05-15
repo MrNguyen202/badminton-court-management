@@ -70,6 +70,11 @@ public class Court {
     @ToString.Exclude
     private Address address;
 
+    @OneToMany(mappedBy = "court")
+    @JsonManagedReference
+    @ToString.Exclude
+    private Set<Feedback> feedbacks;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

@@ -12,7 +12,7 @@ import websiteImage from "../../../public/internet-stroke-rounded.svg";
 import Schedule from "./_components/Schedule";
 import Footer from "../../_components/Footer";
 import Feedback from "./_components/Feedback";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
 
@@ -143,15 +143,6 @@ function page() {
 
   return (
     <div className="px-32 w-full mt-9 flex-col">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        style={{ zIndex: 9999 }}
-      />
       <MenuFocus items={itemMenu} />
       <h1 className="text-3xl font-bold mt-6">{court?.name}</h1>
       <div className="flex justify-between items-center gap-4 mt-4">
