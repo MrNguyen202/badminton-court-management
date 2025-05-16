@@ -23,6 +23,8 @@ public class Booking {
 
     private Long subCourtId; // ID sân con
 
+    private Long scheduleId; // ID lịch sân
+
     private LocalDateTime startTime; // Thời gian bắt đầu (thay vì Date)
 
     private LocalDateTime endTime; // Thời gian kết thúc

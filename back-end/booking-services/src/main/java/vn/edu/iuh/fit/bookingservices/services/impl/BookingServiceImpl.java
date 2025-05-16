@@ -10,6 +10,7 @@ import vn.edu.iuh.fit.bookingservices.services.BookingService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -22,9 +23,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking createBooking(Booking booking, String userInfoJson) {
-        System.out.println("Checking booking conflict for subCourtId: " + booking.getSubCourtId() + ", startTime: " + booking.getStartTime() + ", endTime: " + booking.getEndTime());
-        if (isBookingConflict(booking.getSubCourtId(), booking.getStartTime(), booking.getEndTime())) {
-            System.out.println("Conflict detected!");
+        if (bookingRepository.findByCourtIdAndSubCourtIdAndScheduleId(booking.getCourtId(), booking.getSubCourtId(), booking.getScheduleId()).isPresent()) {
             throw new RuntimeException("Lịch đặt sân bị trùng. Vui lòng chọn khung giờ khác.");
         }
         System.out.println("No conflict, proceeding to save booking: " + booking);
@@ -32,6 +31,23 @@ public class BookingServiceImpl implements BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         savedBooking.setUserInfo(userInfoJson);
         return bookingRepository.save(savedBooking);
+    }
+
+    @Override
+    public Boolean deleteBooking(Long courtId, Long subCourtId, Long bookedScheduleId) {
+        try {
+            // Tìm booking dựa trên courtId, subCourtId, và scheduleId
+            Optional<Booking> bookingOptional = bookingRepository.findByCourtIdAndSubCourtIdAndScheduleId(
+                    courtId, subCourtId, bookedScheduleId
+            );
+            if (bookingOptional.isPresent()) {
+                bookingRepository.delete(bookingOptional.get());
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi xóa booking: " + e.getMessage());
+        }
     }
 
     @Override
@@ -63,13 +79,5 @@ public class BookingServiceImpl implements BookingService {
         }
         booking.setStatus(BookingStatus.CONFIRMED);
         return bookingRepository.save(booking);
-    }
-
-    @Override
-    public boolean isBookingConflict(Long subCourtId, LocalDateTime startTime, LocalDateTime endTime) {
-        List<Booking> conflictingBookings = bookingRepository
-                .findBySubCourtIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                        subCourtId, endTime, startTime);
-        return !conflictingBookings.isEmpty();
     }
 }

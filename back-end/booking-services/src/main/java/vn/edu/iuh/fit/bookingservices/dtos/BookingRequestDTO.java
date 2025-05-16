@@ -9,6 +9,7 @@ import lombok.*;
 public class BookingRequestDTO {
     private Long courtId;
     private Long subCourtId;
+    private Long scheduleId;
     private String date;
     private String fromHour;
     private String toHour;

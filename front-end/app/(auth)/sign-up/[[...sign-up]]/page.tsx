@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { userApi } from "@/app/api/user-services/userAPI";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = () => {
@@ -60,7 +60,7 @@ const SignUp = () => {
       toast.success("Đăng ký thành công!");
       router.push("/");
       setTimeout(() => window.location.reload(), 500);
-      router.push("/sign-in");
+      // router.push("/sign-in");
     } catch (error: any) {
       toast.error("Đăng ký thất bại!");
     }
@@ -180,7 +180,6 @@ const SignUp = () => {
           </div>
         </div>
       </main>
-      <ToastContainer />
     </div>
   );
 };
