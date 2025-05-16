@@ -151,13 +151,13 @@ export const subCourtScheduleApi = {
 
   // Update status sub court schedule
   updateStatusSubCourtSchedule: async (
-    subCourtScheduleID: number,
+    scheduleID: number,
     subCourtId: number,
     status: string
   ) => {
     try {
       const response = await apiClient.put(
-        `/update-status/${subCourtScheduleID}/${subCourtId}`,
+        `/update-status/${scheduleID}/${subCourtId}`,
         { status }
       );
       return response.data;

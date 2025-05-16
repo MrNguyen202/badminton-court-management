@@ -11,24 +11,33 @@ import java.util.List;
 
 @Service
 public class PaypalService {
+
     @Autowired
     private APIContext apiContext;
 
-    public Payment createPayment(Double total, String currency, String method,
-                                 String intent, String description, String cancelUrl, String successUrl) throws PayPalRESTException {
+    public Payment createPayment(
+            Double total,
+            String currency,
+            String method,
+            String intent,
+            String description,
+            String cancelUrl,
+            String successUrl,
+            boolean isDeposit) throws PayPalRESTException {
+
+        // Nếu là đặt cọc, chỉ tính 10% tổng tiền
+        Double paymentAmount = isDeposit ? total * 0.1 : total;
 
         Amount amount = new Amount();
         amount.setCurrency(currency);
-        amount.setTotal(String.format("%.2f", total));
+        amount.setTotal(String.format("%.2f", paymentAmount));
 
-        //Transaction
         Transaction transaction = new Transaction();
         transaction.setDescription(description);
         transaction.setAmount(amount);
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
 
-        //Payer
         Payer payer = new Payer();
         payer.setPaymentMethod(method.toUpperCase());
 
@@ -43,19 +52,13 @@ public class PaypalService {
         payment.setRedirectUrls(redirectUrls);
 
         return payment.create(apiContext);
-
     }
 
-    //execute payment
-
-    public Payment execute(String paymentId, String payerId) throws PayPalRESTException {
-
+    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
         return payment.execute(apiContext, paymentExecution);
     }
-
-
 }

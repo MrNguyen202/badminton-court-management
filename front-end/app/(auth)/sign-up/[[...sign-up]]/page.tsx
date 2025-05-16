@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { userApi } from "@/app/api/user-services/userAPI";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const SignIn = () => {
+const SignUp = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -26,20 +28,22 @@ const SignIn = () => {
 
     // Kiểm tra mật khẩu khớp
     if (formData.password !== formData.confirmPassword) {
-      alert("Mật khẩu không khớp!");
+      toast.error("Mật khẩu không khớp!");
       return;
     }
 
     // Kiểm tra định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert("Email không hợp lệ!");
+      toast.error("Email không hợp lệ!");
       return;
     }
 
     // Kiểm tra số điện thoại
     if (!/^\d{10}$/.test(formData.phone)) {
-      alert("Số điện thoại không hợp lệ!");
+      toast.error(
+        "Số điện thoại không hợp lệ! Vui lòng nhập số điện thoại 10 chữ số."
+      );
       return;
     }
 
@@ -53,12 +57,12 @@ const SignIn = () => {
       };
 
       const data = await userApi.register(userData);
-      alert("Đăng ký và đăng nhập thành công!");
+      toast.success("Đăng ký thành công!");
       router.push("/");
       setTimeout(() => window.location.reload(), 500);
       // router.push("/sign-in");
     } catch (error: any) {
-      alert(error.message);
+      toast.error("Đăng ký thất bại!");
     }
   };
 
@@ -180,18 +184,4 @@ const SignIn = () => {
   );
 };
 
-function validateName(name: string): string {
-  // Kiểm tra tên không được rỗng
-  if (name.trim() === "") {
-    return "Tên không được để trống";
-  }
-
-  // Kiểm tra tên không phải là số
-  if (!isNaN(Number(name))) {
-    return "Tên không được là chữ số";
-  }
-
-  return "Tên hợp lệ";
-}
-
-export default SignIn;
+export default SignUp;

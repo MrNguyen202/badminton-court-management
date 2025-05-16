@@ -4,9 +4,9 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure
 import AddImage from "@/public/add-circle-stroke-rounded.svg";
 import React from "react";
 
-function AddScheduleSingle({ subcourt, date, filteredSchedules }) {
+function AddScheduleSingle({ subcourt, date, filteredSchedules }: any) {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    const [localSchedules, setLocalSchedules] = React.useState([]); // Lịch cục bộ
+    const [localSchedules, setLocalSchedules] = React.useState<{ fromHour: string; toHour: string; price: number; status: string; }[]>([]); // Lịch cục bộ
     const [startTime, setStartTime] = React.useState("");
     const [endTime, setEndTime] = React.useState("");
     const [price, setPrice] = React.useState("");
@@ -15,7 +15,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules }) {
     // Kết hợp filteredSchedules và localSchedules để hiển thị
     const combinedSchedules = [...filteredSchedules, ...localSchedules];
 
-    const validateTime = (start, end) => {
+    const validateTime = (start: any, end: any) => {
         if (!start || !end) return "Vui lòng nhập đầy đủ thời gian.";
         const startDate = new Date(`2000-01-01T${start}`);
         const endDate = new Date(`2000-01-01T${end}`);
@@ -61,7 +61,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules }) {
         setPrice("");
     };
 
-    const handleDeleteSchedule = (item) => {
+    const handleDeleteSchedule = (item: any) => {
         if (item.status === "BOOKED") {
             setError("Không thể xóa lịch đã đặt.");
             return;

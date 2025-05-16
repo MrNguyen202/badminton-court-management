@@ -9,7 +9,7 @@ import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg"
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg"
 import AddScheduleSingle from "../_components/AddScheduleSingle"
 import { useDisclosure } from '@nextui-org/react'
-import BookModal from "../_components/BookModal"
+import BookModal from "./BookModal"
 
 // Types to match API data
 type SubCourtSchedule = {

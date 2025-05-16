@@ -124,7 +124,7 @@ export const courtApi = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.error ||
-          "Lấy thông tin sân thất bại, vui lòng thử lại!"
+        "Lấy thông tin sân thất bại, vui lòng thử lại!"
       );
     }
   },
@@ -137,7 +137,7 @@ export const courtApi = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.error ||
-          "Lấy danh sách sân không thuộc user thất bại!"
+        "Lấy danh sách sân không thuộc user thất bại!"
       );
     }
   },

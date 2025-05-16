@@ -3,6 +3,8 @@ import { NextUIProvider } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import Header from "./_components/Header";
 import ChatWidget from "./_components/ChatBot/ChatWidget";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Provider({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +13,7 @@ function Provider({ children }: { children: React.ReactNode }) {
       <Header />
       {children}
       <ChatWidget />
+      <ToastContainer />
     </NextUIProvider>
   );
 }

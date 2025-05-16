@@ -35,6 +35,24 @@ services:
       timeout: 5s
       retries: 5
 
+  booking-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: booking_user
+      POSTGRES_PASSWORD: booking_password
+      POSTGRES_DB: booking-services
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./init-db/booking:/docker-entrypoint-initdb.d
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booking_user -d booking-services"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   user-services:
     build:
       context: ./user-services
@@ -104,6 +122,25 @@ services:
       - my-network
     volumes:
       - ./chatbot_service:/app
+
+  booking-services:
+    build:
+      context: ./booking-services
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://booking-db:5432/booking-services
+      - SPRING_DATASOURCE_USERNAME=booking_user
+      - SPRING_DATASOURCE_PASSWORD=booking_password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./booking-services:/app
 
 networks:
   my-network:

@@ -31,6 +31,13 @@ spring:
             - Path=/api/sub-court-schedules/**
           filters:
             - StripPrefix=0
+        - id: feedback-service
+          uri: http://court-service:8082
+          predicates:
+            - Path=/api/feedbacks/**
+          filters:
+            - StripPrefix=0
+        
       globalcors:
         cors-configurations:
           "[/**]":
