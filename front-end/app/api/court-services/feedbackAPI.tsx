@@ -62,4 +62,15 @@ export const feedbackAPI = {
             throw error;
         }
     },
+
+    // Rating of a court
+    getRating: async (courtID: number) => {
+        try {
+            const response = await apiClient.get(`/get-average-star-by-court-id/${courtID}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching rating:", error);
+            throw error;
+        }
+    },
 };
