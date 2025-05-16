@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface BookingService {
     Booking createBooking(Booking booking, String userInfoJson);
+    Boolean deleteBooking(Long courtId, Long subCourtId, Long scheduleId);
     Booking getBooking(Long id);
     List<Booking> getUserBookings(Long userId);
     Booking cancelBooking(Long id);
     Booking confirmBooking(Long id);
-    boolean isBookingConflict(Long subCourtId, LocalDateTime startTime, LocalDateTime endTime);
 }

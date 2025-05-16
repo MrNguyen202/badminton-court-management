@@ -99,8 +99,29 @@ function page() {
       };
       updateStatus();
     } else if (message === "failed") {
-      setShowErrorToast(true); // Kích hoạt toast lỗi khi thanh toán thất bại
-      setErrorMessage("Thanh toán thất bại!");
+      const cancelBooking = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8083/api/paypal/cancel?courtID=${courtID}&subCourtId=${subCourtId}&bookedScheduleId=${scheduleId}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+          const result = await response.json();
+          if (result.status === "success") {
+            toast.success("Hủy thanh toán thành công!");
+            // window.location.href = result.redirectUrl; // Redirect nếu thành công
+          } else {
+            setErrorMessage(result.message || "Hủy thanh toán thất bại");
+            setShowErrorToast(true);
+          }
+        } catch (error: any) {
+          setErrorMessage(error.message || "Cập nhật trạng thái thất bại");
+          setShowErrorToast(true);
+        }
+      };
+      cancelBooking();
     }
   }, [searchParams]);
 

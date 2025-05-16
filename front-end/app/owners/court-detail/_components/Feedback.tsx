@@ -10,7 +10,6 @@ function Feedback({ courtID }: any) {
     const [hoverRating, setHoverRating] = useState(0);
     const [newComment, setNewComment] = useState("");
     const [visibleFeedbacks, setVisibleFeedbacks] = useState(5); // State to control visible feedbacks
-
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {

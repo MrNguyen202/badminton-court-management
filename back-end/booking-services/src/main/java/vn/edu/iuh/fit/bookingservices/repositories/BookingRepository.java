@@ -6,13 +6,10 @@ import vn.edu.iuh.fit.bookingservices.models.Booking;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByUserId(Long userId);
 
-    // Kiểm tra trùng lịch đặt sân
-    List<Booking> findBySubCourtIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-            Long subCourtId, LocalDateTime endTime, LocalDateTime startTime);
-
-    List<Booking> findByStatus(BookingStatus status);
+    Optional<Booking> findByCourtIdAndSubCourtIdAndScheduleId(Long courtId, Long subCourtId, Long scheduleId);
 }
