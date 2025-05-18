@@ -43,6 +43,7 @@ spring:
             - Path=/api/paypal/**
           filters:
             - StripPrefix=0
+
       globalcors:
         cors-configurations:
           "[/**]":
