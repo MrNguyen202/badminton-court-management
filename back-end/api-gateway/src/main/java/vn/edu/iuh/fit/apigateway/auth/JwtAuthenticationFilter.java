@@ -28,7 +28,9 @@ public class JwtAuthenticationFilter implements GatewayFilter {
             "/api/courts/get-court/",
             "/api/sub-courts",
             "/api/sub-court-schedules/by-sub-court/",
-            "/api/feedbacks/get-feedbacks-by-court-id/"
+            "/api/feedbacks/get-feedbacks-by-court-id/",
+            "/api/paypal/pay",
+            "/api/paypal/cancel"
     );
 
     private Key getSigningKey() {

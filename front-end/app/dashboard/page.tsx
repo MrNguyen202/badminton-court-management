@@ -7,6 +7,7 @@ import courtImage from "../../public/football-field.gif";
 import calenderImage from "../../public/calendar.gif";
 import utilityImage from "../../public/utility.gif";
 import { courtApi } from "../api/court-services/courtAPI";
+import { feedbackAPI } from "../api/court-services/feedbackAPI";
 import Footer from "../_components/Footer";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -74,18 +75,36 @@ function BadmintonCourtList() {
     localStorage.getItem("user") || "null"
   ) as User | null;
 
-  //get all courts tu api
   useEffect(() => {
-    if (user === null) {
-      courtApi.getAllCourt().then((data) => {
-        setCourts(data);
-      });
-    } else {
-      courtApi.getNotCourtByUserID(user.id).then((data) => {
-        setCourts(data);
-      });
-    }
-  }, []);
+    const fetchCourtsAndRatings = async () => {
+      try {
+        let courtData: Court[];
+        if (user === null) {
+          courtData = await courtApi.getAllCourt();
+        } else {
+          courtData = await courtApi.getNotCourtByUserID(user.id);
+        }
+
+        const courtsWithRatings = await Promise.all(
+          courtData.map(async (court) => {
+            try {
+              const rating = await feedbackAPI.getRating(court.id);
+              return { ...court, rating: rating || 0 };
+            } catch (error) {
+              console.error(`Error fetching rating for court ${court.id}:`, error);
+              return { ...court, rating: 0 };
+            }
+          })
+        );
+
+        setCourts(courtsWithRatings);
+      } catch (error) {
+        console.error("Error fetching courts:", error);
+      }
+    };
+
+    fetchCourtsAndRatings();
+  }, [user]);
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
@@ -95,11 +114,9 @@ function BadmintonCourtList() {
   const filteredCourts = courts.filter(
     (court) =>
       court.name.toLowerCase().includes(filter.toLowerCase()) &&
-      (selectedDistrict
-        ? court.numberOfSubCourts === Number(selectedDistrict)
-        : true) &&
+      (selectedDistrict ? court.district === selectedDistrict : true) &&
       (selectedRating
-        ? Math.floor(court.numberOfSubCourts) === Number(selectedRating)
+        ? Math.floor(court.rating) === Number(selectedRating)
         : true)
   );
 
@@ -111,6 +128,22 @@ function BadmintonCourtList() {
   );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const decimalPart = rating % 1;
+    const hasHalfStar = decimalPart >= 0.5 && rating < 5;
+
+    return (
+      <>
+        {Array.from({ length: fullStars }, (_, i) => (
+          <span key={i}>⭐</span>
+        ))}
+        {hasHalfStar && <span>🌟</span>} {/* Half-star symbol */}
+        ({rating.toFixed(1)})
+      </>
+    );
+  };
 
   return (
     <div className="p-6 max-w-full mx-auto flex flex-col ">
@@ -131,7 +164,9 @@ function BadmintonCourtList() {
           >
             <option value="">Chọn quận</option>
             {[...new Set(courts.map((c) => c.district))].map((district) => (
-              <option key={district} value={district}>Quận {district}</option>
+              <option key={district} value={district}>
+                Quận {district}
+              </option>
             ))}
           </select> */}
           <select
@@ -194,14 +229,7 @@ function BadmintonCourtList() {
                     </p>
                   </div>
                   <p className="text-yellow-500 font-semibold">
-                    {Array.from(
-                      { length: Math.floor(court.numberOfSubCourts) },
-                      (_, i) => (
-                        <span key={i}>⭐</span>
-                      )
-                    )}
-                    {court.numberOfSubCourts % 1 !== 0 && <span>⭐</span>}(
-                    {court.numberOfSubCourts})
+                    {renderStars(court.rating)}
                   </p>
                 </div>
                 <div className="flex items-center">
@@ -239,11 +267,10 @@ function BadmintonCourtList() {
                   <button
                     key={i}
                     onClick={() => paginate(i + 1)}
-                    className={`mx-1 px-3 py-1 rounded ${
-                      currentPage === i + 1
+                    className={`mx-1 px-3 py-1 rounded ${currentPage === i + 1
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200"
-                    }`}
+                      }`}
                   >
                     {i + 1}
                   </button>

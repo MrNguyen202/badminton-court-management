@@ -199,7 +199,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/paypal")
-@CrossOrigin(origins = "http://localhost:3000")
 public class PaypalController {
 
     @Autowired
