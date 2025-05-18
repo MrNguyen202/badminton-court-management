@@ -1,0 +1,66 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-services
+          uri: http://user-services:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+        - id: court-service
+          uri: http://court-service:8082
+          predicates:
+            - Path=/api/courts/**
+          filters:
+            - StripPrefix=0
+        - id: sub-court-service
+          uri: http://court-service:8082
+          predicates:
+            - Path=/api/sub-courts/**
+          filters:
+            - StripPrefix=0
+        - id: sub-court-schedule-service
+          uri: http://court-service:8082
+          predicates:
+            - Path=/api/sub-court-schedules/**
+          filters:
+            - StripPrefix=0
+        - id: feedback-service
+          uri: http://court-service:8082
+          predicates:
+            - Path=/api/feedbacks/**
+          filters:
+            - StripPrefix=0
+        - id: booking-services
+          uri: http://booking-services:8083
+          predicates:
+            - Path=/api/paypal/**
+          filters:
+            - StripPrefix=0
+
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+
+jwt:
+  secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c

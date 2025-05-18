@@ -14,22 +14,27 @@ package vn.edu.iuh.hero.dtos;
  */
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.plaf.multi.MultiFileChooserUI;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class CourtDTO {
     private String name;
     private String phone;
-    private AddressDTO address;
-    private int numberOfCourts;
+    private String description;
+    private int numberOfSubCourts;
     private String openTime;
     private String closeTime;
     private String utilities;
-    private String description;
-    private String websiteLink;
-    private String mapLink;
+    private String linkWeb;
+    private String linkMap;
     private Long userID;
-    private List<String> images;
-    private String status;
+    private List<SubCourtDTO> subCourts;
+    private AddressDTO address;
+    private List<String> imageFiles;
+    private LocalDate createDate;
+
 }

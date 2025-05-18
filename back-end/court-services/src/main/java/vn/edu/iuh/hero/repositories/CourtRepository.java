@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CourtRepository extends JpaRepository<Court, Long> {
     Iterable<Court> getCourtByUserID(Long userID);
+
+    Iterable<Court> findAllByUserIDNot(Long userID);
 }

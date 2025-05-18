@@ -17,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000") // Chỉ định domain frontend
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -32,6 +30,7 @@ public class AuthController {
     private final UserRepository userRepository;
 
     public AuthController(JwtService jwtService, UserRepository userRepository) {
+        System.out.println("oke");
         this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
@@ -45,6 +44,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+
         System.out.println("Nhận được yêu cầu đăng nhập từ email: " + user.getEmail());
         System.out.println("Password: " + user.getPassword());
 
@@ -81,35 +81,6 @@ public class AuthController {
         return userRepository.findByEmail(email)
                 .map(user -> ResponseEntity.ok().body((Object) user))
                 .orElseGet(() -> ResponseEntity.status(404).body("User not found"));
-    }
-
-
-
-    @GetMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(
-            @RequestParam String email,
-            @RequestParam String password) {
-
-        System.out.println("Nhận yêu cầu đăng nhập với email: " + email + " và password: " + password);
-
-        Optional<User> user = userService.authenticateUser(email, password);
-        if (user.isPresent()) {
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("id", user.get().getId());
-            response.put("name", user.get().getName());
-            response.put("email", user.get().getEmail());
-            response.put("password", user.get().getPassword());
-            response.put("phone", user.get().getPhone());
-            response.put("address", user.get().getAddress());
-            response.put("role", user.get().getRole());
-
-            return ResponseEntity.ok(response);
-        } else {
-            System.out.println("Sai email hoặc password!");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Sai thông tin đăng nhập"));
-        }
     }
 
     @PostMapping("/update-user")
@@ -185,7 +156,6 @@ public class AuthController {
             response.put("id", user.get().getId());
             response.put("name", user.get().getName());
             response.put("email", user.get().getEmail());
-            response.put("password", user.get().getPassword());
             response.put("phone", user.get().getPhone());
             response.put("address", user.get().getAddress());
             response.put("role", user.get().getRole());
@@ -194,5 +164,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Không tìm thấy người dùng"));
         }
     }
-
 }

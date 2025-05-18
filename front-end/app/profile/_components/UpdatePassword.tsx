@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
+import { userApi } from "@/app/api/user-services/userAPI";
 
 interface User {
   email: string;
@@ -45,6 +46,53 @@ export default function UpdatePassword() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (formData.newPassword !== formData.confirmPassword) {
+  //     alert("Mật khẩu không khớp!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       alert("Bạn chưa đăng nhập! Vui lòng đăng nhập lại.");
+  //       router.push("/sign-in");
+  //       return;
+  //     }
+
+  //     const response = await axios.post(
+  //       "http://localhost:8080/api/auth/update-password",
+  //       {
+  //         email: formData.email,
+  //         currentPassword: formData.currentPassword,
+  //         newPassword: formData.newPassword,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         withCredentials: true,
+  //       }
+  //     );
+
+  //     alert("Cập nhật mật khẩu thành công!");
+  //     localStorage.setItem("user", JSON.stringify(response.data));
+  //     setUser(response.data);
+  //     onOpenChange();
+  //     setTimeout(() => window.location.reload(), 500);
+  //   } catch (error: any) {
+  //     console.error("Lỗi cập nhật mật khẩu:", error);
+  //     const errorMessage =
+  //       error.response?.data?.error ||
+  //       error.response?.data ||
+  //       "Có lỗi xảy ra, vui lòng thử lại!";
+  //     alert(errorMessage);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,34 +102,18 @@ export default function UpdatePassword() {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/auth/update-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            currentPassword: formData.currentPassword,
-            newPassword: formData.newPassword,
-          }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Cập nhật mật khẩu thành công!");
-        // localStorage.removeItem("user"); // Xóa thông tin cũ, yêu cầu đăng nhập lại
-        // router.push("/sign-in");
-
-        localStorage.setItem("user", JSON.stringify(data));
-        setUser(data);
-        onOpenChange();
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        alert(data.error || "Cập nhật thất bại!");
-      }
-    } catch (error) {
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
+      const data = await userApi.updatePassword({
+        email: formData.email,
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
+      alert("Cập nhật mật khẩu thành công!");
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+      onOpenChange();
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 

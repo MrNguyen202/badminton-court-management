@@ -1,26 +1,26 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.2'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'vn.edu.iuh.fit'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
@@ -31,7 +31,7 @@ dependencies {
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
 	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
-
+    implementation 'org.slf4j:slf4j-api'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -42,6 +42,16 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+ext {
+    set('springCloudVersion', "2024.0.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

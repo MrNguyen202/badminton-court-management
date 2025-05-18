@@ -1,0 +1,147 @@
+services:
+  user-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user_password
+      POSTGRES_DB: user-services
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init-db/user:/docker-entrypoint-initdb.d
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d user-services"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  court-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: court_user
+      POSTGRES_PASSWORD: court_password
+      POSTGRES_DB: court-services
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./init-db/court:/docker-entrypoint-initdb.d
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U court_user -d court-services"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  booking-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: booking_user
+      POSTGRES_PASSWORD: booking_password
+      POSTGRES_DB: booking-services
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./init-db/booking:/docker-entrypoint-initdb.d
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booking_user -d booking-services"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-services:
+    build:
+      context: ./user-services
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user-services
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=user_password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./user-services:/app
+
+  court-service:
+    build:
+      context: ./court-services
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://court-db:5432/court-services
+      - SPRING_DATASOURCE_USERNAME=court_user
+      - SPRING_DATASOURCE_PASSWORD=court_password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - TZ=Asia/Ho_Chi_Minh
+      - JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Ho_Chi_Minh
+    depends_on:
+      court-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./court-services:/app
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-services
+      - court-service
+    networks:
+      - my-network
+    volumes:
+      - ./api-gateway:/app
+
+  chatbot-service:
+    build:
+      context: ./chatbot_service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5001"
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      court-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./chatbot_service:/app
+
+  booking-services:
+    build:
+      context: ./booking-services
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://booking-db:5432/booking-services
+      - SPRING_DATASOURCE_USERNAME=booking_user
+      - SPRING_DATASOURCE_PASSWORD=booking_password
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    networks:
+      - my-network
+    volumes:
+      - ./booking-services:/app
+
+networks:
+  my-network:
+    driver: bridge

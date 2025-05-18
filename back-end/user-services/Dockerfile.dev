@@ -1,0 +1,10 @@
+FROM gradle:8.10.1-jdk17
+WORKDIR /app
+# Copy file cấu hình Gradle để cache dependency
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
+# Tải dependency trước để cache
+RUN gradle build --no-daemon -x test || true
+# Code sẽ được mount qua volume, không cần COPY src
+EXPOSE 8081
+CMD ["gradle", "bootRun", "--no-daemon"]
