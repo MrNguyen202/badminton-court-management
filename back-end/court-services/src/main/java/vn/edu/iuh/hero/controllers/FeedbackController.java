@@ -67,4 +67,10 @@ public class FeedbackController {
             return ResponseEntity.badRequest().body("Court not found");
         }
     }
+
+    // Get average star by court id
+    @GetMapping("/get-average-star-by-court-id/{courtId}")
+    public ResponseEntity<?> getAverageStarByCourtId(@PathVariable Long courtId) {
+        return ResponseEntity.ok(feedbackService.getAverageStarRatingByCourtId(courtId));
+    }
 }

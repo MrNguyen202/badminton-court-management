@@ -44,6 +44,7 @@ export const feedbackAPI = {
     getFeedbacks: async (courtID: number) => {
         try {
             const response = await apiClient.get(`/get-feedbacks-by-court-id/${courtID}`);
+            console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             console.error("Error fetching feedbacks:", error);
@@ -58,6 +59,17 @@ export const feedbackAPI = {
             return response.data;
         } catch (error) {
             console.error("Error creating feedback:", error);
+            throw error;
+        }
+    },
+
+    // Rating of a court
+    getRating: async (courtID: number) => {
+        try {
+            const response = await apiClient.get(`/get-average-star-by-court-id/${courtID}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching rating:", error);
             throw error;
         }
     },

@@ -56,4 +56,9 @@ public class FeedbackServiceImpl implements IServices<Feedback, Long> {
     public Iterable<Feedback> findAllByCourtId(Long courtId) {
         return feedbackRepository.findAllByCourt_Id(courtId);
     }
+
+    // Get average star rating by court id
+    public Double getAverageStarRatingByCourtId(Long courtId) {
+        return feedbackRepository.getAverageStarByCourtId(courtId);
+    }
 }
