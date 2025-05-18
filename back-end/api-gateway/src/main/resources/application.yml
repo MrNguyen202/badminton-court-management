@@ -37,7 +37,12 @@ spring:
             - Path=/api/feedbacks/**
           filters:
             - StripPrefix=0
-        
+        - id: booking-services
+          uri: http://booking-services:8083
+          predicates:
+            - Path=/api/paypal/**
+          filters:
+            - StripPrefix=0
       globalcors:
         cors-configurations:
           "[/**]":

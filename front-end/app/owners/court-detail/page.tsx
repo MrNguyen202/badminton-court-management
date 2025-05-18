@@ -102,7 +102,7 @@ function page() {
       const cancelBooking = async () => {
         try {
           const response = await fetch(
-            `http://localhost:8083/api/paypal/cancel?courtID=${courtID}&subCourtId=${subCourtId}&bookedScheduleId=${scheduleId}`,
+            `http://localhost:8080/api/paypal/cancel?courtID=${courtID}&subCourtId=${subCourtId}&bookedScheduleId=${scheduleId}`,
             {
               method: "GET",
               headers: { "Content-Type": "application/json" },

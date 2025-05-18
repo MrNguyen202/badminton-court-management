@@ -61,7 +61,7 @@ export default function BookingPage() {
 
       // Gọi API thanh toán PayPal trước
       const paymentResponse = await fetch(
-        `http://localhost:8083/api/paypal/pay`,
+        `http://localhost:8080/api/paypal/pay`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
