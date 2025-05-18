@@ -252,7 +252,7 @@ function page() {
         </div>
       </div>
       {courtID && <Schedule courtID={Number(courtID)} />}
-      <Feedback courtID={Number(courtID)}/>
+      {/* <Feedback courtID={Number(courtID)}/> */}
       <Footer />
     </div>
   );

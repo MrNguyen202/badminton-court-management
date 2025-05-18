@@ -4,8 +4,8 @@ from mistralai.client import MistralClient
 from mistralai.models.chatcompletionchoice import ChatMessage
 
 # Thiết lập API key và LangSmith tracing
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "POHnNMWrnjJxtqU0e2jgqRn8X3yambwc")
-client = MistralClient(api_key=MISTRAL_API_KEY)
+from config import Config
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", Config.MISTRAL_API_KEY)
 
  
 
