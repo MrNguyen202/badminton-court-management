@@ -1,0 +1,205 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  GIT_DEPTH: 0
+  FRONTEND_DIR: "front-end"
+  BACKEND_DIR: "back-end"
+  DOCKER_REGISTRY: "docker.io"
+
+build_frontend:
+  stage: build
+  image: node:20.14.0
+  script:
+    - cd $FRONTEND_DIR
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - $FRONTEND_DIR/.next
+    expire_in: 1 hour
+
+build_court_services:
+  stage: build
+  image: gradle:8.10.1-jdk17
+  script:
+    - cd $BACKEND_DIR/court-services
+    - gradle build -x test
+  artifacts:
+    paths:
+      - $BACKEND_DIR/court-services/
+    expire_in: 1 hour
+
+build_user_services:
+  stage: build
+  image: gradle:8.10.1-jdk17
+  dependencies:
+    - build_court_services
+  script:
+    - cd $BACKEND_DIR/user-services
+    - gradle build -x test
+  artifacts:
+    paths:
+      - $BACKEND_DIR/user-services/
+    expire_in: 1 hour
+
+build_booking_services:
+  stage: build
+  image: gradle:8.10.1-jdk17
+  dependencies:
+    - build_user_services
+  script:
+    - cd $BACKEND_DIR/booking-services
+    - gradle build -x test
+  artifacts:
+    paths:
+      - $BACKEND_DIR/booking-services/
+    expire_in: 1 hour
+
+build_api_gateway:
+  stage: build
+  image: gradle:8.10.1-jdk17
+  dependencies:
+    - build_booking_services
+  script:
+    - cd $BACKEND_DIR/api-gateway
+    - gradle build -x test
+  artifacts:
+    paths:
+      - $BACKEND_DIR/api-gateway/
+    expire_in: 1 hour
+
+test_frontend:
+  stage: test
+  image: node:20.14.0
+  dependencies:
+    - build_frontend
+  script:
+    - cd $FRONTEND_DIR
+    - npm run test
+
+test_court_services:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: court-db
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://court-db:5432/court-services"
+    SPRING_DATASOURCE_USERNAME: "court_user"
+    SPRING_DATASOURCE_PASSWORD: "court_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "court_user"
+    POSTGRES_PASSWORD: "court_password"
+    POSTGRES_DB: "court-services"
+  script:
+    - cd $BACKEND_DIR/court-services
+    - gradle test
+
+test_user_services:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: user-db
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://user-db:5432/user-services"
+    SPRING_DATASOURCE_USERNAME: "user"
+    SPRING_DATASOURCE_PASSWORD: "user_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "user"
+    POSTGRES_PASSWORD: "user_password"
+    POSTGRES_DB: "user-services"
+  script:
+    - cd $BACKEND_DIR/user-services
+    - gradle test
+
+test_booking_services:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: booking-db
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://booking-db:5432/booking-services"
+    SPRING_DATASOURCE_USERNAME: "booking_user"
+    SPRING_DATASOURCE_PASSWORD: "booking_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "booking_user"
+    POSTGRES_PASSWORD: "booking_password"
+    POSTGRES_DB: "booking-services"
+  script:
+    - cd $BACKEND_DIR/booking-services
+    - gradle test
+
+test_api_gateway:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  script:
+    - cd $BACKEND_DIR/api-gateway
+    - gradle test
+
+deploy:
+  stage: deploy
+  image: docker:20.10
+  services:
+    - docker:dind
+  dependencies:
+    - build_frontend
+    - build_user_services
+    - build_court_services
+    - build_booking_services
+    - build_api_gateway
+  variables:
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
+    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+    NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
+
+    # Debug
+    - ls -la
+    - ls -la $BACKEND_DIR || echo "back-end directory not found"
+
+    # Deploy front-end
+    - cd $FRONTEND_DIR
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
+
+    # di chuyển về root
+    - cd ..
+
+    # Debug: Verify back-end 
+    - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
+    - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
+    - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"
+    - ls -la $BACKEND_DIR/api-gateway || echo "Directory api-gateway not found"
+
+    # Deploy user-services
+    - cd $BACKEND_DIR/user-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
+
+    # Deploy court-services
+    - cd ..
+    - cd court-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
+
+    # Deploy booking-services
+    - cd ..
+    - cd booking-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
+
+    # Deploy api-gateway
+    - cd ..
+    - cd api-gateway
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
+
+  only:
+    - main

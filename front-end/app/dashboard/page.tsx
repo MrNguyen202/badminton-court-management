@@ -71,11 +71,19 @@ function BadmintonCourtList() {
   const [currentPage, setCurrentPage] = useState(1);
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
-  const user = JSON.parse(
-    localStorage.getItem("user") || "null"
-  ) as User | null;
+
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user === null) return;
+
     const fetchCourtsAndRatings = async () => {
       try {
         let courtData: Court[];
@@ -91,7 +99,10 @@ function BadmintonCourtList() {
               const rating = await feedbackAPI.getRating(court.id);
               return { ...court, rating: rating || 0 };
             } catch (error) {
-              console.error(`Error fetching rating for court ${court.id}:`, error);
+              console.error(
+                `Error fetching rating for court ${court.id}:`,
+                error
+              );
               return { ...court, rating: 0 };
             }
           })
@@ -139,8 +150,8 @@ function BadmintonCourtList() {
         {Array.from({ length: fullStars }, (_, i) => (
           <span key={i}>⭐</span>
         ))}
-        {hasHalfStar && <span>🌟</span>} {/* Half-star symbol */}
-        ({rating.toFixed(1)})
+        {hasHalfStar && <span>🌟</span>} {/* Half-star symbol */}(
+        {rating.toFixed(1)})
       </>
     );
   };
@@ -267,10 +278,11 @@ function BadmintonCourtList() {
                   <button
                     key={i}
                     onClick={() => paginate(i + 1)}
-                    className={`mx-1 px-3 py-1 rounded ${currentPage === i + 1
+                    className={`mx-1 px-3 py-1 rounded ${
+                      currentPage === i + 1
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200"
-                      }`}
+                    }`}
                   >
                     {i + 1}
                   </button>

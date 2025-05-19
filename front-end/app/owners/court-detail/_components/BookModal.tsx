@@ -24,13 +24,13 @@ export default function BookModal({
   courtId,
   subCourtSelected,
   bookedSchedule,
-}) {
+}: any) {
   const router = useRouter();
-  const [court, setCourt] = useState(null);
-  const [subCourt, setSubCourt] = useState(null);
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+  const [court, setCourt] = useState<any>(null);
+  const [subCourt, setSubCourt] = useState<any>(null);
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
   const [userNameBooking, setUserNameBooking] = useState(user?.name || "");
   const [userPhoneBooking, setUserPhoneBooking] = useState(user?.phone || "");
   const [error, setError] = useState({ name: "", phone: "" });
@@ -76,7 +76,7 @@ export default function BookModal({
   }, [subCourtSelected]);
 
   // Hàm xử lý thay đổi input
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: any) => {
     const value = e.target.value;
     setUserNameBooking(value);
     // Kiểm tra validation
@@ -90,7 +90,7 @@ export default function BookModal({
     }
   };
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = (e: any) => {
     const value = e.target.value;
     setUserPhoneBooking(value);
     // Kiểm tra validation
@@ -112,7 +112,7 @@ export default function BookModal({
   const totalCost = bookedSchedule ? bookedSchedule.price * totalHours : 0;
 
   // Hàm xử lý khi nhấn nút Đặt sân
-  const handleBooking = (onClose) => {
+  const handleBooking = (onClose: any) => {
     // Kiểm tra nếu không có user và các trường input không hợp lệ
     if (!user && (!userNameBooking || !userPhoneBooking)) {
       setError({
@@ -125,7 +125,7 @@ export default function BookModal({
     if (!user && (error.name || error.phone)) {
       return;
     }
-
+    console.log("court", court);
     // Tạo đối tượng booking chứa thông tin đặt sân
     const bookingData = {
       courtId: courtId,
@@ -145,7 +145,7 @@ export default function BookModal({
         phone: user ? user.phone : userPhoneBooking,
         email: user?.email || "",
       },
-      bookedScheduleId: bookedSchedule?.scheduleId
+      bookedScheduleId: bookedSchedule?.scheduleId,
     };
 
     console.log("Booking data in modal:", bookingData);
