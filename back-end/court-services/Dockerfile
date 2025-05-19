@@ -16,7 +16,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Copy the specific JAR file
-COPY --from=build /home/gradle/project/build/libs/court-service-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /home/gradle/project/build/libs/court-services-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port for court-service
 EXPOSE 8082
