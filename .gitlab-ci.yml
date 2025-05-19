@@ -86,22 +86,34 @@ test_frontend:
     - npm run test
 
 # Job để test back-end
-test_backend:
+test_court_services:
   stage: test
   image: gradle:8.10.1-jdk17
-  dependencies:
-    - build_api_gateway
   script:
     - cd $BACKEND_DIR/court-services
     - gradle test
+
+test_user_services:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  script:
     - cd $BACKEND_DIR/user-services
     - gradle test
+
+test_booking_services:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  script:
     - cd $BACKEND_DIR/booking-services
     - gradle test
+
+test_api_gateway:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  script:
     - cd $BACKEND_DIR/api-gateway
     - gradle test
 
-# Job để deploy
 deploy:
   stage: deploy
   image: docker:20.10
