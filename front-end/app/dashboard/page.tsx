@@ -82,7 +82,6 @@ function BadmintonCourtList() {
   }, []);
 
   useEffect(() => {
-    if (user === null) return;
 
     const fetchCourtsAndRatings = async () => {
       try {
