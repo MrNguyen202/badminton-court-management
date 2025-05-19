@@ -148,12 +148,12 @@ deploy:
   image: docker:20.10
   services:
     - docker:dind
-  dependencies:
-    - build_frontend
-    - build_user_services
-    - build_court_services
-    - build_booking_services
-    - build_api_gateway
+  # dependencies:
+  #   - build_frontend
+  #   - build_user_services
+  #   - build_court_services
+  #   - build_booking_services
+  #   - build_api_gateway
   variables:
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
