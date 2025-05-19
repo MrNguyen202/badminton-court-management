@@ -1,0 +1,110 @@
+# Định nghĩa các giai đoạn (stages) của pipeline
+stages:
+  - build
+  - test
+  - deploy
+
+# Biến toàn cục
+variables:
+  FRONTEND_DIR: "front-end"
+  BACKEND_DIR: "back-end"
+  DOCKER_REGISTRY: "docker.io"
+
+# Job để build front-end (Next.js)
+build_frontend:
+  stage: build
+  image: node:20.14.0
+  script:
+    - cd $FRONTEND_DIR
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - $FRONTEND_DIR/.next
+    expire_in: 1 hour
+
+# Job để build back-end (các microservices với Gradle)
+build_backend:
+  stage: build
+  image: gradle:8.10.1-jdk17
+  script:
+    - cd $BACKEND_DIR/user-services
+    - gradle build -x test
+    - cd $BACKEND_DIR/court-services
+    - gradle build -x test
+    - cd $BACKEND_DIR/booking-services
+    - gradle build -x test
+    - cd $BACKEND_DIR/api-gateway
+    - gradle build -x test
+  artifacts:
+    paths:
+      - $BACKEND_DIR/user-services/build/libs/*.jar
+      - $BACKEND_DIR/court-services/build/libs/*.jar
+      - $BACKEND_DIR/booking-services/build/libs/*.jar
+      - $BACKEND_DIR/api-gateway/build/libs/*.jar
+    expire_in: 1 hour
+
+# Job để test front-end
+test_frontend:
+  stage: test
+  image: node:20.14.0
+  script:
+    - cd $FRONTEND_DIR
+    - npm install
+    - npm run test
+
+# Job để test back-end (các microservices)
+test_backend:
+  stage: test
+  image: gradle:8.10.1-jdk17
+  script:
+    - cd $BACKEND_DIR/user-services
+    - gradle test
+    - cd $BACKEND_DIR/court-services
+    - gradle test
+    - cd $BACKEND_DIR/booking-services
+    - gradle test
+    - cd $BACKEND_DIR/api-gateway
+    - gradle test
+
+# Job để deploy
+deploy:
+  stage: deploy
+  image: docker:20.10
+  services:
+    - docker:dind
+  script:
+    # Đăng nhập vào Docker Hub một lần duy nhất
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY
+
+    # Build và push Docker image cho front-end
+    - cd $FRONTEND_DIR
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
+
+    # Build và push Docker image cho user-services
+    - cd $BACKEND_DIR/user-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
+
+    # Build và push Docker image cho court-service
+    - cd $BACKEND_DIR/court-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
+
+    # Build và push Docker image cho booking-services
+    - cd $BACKEND_DIR/booking-services
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
+
+    # Build và push Docker image cho api-gateway
+    - cd $BACKEND_DIR/api-gateway
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
+
+    # Build và push Docker image cho chatbot-service
+    - cd $BACKEND_DIR/chatbot_service
+    - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:chatbot-service .
+    - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:chatbot-service
+  only:
+    - main
