@@ -159,8 +159,8 @@ deploy:
     - build_booking_services
     - build_api_gateway
   script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY
-
+    # - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
     # Deploy front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
