@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  GIT_DEPTH: 0 # Thêm dòng này
+  GIT_DEPTH: 0  # Thêm dòng này
   FRONTEND_DIR: "front-end"
   BACKEND_DIR: "back-end"
   DOCKER_REGISTRY: "docker.io"
@@ -30,7 +30,7 @@ build_court_services:
     - gradle build -x test
   artifacts:
     paths:
-      - $BACKEND_DIR/court-services/build/libs/*.jar
+      - $BACKEND_DIR/court-services/
     expire_in: 1 hour
 
 build_user_services:
@@ -43,7 +43,7 @@ build_user_services:
     - gradle build -x test
   artifacts:
     paths:
-      - $BACKEND_DIR/user-services/build/libs/*.jar
+      - $BACKEND_DIR/user-services/
     expire_in: 1 hour
 
 build_booking_services:
@@ -56,7 +56,7 @@ build_booking_services:
     - gradle build -x test
   artifacts:
     paths:
-      - $BACKEND_DIR/booking-services/build/libs/*.jar
+      - $BACKEND_DIR/booking-services/
     expire_in: 1 hour
 
 build_api_gateway:
@@ -69,7 +69,7 @@ build_api_gateway:
     - gradle build -x test
   artifacts:
     paths:
-      - $BACKEND_DIR/api-gateway/build/libs/*.jar
+      - $BACKEND_DIR/api-gateway/
     expire_in: 1 hour
 
 # Các job test giữ nguyên
@@ -155,11 +155,13 @@ deploy:
     - build_booking_services
     - build_api_gateway
   variables:
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
-
+    
     # Deploy front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
