@@ -148,6 +148,12 @@ deploy:
   image: docker:20.10
   services:
     - docker:dind
+  dependencies:
+    - build_frontend
+    - build_user_services
+    - build_court_services
+    - build_booking_services
+    - build_api_gateway
   variables:
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
@@ -156,25 +162,44 @@ deploy:
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
 
+    # Debug: List the directory structure to verify artifacts
+    - ls -la
+    - ls -la $BACKEND_DIR || echo "back-end directory not found"
+
     # Deploy front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # Deploy back-end services
+    # Navigate back to the root directory
+    - cd ..
+
+    # Debug: Verify back-end directories
+    - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
+    - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
+    - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"
+    - ls -la $BACKEND_DIR/api-gateway || echo "Directory api-gateway not found"
+
+    # Deploy user-services
     - cd $BACKEND_DIR/user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
 
-    - cd $BACKEND_DIR/court-services
+    # Deploy court-services
+    - cd ..
+    - cd court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
 
-    - cd $BACKEND_DIR/booking-services
+    # Deploy booking-services
+    - cd ..
+    - cd booking-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
 
-    - cd $BACKEND_DIR/api-gateway
+    # Deploy api-gateway
+    - cd ..
+    - cd api-gateway
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
 
