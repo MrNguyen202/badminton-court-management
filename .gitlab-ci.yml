@@ -167,22 +167,27 @@ deploy:
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # Deploy user-services (thay đổi đường dẫn)
+    # Kiểm tra trước khi cd
+    - ls -la || echo "No files found in working directory"
+    - ls -la user-services || echo "Directory user-services not found"
+
+    # Deploy user-services
     - cd user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
 
-    # Deploy court-services
+    # Tương tự cho các service khác
+    - ls -la court-services || echo "Directory court-services not found"
     - cd court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
 
-    # Deploy booking-services
+    - ls -la booking-services || echo "Directory booking-services not found"
     - cd booking-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
 
-    # Deploy api-gateway
+    - ls -la api-gateway || echo "Directory api-gateway not found"
     - cd api-gateway
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
