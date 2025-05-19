@@ -104,7 +104,7 @@ function BadmintonCourtList() {
     };
 
     fetchCourtsAndRatings();
-  }, [user]);
+  }, []);
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
