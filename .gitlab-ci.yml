@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  GIT_DEPTH: 0  # Thêm dòng này
+  GIT_DEPTH: 0 # Thêm dòng này
   FRONTEND_DIR: "front-end"
   BACKEND_DIR: "back-end"
   DOCKER_REGISTRY: "docker.io"
@@ -161,29 +161,29 @@ deploy:
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
-    
+
     # Deploy front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # Deploy user-services
-    - cd $BACKEND_DIR/user-services
+    # Deploy user-services (thay đổi đường dẫn)
+    - cd user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
 
     # Deploy court-services
-    - cd $BACKEND_DIR/court-services
+    - cd court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
 
     # Deploy booking-services
-    - cd $BACKEND_DIR/booking-services
+    - cd booking-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
 
     # Deploy api-gateway
-    - cd $BACKEND_DIR/api-gateway
+    - cd api-gateway
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
 
