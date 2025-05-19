@@ -158,9 +158,15 @@ deploy:
     - build_court_services
     - build_booking_services
     - build_api_gateway
+  variables:
+    # Truyền các biến môi trường từ GitLab CI/CD Variables
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
+    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+    NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
-    
+
     # Deploy front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
