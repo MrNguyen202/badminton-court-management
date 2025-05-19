@@ -28,9 +28,9 @@ build_backend:
   stage: build
   image: gradle:8.10.1-jdk17
   script:
-    - cd $BACKEND_DIR/user-services
-    - gradle build -x test
     - cd $BACKEND_DIR/court-services
+    - gradle build -x test
+    - cd $BACKEND_DIR/user-services
     - gradle build -x test
     - cd $BACKEND_DIR/booking-services
     - gradle build -x test
@@ -38,8 +38,8 @@ build_backend:
     - gradle build -x test
   artifacts:
     paths:
-      - $BACKEND_DIR/user-services/build/libs/*.jar
       - $BACKEND_DIR/court-services/build/libs/*.jar
+      - $BACKEND_DIR/user-services/build/libs/*.jar
       - $BACKEND_DIR/booking-services/build/libs/*.jar
       - $BACKEND_DIR/api-gateway/build/libs/*.jar
     expire_in: 1 hour
