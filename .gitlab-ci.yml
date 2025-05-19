@@ -89,6 +89,17 @@ test_frontend:
 test_court_services:
   stage: test
   image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: court-db # Khớp với hostname được sử dụng trong SPRING_DATASOURCE_URL
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://court-db:5432/court-services"
+    SPRING_DATASOURCE_USERNAME: "court_user"
+    SPRING_DATASOURCE_PASSWORD: "court_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "court_user"
+    POSTGRES_PASSWORD: "court_password"
+    POSTGRES_DB: "court-services"
   script:
     - cd $BACKEND_DIR/court-services
     - gradle test
@@ -96,6 +107,17 @@ test_court_services:
 test_user_services:
   stage: test
   image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: user-db
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://user-db:5432/user-services"
+    SPRING_DATASOURCE_USERNAME: "user"
+    SPRING_DATASOURCE_PASSWORD: "user_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "user"
+    POSTGRES_PASSWORD: "user_password"
+    POSTGRES_DB: "user-services"
   script:
     - cd $BACKEND_DIR/user-services
     - gradle test
@@ -103,6 +125,17 @@ test_user_services:
 test_booking_services:
   stage: test
   image: gradle:8.10.1-jdk17
+  services:
+    - name: postgres:latest
+      alias: booking-db
+  variables:
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://booking-db:5432/booking-services"
+    SPRING_DATASOURCE_USERNAME: "booking_user"
+    SPRING_DATASOURCE_PASSWORD: "booking_password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    POSTGRES_USER: "booking_user"
+    POSTGRES_PASSWORD: "booking_password"
+    POSTGRES_DB: "booking-services"
   script:
     - cd $BACKEND_DIR/booking-services
     - gradle test
