@@ -4,11 +4,12 @@ stages:
   - deploy
 
 variables:
+  GIT_DEPTH: 0 # Thêm dòng này
   FRONTEND_DIR: "front-end"
   BACKEND_DIR: "back-end"
   DOCKER_REGISTRY: "docker.io"
 
-# Job để build front-end (Next.js)
+# Các job build giữ nguyên
 build_frontend:
   stage: build
   image: node:20.14.0
@@ -21,7 +22,6 @@ build_frontend:
       - $FRONTEND_DIR/.next
     expire_in: 1 hour
 
-# Job để build court-services
 build_court_services:
   stage: build
   image: gradle:8.10.1-jdk17
@@ -33,7 +33,6 @@ build_court_services:
       - $BACKEND_DIR/court-services/build/libs/*.jar
     expire_in: 1 hour
 
-# Job để build user-services
 build_user_services:
   stage: build
   image: gradle:8.10.1-jdk17
@@ -47,7 +46,6 @@ build_user_services:
       - $BACKEND_DIR/user-services/build/libs/*.jar
     expire_in: 1 hour
 
-# Job để build booking-services
 build_booking_services:
   stage: build
   image: gradle:8.10.1-jdk17
@@ -61,7 +59,6 @@ build_booking_services:
       - $BACKEND_DIR/booking-services/build/libs/*.jar
     expire_in: 1 hour
 
-# Job để build api-gateway
 build_api_gateway:
   stage: build
   image: gradle:8.10.1-jdk17
@@ -75,7 +72,7 @@ build_api_gateway:
       - $BACKEND_DIR/api-gateway/build/libs/*.jar
     expire_in: 1 hour
 
-# Job để test front-end
+# Các job test giữ nguyên
 test_frontend:
   stage: test
   image: node:20.14.0
@@ -85,13 +82,12 @@ test_frontend:
     - cd $FRONTEND_DIR
     - npm run test
 
-# Job để test back-end
 test_court_services:
   stage: test
   image: gradle:8.10.1-jdk17
   services:
     - name: postgres:latest
-      alias: court-db # Khớp với hostname được sử dụng trong SPRING_DATASOURCE_URL
+      alias: court-db
   variables:
     SPRING_DATASOURCE_URL: "jdbc:postgresql://court-db:5432/court-services"
     SPRING_DATASOURCE_USERNAME: "court_user"
@@ -159,9 +155,6 @@ deploy:
     - build_booking_services
     - build_api_gateway
   variables:
-    # Truyền các biến môi trường từ GitLab CI/CD Variables
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   script:
