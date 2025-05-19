@@ -30,7 +30,7 @@ build_backend:
   script:
     - cd $BACKEND_DIR/user-services
     - gradle build -x test
-    - cd $BACKEND_DIR/court-service
+    - cd $BACKEND_DIR/court-services
     - gradle build -x test
     - cd $BACKEND_DIR/booking-services
     - gradle build -x test
@@ -39,7 +39,7 @@ build_backend:
   artifacts:
     paths:
       - $BACKEND_DIR/user-services/build/libs/*.jar
-      - $BACKEND_DIR/court-service/build/libs/*.jar
+      - $BACKEND_DIR/court-services/build/libs/*.jar
       - $BACKEND_DIR/booking-services/build/libs/*.jar
       - $BACKEND_DIR/api-gateway/build/libs/*.jar
     expire_in: 1 hour
@@ -72,7 +72,7 @@ deploy:
     - cd $BACKEND_DIR/user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
-    - cd $BACKEND_DIR/court-service
+    - cd $BACKEND_DIR/court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
     - cd $BACKEND_DIR/booking-services

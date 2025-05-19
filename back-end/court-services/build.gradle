@@ -53,3 +53,8 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+jar {
+    archiveBaseName.set('court-service')
+    archiveVersion.set('0.0.1-SNAPSHOT')
+}
