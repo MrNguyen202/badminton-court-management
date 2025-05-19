@@ -148,12 +148,6 @@ deploy:
   image: docker:20.10
   services:
     - docker:dind
-  # dependencies:
-  #   - build_frontend
-  #   - build_user_services
-  #   - build_court_services
-  #   - build_booking_services
-  #   - build_api_gateway
   variables:
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
@@ -167,28 +161,20 @@ deploy:
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # Kiểm tra trước khi cd
-    - ls -la || echo "No files found in working directory"
-    - ls -la user-services || echo "Directory user-services not found"
-
-    # Deploy user-services
-    - cd user-services
+    # Deploy back-end services
+    - cd $BACKEND_DIR/user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
 
-    # Tương tự cho các service khác
-    - ls -la court-services || echo "Directory court-services not found"
-    - cd court-services
+    - cd $BACKEND_DIR/court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
 
-    - ls -la booking-services || echo "Directory booking-services not found"
-    - cd booking-services
+    - cd $BACKEND_DIR/booking-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
 
-    - ls -la api-gateway || echo "Directory api-gateway not found"
-    - cd api-gateway
+    - cd $BACKEND_DIR/api-gateway
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
 
