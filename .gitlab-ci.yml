@@ -30,9 +30,9 @@ build_backend:
   script:
     - cd $BACKEND_DIR/user-services
     - gradle build -x test
-    - cd $BACKEND_DIR/court-services
-    - gradle build -x test
     - cd $BACKEND_DIR/booking-services
+    - gradle build -x test
+      - cd $BACKEND_DIR/court-services
     - gradle build -x test
     - cd $BACKEND_DIR/api-gateway
     - gradle build -x test
