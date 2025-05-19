@@ -4,12 +4,11 @@ stages:
   - deploy
 
 variables:
-  GIT_DEPTH: 0 # Thêm dòng này
+  GIT_DEPTH: 0
   FRONTEND_DIR: "front-end"
   BACKEND_DIR: "back-end"
   DOCKER_REGISTRY: "docker.io"
 
-# Các job build giữ nguyên
 build_frontend:
   stage: build
   image: node:20.14.0
@@ -72,7 +71,6 @@ build_api_gateway:
       - $BACKEND_DIR/api-gateway/
     expire_in: 1 hour
 
-# Các job test giữ nguyên
 test_frontend:
   stage: test
   image: node:20.14.0
@@ -162,7 +160,7 @@ deploy:
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
 
-    # Debug: List the directory structure to verify artifacts
+    # Debug
     - ls -la
     - ls -la $BACKEND_DIR || echo "back-end directory not found"
 
@@ -171,10 +169,10 @@ deploy:
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # Navigate back to the root directory
+    # di chuyển về root
     - cd ..
 
-    # Debug: Verify back-end directories
+    # Debug: Verify back-end 
     - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
     - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
     - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"

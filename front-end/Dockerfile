@@ -1,4 +1,3 @@
-# Dockerfile cho Next.js (front-end)
 FROM node:20.14.0 AS builder
 WORKDIR /app
 COPY package*.json ./
