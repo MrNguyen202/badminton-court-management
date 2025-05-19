@@ -6,4 +6,4 @@ class Config:
     DB_PASSWORD = "court_password"
     DB_HOST = "court-db"
     DB_PORT = "5432"
-    MISTRAL_API_KEY = "POHnNMWrnjJxtqU0e2jgqRn8X3yambwc"  # Thêm API key
+    DEEPSEEK_API_KEY = "sk-454d78ae1b154b4ca1d91852bc0a3f4c"

@@ -1,6 +1,7 @@
 import uuid
 import re
 from src.services.court_service import fetch_courts
+from src.models.deepseek_processor import process_user_input
 
 # Lưu session in-memory
 sessions = {}
@@ -119,8 +120,19 @@ def handle_conversation(session_id, user_message):
         else:
             user_input["amenities"] = [item.strip().lower() for item in user_message.split(",")]
 
+    # Xử lý input người dùng bằng DeepSeek
+    extracted_info = process_user_input(user_message)
+    user_input = session_data["user_input"]
+    user_input.update({
+        "area": extracted_info["area"],
+        "court_type": extracted_info["court_type"],
+        "start_time": extracted_info["start_time"],
+        "end_time": extracted_info["end_time"],
+        "amenities": extracted_info["amenities"]
+    })
+    
     # Tìm sân
-    result = fetch_courts(user_input, sort_by_price=True if current_step == 3 else False)
+    result = fetch_courts(user_input)
     bot_message = result["message"]
     courts_found = len(result["courts"]) > 0
 

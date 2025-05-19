@@ -11,8 +11,8 @@ interface Message {
     name: string;
     location: string;
     court_type: string;
-    price: number;
-    distance: number;
+    close_time: string;
+    open_time: string;
     rating: number;
     amenities: string[];
   }>;
@@ -79,6 +79,8 @@ const ChatWidget = () => {
         message: userMessage,
       });
 
+      console.log("Response from server:", response.data);
+
       // Phân tích phản hồi
       const botMessageText = response.data.message;
       const courts: Message["courts"] = (response.data.courts || []).map((court: any) => ({
@@ -86,9 +88,8 @@ const ChatWidget = () => {
         name: court.name,
         location: court.location,
         court_type: court.court_type,
-        price: court.price,
-        distance: court.distance,
-        rating: court.rating,
+        close_time: court.close_time,
+        open_time: court.open_time,
         amenities: court.amenities.map((item: string) => item.trim()),
       }));
       let question = botMessageText.split("\n").pop()?.trim() || "";
@@ -202,9 +203,8 @@ const ChatWidget = () => {
                             <strong>{court.name}</strong>
                           </p>
                           <p>Địa điểm: {court.location}</p>
-                          <p>Giá: {court.price} VNĐ</p>
-                          <p>Khoảng cách: {court.distance} km</p>
-                          <p>Đánh giá: {court.rating}</p>
+                          <p>Giờ mở cửa: {court.open_time}h</p>
+                          <p>Giờ đóng cửa: {court.close_time}h</p>
                           <p>Tiện ích: {court.amenities.join(", ")}</p>
                         </div>
                       ))}
