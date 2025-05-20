@@ -1,8 +1,9 @@
 "use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { userApi } from "@/app/api/user-services/userAPI";
+import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -16,6 +17,9 @@ const SignUp = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [error, setError] = useState<string | null>(null); // Thêm state để chứa lỗi
 
@@ -94,7 +98,7 @@ const SignUp = () => {
                     <input
                       type="text"
                       name="name"
-                      placeholder="Name"
+                      placeholder="Tên tài khoản"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
@@ -114,7 +118,7 @@ const SignUp = () => {
                     <input
                       type="text"
                       name="phone"
-                      placeholder="Phone"
+                      placeholder="Số điện thoại"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
@@ -124,31 +128,79 @@ const SignUp = () => {
                     <input
                       type="text"
                       name="address"
-                      placeholder="Address"
+                      placeholder="Địa chỉ"
                       onChange={handleChange}
                       required
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      onChange={handleChange}
-                      required
-                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
-                    />
+                    <div className="relative w-64">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Mật khẩu"
+                        onChange={handleChange}
+                        required
+                        className="bg-gray-100 outline-none text-sm flex-1 ml-2 w-full"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 text-sm"
+                      >
+                        {showPassword ? (
+                          <Image
+                            src="/show-pass.png"
+                            width={25}
+                            height={25}
+                            alt="show"
+                          />
+                        ) : (
+                          <Image
+                            src="/hide-pass.png"
+                            width={25}
+                            height={25}
+                            alt="hide"
+                          />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Nhập lại Password"
-                      onChange={handleChange}
-                      required
-                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
-                    />
+                    <div className="relative w-64">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder="Nhập lại mật khẩu"
+                        onChange={handleChange}
+                        required
+                        className="bg-gray-100 outline-none text-sm flex-1 ml-2 w-full"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 text-sm"
+                      >
+                        {showConfirmPassword ? (
+                          <Image
+                            src="/show-pass.png"
+                            width={25}
+                            height={25}
+                            alt="show"
+                          />
+                        ) : (
+                          <Image
+                            src="/hide-pass.png"
+                            width={25}
+                            height={25}
+                            alt="hide"
+                          />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {/* Hiển thị thông báo lỗi nếu có */}
                   {error && <p className="text-red-500">{error}</p>}
