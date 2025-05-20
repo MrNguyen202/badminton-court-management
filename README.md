@@ -2,15 +2,14 @@
 
 **Một nền tảng web hiện đại để đặt sân cầu lông, quản lý lịch sân, và cung cấp trải nghiệm người dùng mượt mà.**
 
-![Banner](https://via.placeholder.com/1200x300.png?text=Badminton+Court+Management)  
-*Hình ảnh minh họa cho dự án (Đề nghị thêm ảnh thực tế của giao diện hoặc sân cầu lông)*
+![Image](https://github.com/user-attachments/assets/2236f5c1-00ea-4814-be9c-6205c499a4f0)
 
 ## 📋 Tổng Quan Dự Án
 
 Dự án **Quản Lý Đặt Sân Cầu Lông** là một ứng dụng web được phát triển trong khuôn khổ môn học **Kiến trúc và Thiết kế Phần mềm** tại trường đại học. Ứng dụng giúp người dùng dễ dàng đặt sân cầu lông, kiểm tra tình trạng sân theo thời gian thực, quản lý hồ sơ cá nhân, và tương tác với chatbot hỗ trợ. Với **kiến trúc microservices**, dự án đảm bảo khả năng mở rộng, bảo mật cao, và hiệu suất tối ưu.
 
 **Link GitHub**: [badminton-court-management](https://github.com/Bao44/badminton-court-management.git)  
-**Demo (nếu có)**: [Liên kết demo trực tuyến] *(Đề nghị triển khai demo trên Vercel hoặc Heroku để giới thiệu)*
+**Demo**: update sau
 
 ## 🎯 Mục Tiêu Dự Án
 
@@ -45,17 +44,17 @@ Dự án **Quản Lý Đặt Sân Cầu Lông** là một ứng dụng web đư�
 - **Cơ Sở Dữ Liệu**: [PostgreSQL](https://www.postgresql.org/) với thiết kế quan hệ tối ưu.
 - **Công Cụ Build**: [Gradle 8.10.1](https://gradle.org/) (JDK 17).
 - **Containerization**: [Docker](https://www.docker.com/) và [Docker Compose](https://docs.docker.com/compose/).
-- **CI/CD**: [GitLab CI/CD](https://docs.gitlab.com/ee/ci/) hoặc [GitHub Actions](https://github.com/features/actions) *(Đề nghị thêm pipeline cụ thể)*.
+- **CI/CD**: [GitLab CI/CD](https://docs.gitlab.com/ee/ci/) hoặc [GitHub Actions](https://github.com/features/actions).
 
 ### Frontend
 - **Framework**: [Next.js](https://nextjs.org/) (React Framework cho SSR/SSG).
 - **Giao Diện**: [Tailwind CSS](https://tailwindcss.com/) để thiết kế giao diện hiện đại, đáp ứng.
 - **Tích Hợp Bản Đồ**: [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) để hiển thị vị trí sân.
-- **Quản Lý Trạng Thái**: [Redux](https://redux.js.org/) hoặc [React Query](https://tanstack.com/query/) *(Đề nghị thêm nếu cần)*.
+- **Quản Lý Trạng Thái**: [Redux](https://redux.js.org/) hoặc [React Query](https://tanstack.com/query/).
 
 ### Công Nghệ Khác
-- **Message Broker**: [RabbitMQ](https://www.rabbitmq.com/) hoặc [Kafka](https://kafka.apache.org/) để giao tiếp bất đồng bộ giữa các microservices *(Gợi ý bổ sung)*.
-- **Monitoring**: [Prometheus](https://prometheus.io/) và [Grafana](https://grafana.com/) để giám sát hiệu suất *(Gợi ý bổ sung)*.
+- **Message Broker**: [RabbitMQ](https://www.rabbitmq.com/) hoặc [Kafka](https://kafka.apache.org/) để giao tiếp bất đồng bộ giữa các microservices.
+- **Monitoring**: [Prometheus](https://prometheus.io/) và [Grafana](https://grafana.com/) để giám sát hiệu suất.
 
 ## 🏛 Kiến Trúc Hệ Thống
 
@@ -269,8 +268,8 @@ Ví dụ pipeline GitLab CI/CD:
 ### Thành Viên Nhóm
 | **Họ và Tên**          | **MSSV**   | **Vai Trò**               |
 |-------------------------|------------|---------------------------|
-| Trương Quốc Bảo         | 21017351   | Backend Developer, DevOps, Frontend Developer |
-| Nguyễn Thanh Thuận      | 21080071   | Backend Developer, DevOps, Frontend Developer        |
+| Trương Quốc Bảo         | 21017351   | Frontend Developer, Backend Developer, DevOps  |
+| Nguyễn Thanh Thuận      | 21080071   | Frontend Developer, Backend Developer, DevOps  |
 
 ### Giảng Viên Hướng Dẫn
 - Nguyễn Trọng Tiến: Giảng viên môn Kiến trúc và Thiết kế Phần mềm.
@@ -281,10 +280,10 @@ Dự án được phát hành dưới MIT License (https://opensource.org/licens
 
 ## 🌟 Gợi Ý Cải Tiến
 
-Dựa trên xu hướng phát triển ứng dụng web và các dự án tương tự, dưới đây là một số gợi ý để nâng cấp dự án:
+Dựa trên xu hướng phát triển ứng dụng web và các dự án trong tương lai, dưới đây là một số ý tưởng mà nhóm sẽ nâng cấp dự án trong thời gian sắp tới:
 
-1. Tích Hợp Thanh Toán: Thêm cổng thanh toán như Stripe (https://stripe.com/) hoặc VNPay (https://vnpay.vn/) để xử lý phí đặt sân.
-2. Thông Báo Đẩy: Sử dụng Firebase Cloud Messaging (https://firebase.google.com/docs/cloud-messaging) để gửi thông báo đẩy về lịch đặt sân.
+1. Mở Rộng Cổng Thanh Toán: Thêm cổng thanh toán như Stripe (https://stripe.com/) hoặc VNPay (https://vnpay.vn/) để xử lý phí đặt sân.
+2. Thông Báo Đẩy: Sử dụng Firebase Cloud Messaging (https://firebase.google.com/docs/cloud-messaging) hoặc Socket.io để gửi thông báo đẩy về lịch đặt sân.
 3. Tối Ưu Hiệu Suất: Tích hợp Redis (https://redis.io/) để lưu cache và tăng tốc truy vấn dữ liệu.
 4. Phân Tích Dữ Liệu: Sử dụng Google Analytics (https://analytics.google.com/) hoặc Mixpanel (https://mixpanel.com/) để theo dõi hành vi người dùng.
 5. Testing: Thêm Cypress (https://www.cypress.io/) cho end-to-end testing và Postman (https://www.postman.com/) để kiểm tra API.
@@ -292,9 +291,7 @@ Dựa trên xu hướng phát triển ứng dụng web và các dự án tương
 ## 📬 Liên Hệ
 
 Nếu bạn có câu hỏi hoặc góp ý, vui lòng liên hệ qua:  
-- Email: bao.truong@example.com (mailto:bao.truong@example.com)  
+- Email: tqbao44@gmail.com
 - GitHub Issues: Mở issue trên GitHub (https://github.com/Bao44/badminton-court-management/issues)
 
 ---
-
-*Ghi chú*: README này đã được tối ưu hóa để dễ đọc, chuyên nghiệp và phù hợp với các dự án mã nguồn mở. Bạn có thể thêm hình ảnh, biểu đồ, hoặc video demo để tăng tính trực quan. Nếu cần hỗ trợ thêm về sơ đồ kiến trúc, pipeline CI/CD chi tiết, hoặc bất kỳ chỉnh sửa nào, hãy cho tôi biết!
