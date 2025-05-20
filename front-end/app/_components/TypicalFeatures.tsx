@@ -55,7 +55,7 @@ const features = [
 
 function TypicalFeatures() {
   return (
-    <div className="bg-gray-100 mt-20 px-8">
+    <div className="bg-gray-100 mt-20 px-8 bg-gradient-to-br from-green-100 to-blue-100">
       <div className=" min-h-screen flex justify-center items-center">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className="ml-10">
