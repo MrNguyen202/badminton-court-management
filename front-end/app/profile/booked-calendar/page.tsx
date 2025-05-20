@@ -143,7 +143,7 @@ function BookingHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-r from-green-50 to-gray-100 p-6">
       <div className="max-w-5xl mx-auto">
         {/* Nút Quay lại */}
         <div className="mb-4">
