@@ -4,13 +4,21 @@ import { feedbackAPI } from "@/app/api/court-services/feedbackAPI";
 import { toast } from "react-toastify";
 
 function Feedback({ courtID }: any) {
-  const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
   const [feedbacks, setFeedbacks] = useState<any>([]);
   const [newRating, setNewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [visibleFeedbacks, setVisibleFeedbacks] = useState(5); // State to control visible feedbacks
+
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {

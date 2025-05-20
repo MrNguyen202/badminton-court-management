@@ -28,8 +28,14 @@ export default function BookModal({
   const router = useRouter();
   const [court, setCourt] = useState<any>(null);
   const [subCourt, setSubCourt] = useState<any>(null);
-  const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const [userNameBooking, setUserNameBooking] = useState(user?.name || "");
   const [userPhoneBooking, setUserPhoneBooking] = useState(user?.phone || "");
