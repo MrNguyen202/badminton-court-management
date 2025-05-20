@@ -10,6 +10,7 @@ import DeleteImage from "@/public/delete-02-stroke-rounded.svg";
 import AddScheduleSingle from "../_components/AddScheduleSingle";
 import { useDisclosure } from "@nextui-org/react";
 import BookModal from "./BookModal";
+import { toast } from "react-toastify";
 
 // Types to match API data
 type SubCourtSchedule = {
@@ -175,9 +176,8 @@ function Schedule({ courtID }: { courtID: number }) {
     try {
       //Viết xử lý xóa lịch ở đây
       await subCourtScheduleApi.deleteSubCourtSchedule(scheduleId, subCourtId);
-      alert("Schedule deleted successfully");
+      toast.success("Xóa lịch thành công");
       setReloadTrigger((prev) => prev + 1);
-      alert(`Delete schedule with ID: ${scheduleId}`);
     } catch (error) {
       console.error("Error deleting schedule:", error);
       alert("An error occurred while deleting the schedule.");
@@ -187,17 +187,6 @@ function Schedule({ courtID }: { courtID: number }) {
   // Format date to ISO string for API lookup
   const formatDateToISOString = (date: Date) => {
     return date.toISOString().split("T")[0];
-  };
-
-  //Đặt lịch
-  const handleBookSchedule = async (scheduleId: any) => {
-    try {
-      //Viết xử lý đặt lịch ở đây
-      alert(`Đặt lịch thành công, ${JSON.stringify(scheduleId)}`);
-    } catch (error) {
-      console.error("Error booking schedule:", error);
-      alert("An error occurred while booking the schedule.");
-    }
   };
 
   // Handle booking modal open
