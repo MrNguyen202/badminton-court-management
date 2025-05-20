@@ -83,6 +83,20 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(404).body("User not found"));
     }
 
+    @GetMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String phone, @RequestParam String newPassword) throws EntityIdNotFoundException {
+
+        Optional<User> user = userRepository.findByEmailAndPhone(email, phone);
+        if (user.isPresent()) {
+            User updatedUser = userService.forgotPassword(email, newPassword);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Không tìm thấy người dùng"));
+        }
+    }
+
     @PostMapping("/update-user")
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
         try {
