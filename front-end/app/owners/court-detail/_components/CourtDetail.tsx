@@ -69,6 +69,9 @@ function CourtDetail() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const courtID = searchParams.get("courtID");
+  const subCourtId = searchParams.get("subCourtId");
+  const scheduleId = searchParams.get("bookedScheduleId");
+  const message = searchParams.get("message");
   const [user, setUser] = useState<User | null>(null);
   const [court, setCourt] = useState<Court | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -76,13 +79,6 @@ function CourtDetail() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const subCourtId = searchParams.get("subCourtId");
-    const scheduleId = searchParams.get("bookedScheduleId");
-    const message = searchParams.get("message");
-    console.log("Message from URL:", message);
-    console.log("SubCourtID from URL:", subCourtId);
-    console.log("scheduleID from URL:", scheduleId);
-
     if (message === "success" && subCourtId && scheduleId) {
       const updateStatus = async () => {
         try {
@@ -91,7 +87,31 @@ function CourtDetail() {
             Number(subCourtId),
             "BOOKED"
           );
-          setShowSuccessToast(true); // Kích hoạt toast thành công
+          setShowSuccessToast(true);
+
+          const userInfo = JSON.parse(localStorage.getItem("user") || "null");
+
+          if (userInfo) {
+            const token = localStorage.getItem("token") || userInfo.token;
+            const response = await fetch(
+              "http://localhost:8080/api/paypal/success",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  email: userInfo.email,
+                }),
+              }
+            );
+
+            const result = await response.json();
+            if (result.status === "success") {
+              toast.success("Kiểm tra email nhé!");
+            }
+          }
         } catch (error: any) {
           setErrorMessage(error.message || "Cập nhật trạng thái thất bại");
           setShowErrorToast(true); // Kích hoạt toast lỗi
@@ -111,7 +131,6 @@ function CourtDetail() {
           const result = await response.json();
           if (result.status === "success") {
             toast.success("Hủy thanh toán thành công!");
-            // window.location.href = result.redirectUrl; // Redirect nếu thành công
           } else {
             setErrorMessage(result.message || "Hủy thanh toán thất bại");
             setShowErrorToast(true);
@@ -129,12 +148,12 @@ function CourtDetail() {
   useEffect(() => {
     if (showSuccessToast) {
       toast.success("Thanh toán thành công! Đang cập nhật lại lịch", {
-        onClose: () => setShowSuccessToast(false), // Reset state sau khi toast đóng
+        onClose: () => setShowSuccessToast(false),
       });
     }
     if (showErrorToast) {
       toast.error(`Lỗi: ${errorMessage}`, {
-        onClose: () => setShowErrorToast(false), // Reset state sau khi toast đóng
+        onClose: () => setShowErrorToast(false),
       });
     }
   }, [showSuccessToast, showErrorToast, errorMessage]);
