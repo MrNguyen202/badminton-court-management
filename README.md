@@ -75,7 +75,6 @@ Dự án này là một nền tảng web để đặt sân cầu lông, được
 badminton-court-management/
 
 ├── back-end/
-
 │   ├── user-services/
 
 │   ├── booking-services/
@@ -89,7 +88,6 @@ badminton-court-management/
 │   └── Dockerfile
 
 ├── front-end/
-
 │   ├── pages/
 
 │   ├── components/
@@ -99,7 +97,6 @@ badminton-court-management/
 │   └── Dockerfile
 
 ├── docs/
-
 └── README.md
 
 
