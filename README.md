@@ -73,13 +73,16 @@ Dự án này là một nền tảng web để đặt sân cầu lông, được
 
 ## Cấu Trúc Thư Mục
 badminton-court-management/
+
 ├── back-end/
+
 │   ├── user-services/
 │   ├── booking-services/
 │   ├── court-services/
 │   ├── chatbot-services/
 │   ├── api-gateway/
 │   └── Dockerfile
+
 ├── front-end/
 │   ├── pages/
 │   ├── components/
