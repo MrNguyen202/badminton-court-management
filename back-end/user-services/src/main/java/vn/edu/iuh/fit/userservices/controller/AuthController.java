@@ -83,8 +83,11 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(404).body("User not found"));
     }
 
-    @GetMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String phone, @RequestParam String newPassword) throws EntityIdNotFoundException {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) throws EntityIdNotFoundException {
+        String email = request.get("email");
+        String phone = request.get("phone");
+        String newPassword = request.get("newPassword");
 
         Optional<User> user = userRepository.findByEmailAndPhone(email, phone);
         if (user.isPresent()) {

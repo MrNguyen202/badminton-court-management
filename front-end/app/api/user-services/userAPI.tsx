@@ -110,25 +110,25 @@ export const userApi = {
     }
   },
 
-    // API cập nhật thông tin user
-    updateRole: async (userData: {
-      id?: string;
-      name: string;
-      email: string;
-      phone: string;
-      address: string;
-      role: string;
-    }) => {
-      try {
-        const response = await apiClient.post("/update-role", userData);
-        return response.data;
-      } catch (error: any) {
-        throw new Error(
-          error.response?.data?.error ||
-            "Cập nhật role thất bại, vui lòng thử lại!"
-        );
-      }
-    },
+  // API cập nhật thông tin user
+  updateRole: async (userData: {
+    id?: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    role: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/update-role", userData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Cập nhật role thất bại, vui lòng thử lại!"
+      );
+    }
+  },
 
   // API cập nhật mật khẩu
   updatePassword: async (data: {
@@ -143,6 +143,22 @@ export const userApi = {
       throw new Error(
         error.response?.data?.error ||
           "Cập nhật mật khẩu thất bại, vui lòng thử lại!"
+      );
+    }
+  },
+
+  // API quên mật khẩu
+  forgotPassword: async (data: {
+    email: string;
+    phone: string;
+    newPassword: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/forgot-password", data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.error || "Thất bại , vui lòng thử lại!"
       );
     }
   },
