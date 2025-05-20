@@ -110,4 +110,16 @@ public class UserService {
             throw new EntityIdNotFoundException("User không tồn tại");
         }
     }
+
+    public User forgotPassword(String email, String newPassword) throws EntityIdNotFoundException {
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            return userRepository.save(user);
+        } else {
+            throw new EntityIdNotFoundException("User không tồn tại");
+        }
+    }
 }
