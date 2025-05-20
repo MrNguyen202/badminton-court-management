@@ -22,7 +22,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 function Footer() {
   return (
-    <footer className="px-8 pt-24 pb-8 mt-20 border-t border-gray-200 ">
+    <footer className="px-8 pt-24 pb-8 mt-20 border-t border-gray-200 bg-gradient-to-br from-blue-100 to-green-100">
       <div className="container max-w-6xl flex flex-col mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 !w-full ">
           <div className="flex col-span-2 items-center gap-10 mb-10 lg:mb-0 md:gap-36">

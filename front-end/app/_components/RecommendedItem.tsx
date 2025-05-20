@@ -118,7 +118,7 @@ const features = [
 
 function RecommendedItem() {
   return (
-    <section className="pb-20 px-8 pt-20 bg-[#eef1f6] py-12 text-center">
+    <section className="pb-20 px-8 pt-20 bg-[#eef1f6] py-12 text-center bg-gradient-to-br from-blue-100 to-green-100">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-5xl font-bold text-gray-800">
           Điểm khác biệt của phần mềm quản lý lịch hẹn đặt sân BT
