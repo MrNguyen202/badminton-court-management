@@ -77,18 +77,29 @@ badminton-court-management/
 ├── back-end/
 
 │   ├── user-services/
+
 │   ├── booking-services/
+
 │   ├── court-services/
+
 │   ├── chatbot-services/
+
 │   ├── api-gateway/
+
 │   └── Dockerfile
 
 ├── front-end/
+
 │   ├── pages/
+
 │   ├── components/
+
 │   ├── styles/
+
 │   └── Dockerfile
+
 ├── docs/
+
 └── README.md
 
 
