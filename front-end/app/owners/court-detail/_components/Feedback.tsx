@@ -47,10 +47,10 @@ function Feedback({ courtID }: any) {
     }
 
     const newFeedback = {
-      userName: user ? JSON.parse(user).name : "Người dùng",
+      userName: user ? user.name : "Người dùng",
       numberStar: newRating,
       content: newComment,
-      userId: user ? JSON.parse(user).id : 0,
+      userId: user ? user.id : 0,
       courtId: courtID,
     };
 
@@ -178,7 +178,7 @@ function Feedback({ courtID }: any) {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {feedback.userId === JSON.parse(user)?.id && (
+                        {feedback.userId === user?.id && (
                           <button>
                             <Delete className="text-red-500" />
                           </button>

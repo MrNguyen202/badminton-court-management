@@ -28,7 +28,9 @@ import vn.edu.iuh.hero.services.impls.ScheduleServiceImpl;
 import vn.edu.iuh.hero.services.impls.SubCourtScheduleServiceImpl;
 import vn.edu.iuh.hero.services.impls.SubCourtServiceImpl;
 
+import java.sql.Time;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,46 +57,94 @@ public class SubCourtScheduleController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody SubCourtScheduleRequestDTO subCourtScheduleRequestDTO) {
+    @Transactional
+    public ResponseEntity<?> create(@RequestBody SubCourtScheduleRequestDTO dto) {
         try {
-            //Kiểm tra SubCourt có tồn tại không
-            Optional<SubCourt> subCourtOpt = subCourtServiceImpl.findById(subCourtScheduleRequestDTO.getSubCourtId());
-            if (!subCourtOpt.isPresent()) {
+            // 1. Kiểm tra sân con
+            Optional<SubCourt> subCourtOpt = subCourtServiceImpl.findById(dto.getSubCourtId());
+            if (subCourtOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body("Sub court not found");
             }
             SubCourt subCourt = subCourtOpt.get();
 
-            //Kiểm tra Schedule có tồn tại không
+            // 2. Validate thời gian
+            LocalDate date = dto.getDate();
+            Time fromHour = dto.getFromHour();
+            Time toHour = dto.getToHour();
+            double price = dto.getPrice();
+
+            if (!fromHour.before(toHour)) {
+                return ResponseEntity.badRequest().body("fromHour must be before toHour");
+            }
+
+            // 3. Lấy lịch đã tồn tại cho sân con trong ngày
+            List<SubCourtSchedule> existingSchedules = subCourtScheduleService
+                    .findBySubCourtIdAndDate(dto.getSubCourtId(), date);
+
+            List<SubCourtSchedule> schedulesToDelete = new ArrayList<>();
+
+            for (SubCourtSchedule existing : existingSchedules) {
+                Schedule existingSchedule = existing.getSchedule();
+                Time existingFrom = existingSchedule.getFromHour();
+                Time existingTo = existingSchedule.getToHour();
+                double existingPrice = existing.getPrice();
+
+                boolean isOverlap = fromHour.before(existingTo) && toHour.after(existingFrom);
+
+                if (isOverlap) {
+                    if (fromHour.equals(existingFrom) && toHour.equals(existingTo)) {
+                        if (existing.getStatus() == StatusSchedule.BOOKED) {
+                            return ResponseEntity.badRequest().body("Schedule already booked");
+                        } else if (existing.getStatus() == StatusSchedule.AVAILABLE) {
+                            // Nếu chỉ khác giá → cập nhật giá
+                            if (price != existingPrice) {
+                                existing.setPrice(price);
+                                subCourtScheduleService.update(existing);
+                            }
+                            return ResponseEntity.ok("Create success");
+                        }
+                    } else {
+                        // Nếu không trùng exact thời gian nhưng overlap & AVAILABLE → xóa
+                        if (existing.getStatus() == StatusSchedule.AVAILABLE) {
+                            schedulesToDelete.add(existing);
+                        } else {
+                            return ResponseEntity.badRequest().body("Overlap with booked schedule");
+                        }
+                    }
+                }
+            }
+
+            // 4. Xoá các lịch bị overlap mà vẫn AVAILABLE
+            for (SubCourtSchedule toDelete : schedulesToDelete) {
+                subCourtScheduleService.delete(toDelete.getSubCourtScheduleID());
+            }
+
+            // 5. Tạo hoặc lấy Schedule
             Schedule schedule = scheduleServiceImpl
-                    .findByDateAndFromHourAndToHour(
-                            subCourtScheduleRequestDTO.getDate(),
-                            subCourtScheduleRequestDTO.getFromHour(),
-                            subCourtScheduleRequestDTO.getToHour()
-                    )
+                    .findByDateAndFromHourAndToHour(date, fromHour, toHour)
                     .orElseGet(() -> {
                         Schedule newSchedule = new Schedule();
-                        newSchedule.setDate(subCourtScheduleRequestDTO.getDate());
-                        newSchedule.setFromHour(subCourtScheduleRequestDTO.getFromHour());
-                        newSchedule.setToHour(subCourtScheduleRequestDTO.getToHour());
+                        newSchedule.setDate(date);
+                        newSchedule.setFromHour(fromHour);
+                        newSchedule.setToHour(toHour);
                         return scheduleServiceImpl.save(newSchedule);
                     });
 
-            // Tạo SubCourtSchedule với constructor mới
-            SubCourtSchedule subCourtSchedule = new SubCourtSchedule(
+            // 6. Tạo lịch mới
+            SubCourtSchedule newSchedule = new SubCourtSchedule(
                     subCourt,
                     schedule,
-                    subCourtScheduleRequestDTO.getPrice(),
+                    price,
                     StatusSchedule.AVAILABLE
             );
-
-            //Lưu vào database
-            subCourtScheduleService.save(subCourtSchedule);
+            subCourtScheduleService.save(newSchedule);
 
             return ResponseEntity.ok("Create success");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
     //Update status of sub court schedule
     @PutMapping("/update-status/{subCourtScheduleId}/{subCourtId}")
@@ -131,7 +181,7 @@ public class SubCourtScheduleController {
             SubCourtScheduleID id = new SubCourtScheduleID(subCourtId, scheduleId);
             System.out.println("SubCourtScheduleID: " + id);
             Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleService.findById(id);
-            if (!subCourtScheduleOpt.isPresent()) {
+            if (subCourtScheduleOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body("Sub court schedule not found");
             }
             subCourtScheduleService.delete(id);

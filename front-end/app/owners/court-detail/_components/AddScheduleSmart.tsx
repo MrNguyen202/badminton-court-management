@@ -24,8 +24,8 @@ type SubCourt = {
 
 
 function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
-  const [subCourts, setSubCourts] = useState<SubCourt[]>([])
-  const [courtId, setCourtId] = useState(courtID)
+  const [subCourts, setSubCourts] = useState<SubCourt[]>([]);
+  const [courtId, setCourtId] = useState(courtID);
 
   useEffect(() => {
     const fetchSubCourts = async () => {
@@ -134,9 +134,6 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
 
         // Format ngày theo định dạng YYYY-MM-DD
         const dateString = currentDate.toISOString().split("T")[0];
-
-        // Log để kiểm tra từng ngày được tạo
-        console.log(`Ngày thứ ${i + 1}:`, dateString);
 
         // Thêm lịch khung Sáng
         for (const schedule of morningSchedules) {

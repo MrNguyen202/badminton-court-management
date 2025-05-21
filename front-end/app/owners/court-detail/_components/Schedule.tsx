@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
 import { getNextSevenDay } from "../_helps/OwnWeekTime";
 import AddScheduleSmart from "../_components/AddScheduleSmart";
-import { subCourtApi } from "@/app/api/court-services/subCourtAPI";
+import { subCourtApi } from "@/app/api/court-services/subCourtAPI"; 
 import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg";
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg";
 import AddScheduleSingle from "../_components/AddScheduleSingle";
 import { useDisclosure } from "@nextui-org/react";
 import BookModal from "./BookModal";
+import { toast } from "react-toastify";
 
 // Types to match API data
 type SubCourtSchedule = {
@@ -175,9 +176,8 @@ function Schedule({ courtID }: { courtID: number }) {
     try {
       //Viết xử lý xóa lịch ở đây
       await subCourtScheduleApi.deleteSubCourtSchedule(scheduleId, subCourtId);
-      alert("Schedule deleted successfully");
+      toast.success("Xóa lịch thành công");
       setReloadTrigger((prev) => prev + 1);
-      alert(`Delete schedule with ID: ${scheduleId}`);
     } catch (error) {
       console.error("Error deleting schedule:", error);
       alert("An error occurred while deleting the schedule.");
@@ -187,17 +187,6 @@ function Schedule({ courtID }: { courtID: number }) {
   // Format date to ISO string for API lookup
   const formatDateToISOString = (date: Date) => {
     return date.toISOString().split("T")[0];
-  };
-
-  //Đặt lịch
-  const handleBookSchedule = async (scheduleId: any) => {
-    try {
-      //Viết xử lý đặt lịch ở đây
-      alert(`Đặt lịch thành công, ${JSON.stringify(scheduleId)}`);
-    } catch (error) {
-      console.error("Error booking schedule:", error);
-      alert("An error occurred while booking the schedule.");
-    }
   };
 
   // Handle booking modal open
@@ -216,11 +205,10 @@ function Schedule({ courtID }: { courtID: number }) {
               <button
                 key={subCourt.id}
                 onClick={() => setSelectedSubCourt(subCourt.id)}
-                className={`px-4 py-2 border rounded-lg shadow-md transition-all duration-200 ${
-                  selectedSubCourt === subCourt.id
-                    ? "bg-slate-900 text-white border-primary-500"
-                    : "bg-white text-gray-900 border-gray-200 hover:bg-gray-100"
-                }`}
+                className={`px-4 py-2 border rounded-lg shadow-md transition-all duration-200 ${selectedSubCourt === subCourt.id
+                  ? "bg-slate-900 text-white border-primary-500"
+                  : "bg-white text-gray-900 border-gray-200 hover:bg-gray-100"
+                  }`}
               >
                 <span className="text-lg font-semibold">
                   {subCourt.subName} -{" "}
@@ -302,17 +290,15 @@ function Schedule({ courtID }: { courtID: number }) {
           <div className="flex justify-between items-center">
             <button
               onClick={() => setTimeFrame("morning")}
-              className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${
-                timeFrame === "morning" ? "bg-primary-500 text-white" : ""
-              }`}
+              className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === "morning" ? "bg-primary-500 text-white" : ""
+                }`}
             >
               Khung sáng
             </button>
             <button
               onClick={() => setTimeFrame("afternoon")}
-              className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${
-                timeFrame === "afternoon" ? "bg-primary-500 text-white" : ""
-              }`}
+              className={`px-4 py-3 text-xl text-gray-400 border border-slate-900 rounded-md mr-2 hover:text-slate-900 ${timeFrame === "afternoon" ? "bg-primary-500 text-white" : ""
+                }`}
             >
               Khung chiều
             </button>
@@ -341,27 +327,24 @@ function Schedule({ courtID }: { courtID: number }) {
             >
               <div className="rounded-lg ml-2 w-1/12 justify-evenly items-center flex">
                 <div
-                  className={`text-center py-3 w-1/2 rounded-lg border border-primary-500 ${
-                    day.toDateString() === new Date().toDateString()
-                      ? "bg-primary-500"
-                      : ""
-                  }`}
+                  className={`text-center py-3 w-1/2 rounded-lg border border-primary-500 ${day.toDateString() === new Date().toDateString()
+                    ? "bg-primary-500"
+                    : ""
+                    }`}
                 >
                   <span
-                    className={`text-lg font-bold ${
-                      day.toDateString() === new Date().toDateString()
-                        ? "text-white"
-                        : "text-black"
-                    }`}
+                    className={`text-lg font-bold ${day.toDateString() === new Date().toDateString()
+                      ? "text-white"
+                      : "text-black"
+                      }`}
                   >
                     {daysOfWeek[day.getDay()]}
                   </span>
                   <span
-                    className={`block text-sm font-medium ${
-                      day.toDateString() === new Date().toDateString()
-                        ? "text-white"
-                        : "text-black"
-                    }`}
+                    className={`block text-sm font-medium ${day.toDateString() === new Date().toDateString()
+                      ? "text-white"
+                      : "text-black"
+                      }`}
                   >
                     {day.getDate()}/{day.getMonth() + 1}
                   </span>
@@ -380,7 +363,7 @@ function Schedule({ courtID }: { courtID: number }) {
                       className={`relative flex-col items-center justify-evenly p-2 px-3 border-b rounded-lg hover:bg-opacity-75 ${getStatusColor(
                         item.status
                       )}`}
-                      disabled={item.status !== "AVAILABLE" || isAdmin}
+                      disabled={item.status !== "AVAILABLE"}
                       onClick={() => handleOpenBookingModal(item)}
                     >
                       <span className="text-lg font-bold text-gray-900">
