@@ -93,14 +93,14 @@ public class SubCourtScheduleController {
 
                 if (isOverlap) {
                     if (fromHour.equals(existingFrom) && toHour.equals(existingTo)) {
-                        if (existing.getStatus() == StatusSchedule.BOOKED) {
-                            return ResponseEntity.badRequest().body("Schedule already booked");
-                        } else if (existing.getStatus() == StatusSchedule.AVAILABLE) {
+                        if (existing.getStatus() == StatusSchedule.AVAILABLE) {
                             // Nếu chỉ khác giá → cập nhật giá
                             if (price != existingPrice) {
                                 existing.setPrice(price);
                                 subCourtScheduleService.update(existing);
                             }
+                            return ResponseEntity.ok("Create success");
+                        }else{
                             return ResponseEntity.ok("Create success");
                         }
                     } else {
@@ -108,7 +108,7 @@ public class SubCourtScheduleController {
                         if (existing.getStatus() == StatusSchedule.AVAILABLE) {
                             schedulesToDelete.add(existing);
                         } else {
-                            return ResponseEntity.badRequest().body("Overlap with booked schedule");
+                            return ResponseEntity.ok("Create success");
                         }
                     }
                 }

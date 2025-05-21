@@ -72,14 +72,7 @@ function BadmintonCourtList() {
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
 
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  const user = JSON.parse(localStorage.getItem("user") || "null") as User | null;
 
   useEffect(() => {
 
@@ -89,7 +82,7 @@ function BadmintonCourtList() {
         if (user === null) {
           courtData = await courtApi.getAllCourt();
         } else {
-          courtData = await courtApi.getNotCourtByUserID(user.id);
+          courtData = await courtApi.getNotCourtByUserID(user?.id);
         }
 
         const courtsWithRatings = await Promise.all(

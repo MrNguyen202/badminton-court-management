@@ -10,6 +10,7 @@ import soonImage from "../../../../public/sun-03-stroke-rounded.svg"
 import moonImage from "../../../../public/moon-02-stroke-rounded.svg"
 import { Input } from "@nextui-org/input"
 import { Checkbox, CheckboxGroup, Radio, RadioGroup, DatePicker, TimeInput } from "@nextui-org/react"
+import { toast } from "react-toastify"
 
 interface AddScheduleSmartProps {
   courtID: number;
@@ -172,12 +173,13 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
         await subCourtScheduleApi.createSubCourtSchedule(schedule);
       }
 
-      alert("Thêm lịch thành công!");
-      onScheduleAdded(selectedDate.toDate("UTC"));
+      toast.success("Thêm lịch thành công!");
+      // set ngày hiện tại cho lịch
+      onScheduleAdded(new Date());
       onClose();
     } catch (error) {
       console.error("Lỗi khi thêm lịch:", error);
-      alert("Có lỗi xảy ra khi thêm lịch.");
+      toast.error("Có lỗi xảy ra khi thêm lịch.");
     }
   };
 
@@ -295,7 +297,6 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
                   value={selectedDate}
                   onChange={(date) => {
                     if (date) {
-                      console.log("Ngày được chọn:", date)
                       setSelectedDate(date)
                     }
                   }}
@@ -366,25 +367,28 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
               </div>
             )}
           </ModalBody>
-          <ModalFooter>
-            <button
-              className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"
-              onClick={onClose}
-            >
-              Hủy
-            </button>
-            <button
-              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
-              onClick={handleAddSubCourtSchedule}
-              disabled={
-                ((!morningStartTime || !morningEndTime || morningStartTime >= morningEndTime) &&
-                  (!eveningStartTime || !eveningEndTime || eveningStartTime >= eveningEndTime)) ||
-                !price ||
-                Number.parseFloat(price) <= 0
-              }
-            >
-              Thêm
-            </button>
+          <ModalFooter className="flex justify-between items-center">
+            <span className="italic text-red-500">Lưu ý: Thao tác sẽ thay thế tất cả các lịch cũ bị trùng nếu như lịch đó chưa được đặt</span>
+            <div className="flex gap-4">
+              <button
+                className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"
+                onClick={onClose}
+              >
+                Hủy
+              </button>
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
+                onClick={handleAddSubCourtSchedule}
+                disabled={
+                  ((!morningStartTime || !morningEndTime || morningStartTime >= morningEndTime) &&
+                    (!eveningStartTime || !eveningEndTime || eveningStartTime >= eveningEndTime)) ||
+                  !price ||
+                  Number.parseFloat(price) <= 0
+                }
+              >
+                Thêm
+              </button>
+            </div>
           </ModalFooter>
         </ModalContent>
       </Modal>

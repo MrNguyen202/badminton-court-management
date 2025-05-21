@@ -40,7 +40,7 @@ function Schedule({ courtID }: { courtID: number }) {
       : "morning"
   );
 
-  const [selectedSubCourt, setSelectedSubCourt] = useState<number | null>(null);
+  const [selectedSubCourt, setSelectedSubCourt] = useState<SubCourt | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [date, setDate] = useState(new Date());
   const [subCourts, setSubCourts] = useState<SubCourt[]>([]);
@@ -78,7 +78,7 @@ function Schedule({ courtID }: { courtID: number }) {
         const response = await subCourtApi.getAllSubCourt(courtID);
         setSubCourts(response);
         if (response.length > 0) {
-          setSelectedSubCourt(response[0]?.id);
+          setSelectedSubCourt(response[0]);
         }
       } catch (error) {
         console.error("Error fetching sub-courts:", error);
@@ -114,7 +114,7 @@ function Schedule({ courtID }: { courtID: number }) {
         formattedDate.setHours(12, 0, 0, 0);
 
         const response = await subCourtScheduleApi.getScheduleByCourtId(
-          selectedSubCourt,
+          selectedSubCourt?.id,
           formattedDate
         );
 
@@ -204,8 +204,8 @@ function Schedule({ courtID }: { courtID: number }) {
             {subCourts.map((subCourt) => (
               <button
                 key={subCourt.id}
-                onClick={() => setSelectedSubCourt(subCourt.id)}
-                className={`px-4 py-2 border rounded-lg shadow-md transition-all duration-200 ${selectedSubCourt === subCourt.id
+                onClick={() => setSelectedSubCourt(subCourt)}
+                className={`px-4 py-2 border rounded-lg shadow-md transition-all duration-200 ${selectedSubCourt?.id === subCourt.id
                   ? "bg-slate-900 text-white border-primary-500"
                   : "bg-white text-gray-900 border-gray-200 hover:bg-gray-100"
                   }`}
@@ -311,8 +311,8 @@ function Schedule({ courtID }: { courtID: number }) {
           // Format date consistently for API lookup
           const keyDate = formatDateToISOString(day);
           const daySchedules =
-            selectedSubCourt !== null && schedule[selectedSubCourt]
-              ? schedule[selectedSubCourt][keyDate] || []
+            selectedSubCourt !== null && schedule[selectedSubCourt?.id]
+              ? schedule[selectedSubCourt?.id][keyDate] || []
               : [];
 
           const filteredSchedules =
@@ -398,6 +398,7 @@ function Schedule({ courtID }: { courtID: number }) {
                     subcourt={selectedSubCourt}
                     date={day}
                     filteredSchedules={filteredSchedules}
+                    onScheduleAdded={handleScheduleAdded}
                   />
                 )}
               </div>
@@ -409,7 +410,7 @@ function Schedule({ courtID }: { courtID: number }) {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         courtId={courtID}
-        subCourtSelected={selectedSubCourt}
+        subCourtSelected={selectedSubCourt?.id}
         bookedSchedule={bookedSchedule}
       />
     </div>

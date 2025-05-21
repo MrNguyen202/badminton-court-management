@@ -83,8 +83,6 @@ function AdminPage() {
     }
   }, []);
 
-  console.log("User:", user);
-
   // Lấy danh sách sân của chủ sân
   // useEffect(() => {
   //   const fetchCourts = async () => {
