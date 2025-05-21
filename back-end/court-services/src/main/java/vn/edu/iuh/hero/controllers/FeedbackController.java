@@ -73,4 +73,18 @@ public class FeedbackController {
     public ResponseEntity<?> getAverageStarByCourtId(@PathVariable Long courtId) {
         return ResponseEntity.ok(feedbackService.getAverageStarRatingByCourtId(courtId));
     }
+
+    // Delete feedback by id
+    @DeleteMapping("/delete-feedback/{feedbackId}")
+    public ResponseEntity<?> deleteFeedback(@PathVariable Long feedbackId) {
+        System.out.println(feedbackId);
+        Optional<Feedback> feedback = feedbackService.findById(feedbackId);
+        System.out.println(feedback);
+        if (feedback.isPresent()) {
+            feedbackService.delete(feedbackId);
+            return ResponseEntity.ok("Feedback deleted successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Feedback not found");
+        }
+    }
 }

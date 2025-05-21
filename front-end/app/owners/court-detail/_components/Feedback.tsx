@@ -34,6 +34,7 @@ function Feedback({ courtID }: any) {
     fetchFeedbacks();
   }, [courtID]);
 
+  // Hàm gửi nhận xét
   const handleSubmit = (e: any) => {
     e.preventDefault();
     if (newRating === 0 || !newComment.trim()) {
@@ -78,6 +79,22 @@ function Feedback({ courtID }: any) {
   // Handle "View More" button click
   const handleViewMore = () => {
     setVisibleFeedbacks(feedbacks.length); // Show all feedbacks
+  };
+
+  // Hàm xóa nhận xét
+  const handleDeleteFeedback = (feedbackId: any) => {
+    feedbackAPI
+      .deleteFeedback(feedbackId)
+      .then(() => {
+        setFeedbacks((prevFeedbacks: any) =>
+          prevFeedbacks.filter((feedback: any) => feedback?.id !== feedbackId)
+        );
+        toast.success("Đã xóa nhận xét thành công!");
+      })
+      .catch((error) => {
+        console.error("Error deleting feedback:", error);
+        toast.error("Có lỗi xảy ra khi xóa nhận xét.");
+      });
   };
 
   return (
@@ -179,7 +196,7 @@ function Feedback({ courtID }: any) {
                       </div>
                       <div className="flex items-center gap-2">
                         {feedback.userId === user?.id && (
-                          <button>
+                          <button onClick={() => handleDeleteFeedback(feedback?.id)}>
                             <Delete className="text-red-500" />
                           </button>
                         )}
