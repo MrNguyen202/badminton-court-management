@@ -10,7 +10,5 @@ public interface BookingService {
     Boolean deleteBooking(Long courtId, Long subCourtId, Long scheduleId);
     Booking getBooking(Long id);
     List<Booking> getBookingsByUserId(Long userId);
-    List<Booking> getUserBookings(Long userId);
-    Booking cancelBooking(Long id);
-    Booking confirmBooking(Long id);
+    Booking confirmBooking(Booking booking, String userInfoJson);
 }

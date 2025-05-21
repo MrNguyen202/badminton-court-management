@@ -118,8 +118,10 @@ function BookingHistoryPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "NEW":
+      case "PAID":
         return "success";
+      case "DIRECT_PAYMENT":
+        return "warning";
       default:
         return "default";
     }
@@ -127,8 +129,10 @@ function BookingHistoryPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "NEW":
+      case "PAID":
         return "Đã thanh toán";
+      case "DIRECT_PAYMENT":
+        return "Thanh toán trực tiếp";
       default:
         return status;
     }

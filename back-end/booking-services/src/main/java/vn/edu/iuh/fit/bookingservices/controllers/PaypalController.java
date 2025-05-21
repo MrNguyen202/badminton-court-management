@@ -118,6 +118,64 @@ public class PaypalController {
         return ResponseEntity.badRequest().body("Không thể tạo thanh toán");
     }
 
+    @PostMapping("/confirm")
+    public ResponseEntity<String> directPayment(@RequestBody BookingRequestDTO bookingRequest) {
+        try {
+
+            if (bookingRequest.getCourtId() == null || bookingRequest.getSubCourtId() == null) {
+                return ResponseEntity.badRequest().body("courtId và subCourtId không được để trống");
+            }
+
+            if (bookingRequest.getFromHour() == null || bookingRequest.getToHour() == null) {
+                return ResponseEntity.badRequest().body("fromHour và toHour không được để trống");
+            }
+
+            if (bookingRequest.getTotalCost() == null) {
+                return ResponseEntity.badRequest().body("totalCost không được để trống");
+            }
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime startTime;
+            LocalDateTime endTime;
+            try {
+                startTime = LocalDateTime.parse(bookingRequest.getFromHour(), formatter);
+                endTime = LocalDateTime.parse(bookingRequest.getToHour(), formatter);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Định dạng thời gian không hợp lệ. Vui lòng sử dụng định dạng yyyy-MM-dd'T'HH:mm:ss");
+            }
+
+            double totalInVND = bookingRequest.getTotalCost();
+            double totalInUSD = Math.max(0.01, totalInVND / 25000.0);
+
+            // Lưu thông tin booking vào database với trạng thái DIRECT_PAYMENT
+            Booking tempBooking = new Booking();
+            tempBooking.setCourtId(bookingRequest.getCourtId());
+            tempBooking.setSubCourtId(bookingRequest.getSubCourtId());
+            tempBooking.setUserId(bookingRequest.getUserId());
+            tempBooking.setScheduleId(bookingRequest.getScheduleId());
+            tempBooking.setStartTime(startTime);
+            tempBooking.setEndTime(endTime);
+            tempBooking.setTotalAmount(BigDecimal.valueOf(bookingRequest.getTotalCost()));
+            tempBooking.setStatus(BookingStatus.DIRECT_PAYMENT);
+
+            String userInfoJson = null;
+            if (bookingRequest.getUserId() == null) {
+                if (bookingRequest.getUserInfo() == null) {
+                    return ResponseEntity.badRequest().body("userInfo không được để trống khi không có userId");
+                }
+                userInfoJson = objectMapper.writeValueAsString(bookingRequest.getUserInfo());
+            }
+
+            Booking createdTempBooking = bookingService.confirmBooking(tempBooking, userInfoJson);
+
+            bookingRepository.save(createdTempBooking);
+
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/success")
     public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> request) {
         try {

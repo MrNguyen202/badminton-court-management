@@ -195,6 +195,9 @@ function BookingDetailPage() {
               {booking.status === "NEW" && (
                 <span className="text-green-600">Đã thanh toán</span>
               )}
+              {booking.status === "DIRECT_PAYMENT" && (
+                <span className="text-blue-600">Thanh toán tại sân</span>
+              )}
             </p>
           </div>
 

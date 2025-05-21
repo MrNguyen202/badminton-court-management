@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Card } from "@nextui-org/react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { subCourtScheduleApi } from "../api/court-services/subCourtSchedule";
 
 export default function BookingPage() {
   const router = useRouter();
@@ -52,22 +53,52 @@ export default function BookingPage() {
         isDeposit: false,
       };
 
-      const paymentResponse = await fetch(
-        `http://localhost:8080/api/paypal/pay`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
+      if (user?.role === "ADMIN") {
+        // ADMIN: Xác nhận đặt sân mà không cần thanh toán PayPal
+        const token = localStorage.getItem("token") || user.token;
+        const bookingResponse = await fetch(
+          `http://localhost:8080/api/paypal/confirm`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+        const paymentResult = await bookingResponse.text();
+        console.log("paymentResult", paymentResult);
+        if (paymentResult === "success") {
+          console.log("Đặt sân thành công");
+          await subCourtScheduleApi.updateStatusSubCourtSchedule(
+            Number(bookingData.bookedScheduleId),
+            Number(bookingData.subCourtId),
+            "BOOKED"
+          );
+          localStorage.removeItem("pendingBooking");
+          router.push("/owners/court-detail?courtID=" + bookingData.courtId);
+          toast.success("Đặt sân thành công! Thanh toán tiền mặt tại sân.");
         }
-      );
-
-      const paymentResult = await paymentResponse.text();
-
-      if (paymentResult.includes("Redirect to:")) {
-        const url = paymentResult.replace("Redirect to: ", "").trim();
-        window.location.href = url;
       } else {
-        throw new Error(paymentResult || "Khởi tạo thanh toán thất bại");
+        // USER: Thanh toán qua PayPal
+        const paymentResponse = await fetch(
+          `http://localhost:8080/api/paypal/pay`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+        const paymentResult = await paymentResponse.text();
+
+        if (paymentResult.includes("Redirect to:")) {
+          const url = paymentResult.replace("Redirect to: ", "").trim();
+          window.location.href = url;
+        } else {
+          throw new Error(paymentResult || "Khởi tạo thanh toán thất bại");
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Đặt sân thất bại");
@@ -161,14 +192,14 @@ export default function BookingPage() {
               onClick={handleBookingConfirm}
               disabled={isLoading}
             >
-              {isLoading ? "Đang xử lý..." : "Thanh toán"}
+              {isLoading ? "Đang xử lý..." : "Xác nhận"}
             </Button>
           </div>
         </Card>
 
         <Card className="p-6 shadow-xl">
           <h2 className="text-xl font-semibold mb-4 text-primary">
-            Thanh toán trực tuyến
+            Thanh toán
           </h2>
           <div className="border p-4 rounded-lg flex items-center bg-blue-50">
             <input
@@ -179,15 +210,30 @@ export default function BookingPage() {
               defaultChecked
               disabled
             />
-            <label htmlFor="payment-online">Thanh toán qua PayPal</label>
+            <label htmlFor="payment-online">
+              {JSON.parse(localStorage.getItem("user") || "null")?.role ===
+              "ADMIN"
+                ? "Thanh toán tiền mặt tại sân"
+                : "Thanh toán qua PayPal"}
+            </label>
           </div>
 
           <div className="mt-8 text-gray-600">
             <h3 className="font-semibold mb-2">Hướng dẫn đặt sân</h3>
             <ul className="list-disc ml-6 space-y-2 text-sm">
               <li>Xác nhận thông tin sân & thanh toán</li>
-              <li>Thực hiện thanh toán qua PayPal</li>
-              <li>Nhận email xác nhận thanh toán và đặt sân</li>
+              {JSON.parse(localStorage.getItem("user") || "null")?.role ===
+              "ADMIN" ? (
+                <>
+                  <li>Xác nhận đặt sân tại hệ thống</li>
+                  <li>Nhận tiền mặt tại sân</li>
+                </>
+              ) : (
+                <>
+                  <li>Thực hiện thanh toán qua PayPal</li>
+                  <li>Nhận email xác nhận thanh toán và đặt sân</li>
+                </>
+              )}
               <li>Đến sân đúng thời gian đã đặt</li>
             </ul>
           </div>
