@@ -15,6 +15,7 @@ import Album from "./Album";
 import Schedule from "./Schedule";
 import Feedback from "./Feedback";
 import Footer from "@/app/_components/Footer";
+import MapInCourtDetail from "./MapInCourtDetail";
 
 type User = {
   name: string;
@@ -262,6 +263,9 @@ function CourtDetail() {
         </div>
       </div>
       {courtID && <Schedule courtID={Number(courtID)} />}
+      <div>
+        <MapInCourtDetail courtAddress={court?.address}/>
+      </div>
       <Feedback courtID={Number(courtID)} />
       <Footer />
     </div>
