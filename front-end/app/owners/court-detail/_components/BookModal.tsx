@@ -135,6 +135,22 @@ export default function BookModal({
 
   // Hàm xử lý khi nhấn nút Đặt sân
   const handleBooking = (onClose: any) => {
+    // Kiểm tra đã đủ thông tin chưa
+    if(userNameBooking.trim() === "") {
+      setError((prev) => ({ ...prev, name: "Vui lòng nhập họ và tên" }));
+      return;
+    }
+    if(userPhoneBooking.trim() === "") {
+      setError((prev) => ({ ...prev, phone: "Vui lòng nhập số điện thoại" }));
+      return;
+    }else if(error.email === "Email không hợp lệ") {
+      setError((prev) => ({ ...prev, email: "Email không hợp lệ" }));
+      return;
+    }
+    if(userEmailBooking.trim() === "") {
+      setError((prev) => ({ ...prev, email: "Vui lòng nhập email" }));
+      return;
+    }
     // Kiểm tra nếu không có user và các trường input không hợp lệ
     if (!user && (!userNameBooking || !userPhoneBooking || !userEmailBooking)) {
       setError({
@@ -164,9 +180,9 @@ export default function BookModal({
       totalHours: totalHours,
       totalCost: totalCost,
       userInfo: {
-        name: user ? user.name : userNameBooking,
-        phone: user ? user.phone : userPhoneBooking,
-        email: user ? user.email : userEmailBooking,
+        name: user && !(user?.role === "ADMIN") ? user.name : userNameBooking,
+        phone: user && !(user?.role === "ADMIN") ? user.phone : userPhoneBooking,
+        email: user && !(user?.role === "ADMIN") ? user.email : userEmailBooking,
       },
       bookedScheduleId: bookedSchedule?.scheduleId,
     };
