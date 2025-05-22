@@ -263,12 +263,12 @@ function AdminPage() {
                     >
                       Xem chi tiết
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handleEdit(court)}
                       className="flex-1 bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition duration-300"
                     >
                       Sửa
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => handleDelete(court.id!)}
                       className="flex-1 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-300"

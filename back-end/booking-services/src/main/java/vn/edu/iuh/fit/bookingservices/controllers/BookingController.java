@@ -7,6 +7,7 @@ import vn.edu.iuh.fit.bookingservices.models.Booking;
 import vn.edu.iuh.fit.bookingservices.services.BookingService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -30,6 +31,19 @@ public class BookingController {
     public ResponseEntity<Booking> getBookingById(@PathVariable Long bookingId) {
         try {
             Booking booking = bookingService.getBooking(bookingId);
+            if (booking == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(booking);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/court/{subCourtId}/schedule/{scheduleId}")
+    public ResponseEntity<?> getBookingByCourtAndSchedule(@PathVariable Long subCourtId, @PathVariable Long scheduleId) {
+        try {
+            Optional<Booking> booking = bookingService.getBookingByCourtAndSchedule(subCourtId, scheduleId);
             if (booking == null) {
                 return ResponseEntity.notFound().build();
             }

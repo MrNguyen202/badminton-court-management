@@ -69,4 +69,10 @@ public class BookingServiceImpl implements BookingService {
         savedBooking.setUserInfo(userInfoJson);
         return bookingRepository.save(savedBooking);
     }
+
+    @Override
+    public Optional<Booking> getBookingByCourtAndSchedule(Long subCourtId, Long scheduleId) {
+        return Optional.ofNullable(bookingRepository.findBySubCourtIdAndScheduleId(subCourtId, scheduleId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy booking")));
+    }
 }

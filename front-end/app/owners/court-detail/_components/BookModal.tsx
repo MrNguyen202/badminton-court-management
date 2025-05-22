@@ -322,10 +322,6 @@ export default function BookModal({
                   <span>{totalCost.toLocaleString("vi-VN") + " VNĐ"}</span>
                 </div>
               </div>
-              <p className="text-red-500 italic text-sm">
-                Lưu ý: Khi đặt bạn phải cọc trước 10% tổng tiền hoặc thanh toán
-                toàn bộ!
-              </p>
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>

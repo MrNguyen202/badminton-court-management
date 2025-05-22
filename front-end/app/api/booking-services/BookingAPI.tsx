@@ -130,4 +130,24 @@ export const bookingApi = {
       );
     }
   },
+
+  // Lấy booking theo theo subCourtId and scheduleId
+  getBookingBySubCourtIdAndScheduleId: async (
+    subCourtId: number,
+    scheduleId: number
+  ) => {
+    try {
+      const response = await axios.get(`http://localhost:8083/api/bookings/court/${subCourtId}/schedule/${scheduleId}`);
+      console.log(
+        "Lấy thông tin booking theo subCourtId và scheduleId thành công:",
+        response.data
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Lấy thông tin booking thất bại, vui lòng thử lại!"
+      );
+    }
+  },
 };

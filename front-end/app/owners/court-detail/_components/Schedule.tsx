@@ -4,13 +4,15 @@ import { useState, useEffect } from "react";
 import { subCourtScheduleApi } from "@/app/api/court-services/subCourtSchedule";
 import { getNextSevenDay } from "../_helps/OwnWeekTime";
 import AddScheduleSmart from "../_components/AddScheduleSmart";
-import { subCourtApi } from "@/app/api/court-services/subCourtAPI"; 
+import { subCourtApi } from "@/app/api/court-services/subCourtAPI";
 import EditImage from "@/public/pencil-edit-02-stroke-rounded.svg";
 import DeleteImage from "@/public/delete-02-stroke-rounded.svg";
 import AddScheduleSingle from "../_components/AddScheduleSingle";
 import { useDisclosure } from "@nextui-org/react";
 import BookModal from "./BookModal";
 import { toast } from "react-toastify";
+import { bookingApi } from "@/app/api/booking-services/BookingAPI";
+import { useRouter } from "next/navigation";
 
 // Types to match API data
 type SubCourtSchedule = {
@@ -31,6 +33,7 @@ type SubCourt = {
 };
 
 function Schedule({ courtID }: { courtID: number }) {
+  const router = useRouter();
   const [schedule, setSchedule] = useState<
     Record<number, Record<string, SubCourtSchedule[]>>
   >({});
@@ -193,6 +196,22 @@ function Schedule({ courtID }: { courtID: number }) {
   const handleOpenBookingModal = (schedule: SubCourtSchedule) => {
     setBookedSchedule(schedule);
     onOpen();
+  };
+
+  //View booking details
+  const handleViewBookingDetails = async (schedule: SubCourtSchedule) => {
+    try {
+      const bookingDetails = await bookingApi.getBookingBySubCourtIdAndScheduleId(schedule?.subCourtId, schedule?.scheduleId);
+      console.log("Booking details:", bookingDetails);
+      if (bookingDetails) {
+        router.push(`/profile/booked-calendar/${bookingDetails?.id}`);
+      } else {
+        toast.error("Không tìm thấy thông tin đặt sân");
+      }
+    } catch (error) {
+      console.error("Error fetching booking details:", error);
+      toast.error("Lỗi khi lấy thông tin đặt sân");
+    }
   };
 
   return (
@@ -363,8 +382,14 @@ function Schedule({ courtID }: { courtID: number }) {
                       className={`relative flex-col items-center justify-evenly p-2 px-3 border-b rounded-lg hover:bg-opacity-75 ${getStatusColor(
                         item.status
                       )}`}
-                      disabled={item.status !== "AVAILABLE"}
-                      onClick={() => handleOpenBookingModal(item)}
+                      disabled={item.status !== "AVAILABLE" && item.status !== "BOOKED"}
+                      onClick={() => {
+                        if (item.status === "AVAILABLE") {
+                          handleOpenBookingModal(item);
+                        } else if (item.status === "BOOKED" && isAdmin) {
+                          handleViewBookingDetails(item);
+                        }
+                      }}
                     >
                       <span className="text-lg font-bold text-gray-900">
                         {item.fromHour.slice(0, 5)} - {item.toHour.slice(0, 5)}
