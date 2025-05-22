@@ -141,73 +141,6 @@ test_api_gateway:
     - cd $BACKEND_DIR/api-gateway
     - gradle test
 
-# deploy:
-#   stage: deploy
-#   image: docker:20.10
-#   services:
-#     - docker:dind
-#   dependencies:
-#     - build_frontend
-#     - build_user_services
-#     - build_court_services
-#     - build_booking_services
-#     - build_api_gateway
-#   variables:
-#     NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
-#     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
-#     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-#     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
-#   before_script:
-#     - chmod 400 $SSH_KEY
-#   script:
-#     - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@206.189.87.168
-#     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
-
-#     # Debug
-#     - ls -la
-#     - ls -la $BACKEND_DIR || echo "back-end directory not found"
-
-#     # Deploy front-end
-#     - cd $FRONTEND_DIR
-#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
-#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
-
-#     # di chuyển về root
-#     - cd ..
-
-#     # Debug: Verify back-end 
-#     - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
-#     - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
-#     - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"
-#     - ls -la $BACKEND_DIR/api-gateway || echo "Directory api-gateway not found"
-
-#     # Deploy user-services
-#     - cd $BACKEND_DIR/user-services
-#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
-#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
-
-#     # Deploy court-services
-#     - cd ..
-#     - cd court-services
-#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
-#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
-
-#     # Deploy booking-services
-#     - cd ..
-#     - cd booking-services
-#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
-#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
-
-#     # Deploy api-gateway
-#     - cd ..
-#     - cd api-gateway
-#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
-#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
-
-#   only:
-#     - main
-
-
 deploy:
   stage: deploy
   image: docker:20.10
@@ -220,11 +153,13 @@ deploy:
     - build_booking_services
     - build_api_gateway
   variables:
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   before_script:
     - chmod 400 $SSH_KEY
-    - apk add --no-cache openssh-client # Cài đặt SSH client trong image docker
+    - apk add --no-cache openssh-client
   script:
     # Đăng nhập vào Docker Hub
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
@@ -262,12 +197,56 @@ deploy:
         docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service &&
         docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services &&
         docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway &&
-        docker stop frontend user-services court-service booking-services api-gateway || true &&
-        docker rm frontend user-services court-service booking-services api-gateway || true &&
-        docker run -d --name frontend -p 3000:3000 $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend &&
-        docker run -d --name user-services -p 8081:8081 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_USER $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services &&
-        docker run -d --name court-service -p 8082:8082 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_COURT $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service &&
-        docker run -d --name booking-services -p 8083:8083 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_BOOKING $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services &&
-        docker run -d --name api-gateway -p 8080:8080 $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway"
+        docker stop user-db court-db booking-db frontend user-services court-service booking-services api-gateway || true &&
+        docker rm user-db court-db booking-db frontend user-services court-service booking-services api-gateway || true &&
+        docker run -d --name user-db -p 5433:5432 \
+          -e POSTGRES_USER=user \
+          -e POSTGRES_PASSWORD=user_password \
+          -e POSTGRES_DB=user-services \
+          postgres:latest &&
+        docker run -d --name court-db -p 5434:5432 \
+          -e POSTGRES_USER=court_user \
+          -e POSTGRES_PASSWORD=court_password \
+          -e POSTGRES_DB=court-services \
+          postgres:latest &&
+        docker run -d --name booking-db -p 5435:5432 \
+          -e POSTGRES_USER=booking_user \
+          -e POSTGRES_PASSWORD=booking_password \
+          -e POSTGRES_DB=booking-services \
+          postgres:latest &&
+        docker run -d --name frontend -p 3000:3000 \
+          --env NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN \
+          --env NEXT_PUBLIC_API_GATEWAY=$NEXT_PUBLIC_API_GATEWAY \
+          $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend &&
+        docker run -d --name user-services -p 8081:8081 \
+          --env SPRING_DATASOURCE_URL=jdbc:postgresql://206.189.87.168:5433/user-services \
+          --env SPRING_DATASOURCE_USERNAME=user \
+          --env SPRING_DATASOURCE_PASSWORD=user_password \
+          --env SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect \
+          $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services &&
+        docker run -d --name court-service -p 8082:8082 \
+          --env SPRING_DATASOURCE_URL=jdbc:postgresql://206.189.87.168:5434/court-services \
+          --env SPRING_DATASOURCE_USERNAME=court_user \
+          --env SPRING_DATASOURCE_PASSWORD=court_password \
+          --env SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect \
+          --env TZ=Asia/Ho_Chi_Minh \
+          --env JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Ho_Chi_Minh \
+          $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service &&
+        docker run -d --name booking-services -p 8083:8083 \
+          --env SPRING_DATASOURCE_URL=jdbc:postgresql://206.189.87.168:5435/booking-services \
+          --env SPRING_DATASOURCE_USERNAME=booking_user \
+          --env SPRING_DATASOURCE_PASSWORD=booking_password \
+          --env SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect \
+          $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services &&
+        docker run -d --name api-gateway -p 8080:8080 \
+          $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway &&
+        docker ps | grep -q user-db || (echo 'User-db container failed to start' && exit 1) &&
+        docker ps | grep -q court-db || (echo 'Court-db container failed to start' && exit 1) &&
+        docker ps | grep -q booking-db || (echo 'Booking-db container failed to start' && exit 1) &&
+        docker ps | grep -q frontend || (echo 'Frontend container failed to start' && exit 1) &&
+        docker ps | grep -q user-services || (echo 'User-services container failed to start' && exit 1) &&
+        docker ps | grep -q court-service || (echo 'Court-service container failed to start' && exit 1) &&
+        docker ps | grep -q booking-services || (echo 'Booking-services container failed to start' && exit 1) &&
+        docker ps | grep -q api-gateway || (echo 'API Gateway container failed to start' && exit 1)"
   only:
     - main
