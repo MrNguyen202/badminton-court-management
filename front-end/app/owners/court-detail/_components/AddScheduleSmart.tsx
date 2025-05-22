@@ -9,7 +9,7 @@ import { Time, CalendarDate } from "@internationalized/date"
 import soonImage from "../../../../public/sun-03-stroke-rounded.svg"
 import moonImage from "../../../../public/moon-02-stroke-rounded.svg"
 import { Input } from "@nextui-org/input"
-import { Checkbox, CheckboxGroup, Radio, RadioGroup, DatePicker, TimeInput } from "@nextui-org/react"
+import { Checkbox, CheckboxGroup, Radio, RadioGroup, DatePicker, TimeInput, Spinner, Button } from "@nextui-org/react"
 import { toast } from "react-toastify"
 
 interface AddScheduleSmartProps {
@@ -40,6 +40,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
     fetchSubCourts()
   }, [courtId])
 
+  const [loading, setLoading] = useState(false)
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
 
   const [selectedCourts, setSelectedCourts] = useState<string[]>(["all"])
@@ -50,7 +51,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
   const [eveningStartTime, setEveningStartTime] = useState<Time | null>(new Time(13, 0))
   const [eveningEndTime, setEveningEndTime] = useState<Time | null>(new Time(22, 0))
   const [duration, setDuration] = useState<"day" | "week" | "month" | "year">("day")
-  const [price, setPrice] = useState<string>("100")
+  const [price, setPrice] = useState<string>("50000")
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(
     new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
   )
@@ -115,29 +116,30 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
 
   const handleAddSubCourtSchedule = async () => {
     try {
-      // Đảm bảo sử dụng đúng ngày được chọn
+      setLoading(true);
       const startDate = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
       startDate.setHours(12, 0, 0, 0);
-
       const daysToAdd = duration === "day" ? 1 : duration === "week" ? 7 : duration === "month" ? 30 : 365;
-
       const subCourtIds = selectedCourts.includes("all")
         ? subCourts.map((subCourt) => subCourt.id)
         : selectedCourts.filter((court) => court !== "all").map((court) => Number.parseInt(court.split("-")[1]));
+      const totalSchedules = daysToAdd * subCourtIds.length * (morningSchedules.length + eveningSchedules.length);
+
+      if (totalSchedules > 10000) {
+        const confirm = window.confirm(`Sẽ tạo ${totalSchedules} lịch. Điều này có thể mất nhiều thời gian. Bạn có muốn tiếp tục?`);
+        if (!confirm) {
+          setLoading(false);
+          return;
+        }
+      }
 
       const schedulesToAdd = [];
       const priceValue = Number.parseFloat(price) || 0;
+      const currentDate = new Date(startDate);
 
       for (let i = 0; i < daysToAdd; i++) {
-        // Tạo một bản sao mới của ngày bắt đầu để tránh thay đổi ngày gốc
-        const currentDate = new Date(startDate);
-        currentDate.setDate(startDate.getDate() + i);
-
-        // Format ngày theo định dạng YYYY-MM-DD
         const dateString = currentDate.toISOString().split("T")[0];
-
-        // Thêm lịch khung Sáng
-        for (const schedule of morningSchedules) {
+        for (const schedule of [...morningSchedules, ...eveningSchedules]) {
           for (const subCourtId of subCourtIds) {
             schedulesToAdd.push({
               courtId: courtId,
@@ -150,35 +152,18 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
             });
           }
         }
-
-        // Thêm lịch khung Tối
-        for (const schedule of eveningSchedules) {
-          for (const subCourtId of subCourtIds) {
-            schedulesToAdd.push({
-              courtId: courtId,
-              subCourtId: subCourtId,
-              date: dateString,
-              fromHour: `${schedule.fromHour}:00`,
-              toHour: `${schedule.toHour}:00`,
-              price: priceValue,
-              status: "AVAILABLE",
-            });
-          }
-        }
+        currentDate.setDate(currentDate.getDate() + 1);
       }
 
+      await subCourtScheduleApi.createSubCourtSchedulesBulk({ schedules: schedulesToAdd });
 
-      // Gửi từng lịch lên backend
-      for (const schedule of schedulesToAdd) {
-        await subCourtScheduleApi.createSubCourtSchedule(schedule);
-      }
-
+      setLoading(false);
       toast.success("Thêm lịch thành công!");
-      // set ngày hiện tại cho lịch
       onScheduleAdded(new Date());
       onClose();
     } catch (error) {
       console.error("Lỗi khi thêm lịch:", error);
+      setLoading(false);
       toast.error("Có lỗi xảy ra khi thêm lịch.");
     }
   };
@@ -202,7 +187,12 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-xl">Thêm lịch thông minh</ModalHeader>
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50 border rounded-xl">
+              <Spinner size="lg" color="primary" />
+            </div>
+          )}
+          <ModalHeader className="text-xl bg-slate-900 text-white">Thêm lịch thông minh</ModalHeader>
           <ModalBody>
             <CheckboxGroup
               color="primary"
@@ -370,15 +360,13 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
           <ModalFooter className="flex justify-between items-center">
             <span className="italic text-red-500">Lưu ý: Thao tác sẽ thay thế tất cả các lịch cũ bị trùng nếu như lịch đó chưa được đặt</span>
             <div className="flex gap-4">
-              <button
-                className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"
-                onClick={onClose}
+              <Button color="danger" variant="light"
+                onPress={onClose}
               >
                 Hủy
-              </button>
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
-                onClick={handleAddSubCourtSchedule}
+              </Button>
+              <Button color="primary" variant="solid"
+                onPress={handleAddSubCourtSchedule}
                 disabled={
                   ((!morningStartTime || !morningEndTime || morningStartTime >= morningEndTime) &&
                     (!eveningStartTime || !eveningEndTime || eveningStartTime >= eveningEndTime)) ||
@@ -387,7 +375,7 @@ function AddScheduleSmart({ courtID, onScheduleAdded }: AddScheduleSmartProps) {
                 }
               >
                 Thêm
-              </button>
+              </Button>
             </div>
           </ModalFooter>
         </ModalContent>

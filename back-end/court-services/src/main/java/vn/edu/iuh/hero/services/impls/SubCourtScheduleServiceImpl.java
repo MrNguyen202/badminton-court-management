@@ -129,4 +129,8 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
         return subCourtScheduleRepository.findBySubCourtIdAndScheduleDate(subCourtId, date);
     }
 
+    public void saveAll(List<SubCourtSchedule> schedules) {
+        subCourtScheduleRepository.saveAll(schedules);
+    }
+
 }

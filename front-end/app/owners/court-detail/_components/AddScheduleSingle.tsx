@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, useDisclosure } from '@nextui-org/react';
 import AddImage from "@/public/add-circle-stroke-rounded.svg";
 import React from "react";
 import { subCourtScheduleApi } from '@/app/api/court-services/subCourtSchedule';
@@ -18,6 +18,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onSched
     const [price, setPrice] = React.useState("");
     const [error, setError] = React.useState("");
     const [subCourtSchedulesDelete, setSubCourtSchedulesDelete] = React.useState<any>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     // Kết hợp tempFilteredSchedules và localSchedules để hiển thị
     const combinedSchedules = [...tempFilteredSchedules, ...localSchedules];
@@ -96,6 +97,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onSched
 
     const handleAddSubCourtSchedule = async () => {
         try {
+            setIsLoading(true);
             if (subCourtSchedulesDelete.length > 0) {
                 for (const subCourtSchedule of subCourtSchedulesDelete) {
                     await subCourtScheduleApi.deleteSubCourtSchedule(subCourtSchedule.scheduleId, subCourtSchedule?.subCourtId)
@@ -134,13 +136,14 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onSched
             }
 
             // Đóng modal và reset state
-            onClose();
+            setIsLoading(false);
             toast.success("Thêm lịch thành công!");
             // set ngày hiện tại cho lịch
             onScheduleAdded(new Date());
-            
+            onClose();
         } catch (error) {
             console.error("Error adding schedule:", error);
+            setIsLoading(false);
             toast.error("Có lỗi xảy ra khi thêm lịch.");
         }
     };
@@ -175,7 +178,12 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onSched
                 }}
             >
                 <ModalContent>
-                    <ModalHeader className="text-xl">Thêm lịch đơn lẻ</ModalHeader>
+                    {isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50 border rounded-xl">
+                            <Spinner size="lg" color="primary" />
+                        </div>
+                    )}
+                    <ModalHeader className="text-xl bg-slate-900 text-white ">Thêm lịch đơn lẻ</ModalHeader>
                     <ModalBody>
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between">
@@ -261,18 +269,16 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onSched
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <button
-                            className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300"
-                            onClick={handleCancel}
+                        <Button color="danger" variant="light"
+                            onPress={handleCancel}
                         >
                             Hủy
-                        </button>
-                        <button
-                            className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300"
-                            onClick={handleAddSubCourtSchedule}
+                        </Button>
+                        <Button color="primary" variant="solid"
+                            onPress={handleAddSubCourtSchedule}
                         >
                             Lưu
-                        </button>
+                        </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

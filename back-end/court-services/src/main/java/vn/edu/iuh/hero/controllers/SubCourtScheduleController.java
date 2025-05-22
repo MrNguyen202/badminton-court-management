@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.iuh.hero.dtos.SubCourtScheduleBulkRequestDTO;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleDTO;
 import vn.edu.iuh.hero.dtos.SubCourtScheduleRequestDTO;
 import vn.edu.iuh.hero.enums.StatusSchedule;
@@ -53,6 +54,98 @@ public class SubCourtScheduleController {
             @PathVariable Long subCourtId,
             @RequestParam(required = false) LocalDate startDate) {
         return ResponseEntity.ok(subCourtScheduleService.findBySubCourtId(subCourtId, startDate));
+    }
+
+    @PostMapping("/bulk-create")
+    @Transactional
+    public ResponseEntity<?> createBulk(@RequestBody SubCourtScheduleBulkRequestDTO bulkDto) {
+        try {
+            List<SubCourtScheduleRequestDTO> schedules = bulkDto.getSchedules();
+            List<SubCourtSchedule> newSchedules = new ArrayList<>();
+            List<SubCourtSchedule> schedulesToDelete = new ArrayList<>();
+
+            // 1. Kiểm tra và xử lý từng lịch
+            for (SubCourtScheduleRequestDTO dto : schedules) {
+                // Kiểm tra sân con
+                Optional<SubCourt> subCourtOpt = subCourtServiceImpl.findById(dto.getSubCourtId());
+                if (subCourtOpt.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Sub court not found for ID: " + dto.getSubCourtId());
+                }
+                SubCourt subCourt = subCourtOpt.get();
+
+                // Validate thời gian
+                LocalDate date = dto.getDate();
+                Time fromHour = dto.getFromHour();
+                Time toHour = dto.getToHour();
+                double price = dto.getPrice();
+
+                if (!fromHour.before(toHour)) {
+                    return ResponseEntity.badRequest().body("fromHour must be before toHour for schedule on " + date);
+                }
+
+                // Lấy lịch đã tồn tại
+                List<SubCourtSchedule> existingSchedules = subCourtScheduleService
+                        .findBySubCourtIdAndDate(dto.getSubCourtId(), date);
+
+                for (SubCourtSchedule existing : existingSchedules) {
+                    Schedule existingSchedule = existing.getSchedule();
+                    Time existingFrom = existingSchedule.getFromHour();
+                    Time existingTo = existingSchedule.getToHour();
+                    double existingPrice = existing.getPrice();
+
+                    boolean isOverlap = fromHour.before(existingTo) && toHour.after(existingFrom);
+
+                    if (isOverlap) {
+                        if (fromHour.equals(existingFrom) && toHour.equals(existingTo)) {
+                            if (existing.getStatus() == StatusSchedule.AVAILABLE) {
+                                // Cập nhật giá nếu cần
+                                if (price != existingPrice) {
+                                    existing.setPrice(price);
+                                    subCourtScheduleService.update(existing);
+                                }
+                            }
+                        } else {
+                            // Xóa lịch AVAILABLE nếu overlap
+                            if (existing.getStatus() == StatusSchedule.AVAILABLE) {
+                                schedulesToDelete.add(existing);
+                            }
+                        }
+                    }
+                }
+
+                // Tạo hoặc lấy Schedule
+                Schedule schedule = scheduleServiceImpl
+                        .findByDateAndFromHourAndToHour(date, fromHour, toHour)
+                        .orElseGet(() -> {
+                            Schedule newSchedule = new Schedule();
+                            newSchedule.setDate(date);
+                            newSchedule.setFromHour(fromHour);
+                            newSchedule.setToHour(toHour);
+                            return scheduleServiceImpl.save(newSchedule);
+                        });
+
+                // Tạo lịch mới
+                SubCourtSchedule newSchedule = new SubCourtSchedule(
+                        subCourt,
+                        schedule,
+                        price,
+                        StatusSchedule.AVAILABLE
+                );
+                newSchedules.add(newSchedule);
+            }
+
+            // 2. Xóa các lịch bị overlap mà vẫn AVAILABLE
+            for (SubCourtSchedule toDelete : schedulesToDelete) {
+                subCourtScheduleService.delete(toDelete.getSubCourtScheduleID());
+            }
+
+            // 3. Lưu hàng loạt lịch mới
+            subCourtScheduleService.saveAll(newSchedules);
+
+            return ResponseEntity.ok("Bulk create success");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 
 

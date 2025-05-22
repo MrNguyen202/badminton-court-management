@@ -108,4 +108,17 @@ export const subCourtScheduleApi = {
       );
     }
   },
+
+  // 
+  createSubCourtSchedulesBulk: async (payload: { schedules: any[] }) => {
+    try {
+      const response = await apiClient.post(`/bulk-create`, payload);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error creating bulk sub court schedules:", error.message);
+      throw new Error(
+        error.response?.data?.error || "Tạo hàng loạt lịch sân phụ thất bại!"
+      );
+    }
+  },
 };
