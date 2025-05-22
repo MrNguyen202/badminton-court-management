@@ -141,6 +141,73 @@ test_api_gateway:
     - cd $BACKEND_DIR/api-gateway
     - gradle test
 
+# deploy:
+#   stage: deploy
+#   image: docker:20.10
+#   services:
+#     - docker:dind
+#   dependencies:
+#     - build_frontend
+#     - build_user_services
+#     - build_court_services
+#     - build_booking_services
+#     - build_api_gateway
+#   variables:
+#     NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
+#     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
+#     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+#     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
+#   before_script:
+#     - chmod 400 $SSH_KEY
+#   script:
+#     - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@206.189.87.168
+#     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
+
+#     # Debug
+#     - ls -la
+#     - ls -la $BACKEND_DIR || echo "back-end directory not found"
+
+#     # Deploy front-end
+#     - cd $FRONTEND_DIR
+#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
+#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
+
+#     # di chuyển về root
+#     - cd ..
+
+#     # Debug: Verify back-end 
+#     - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
+#     - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
+#     - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"
+#     - ls -la $BACKEND_DIR/api-gateway || echo "Directory api-gateway not found"
+
+#     # Deploy user-services
+#     - cd $BACKEND_DIR/user-services
+#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
+#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
+
+#     # Deploy court-services
+#     - cd ..
+#     - cd court-services
+#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
+#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
+
+#     # Deploy booking-services
+#     - cd ..
+#     - cd booking-services
+#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
+#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
+
+#     # Deploy api-gateway
+#     - cd ..
+#     - cd api-gateway
+#     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
+#     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
+
+#   only:
+#     - main
+
+
 deploy:
   stage: deploy
   image: docker:20.10
@@ -153,56 +220,54 @@ deploy:
     - build_booking_services
     - build_api_gateway
   variables:
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: $NEXT_PUBLIC_CLERK_SIGN_IN_URL
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
   before_script:
     - chmod 400 $SSH_KEY
+    - apk add --no-cache openssh-client # Cài đặt SSH client trong image docker
   script:
-    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@68.183.191.240
+    # Đăng nhập vào Docker Hub
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
 
-    # Debug
-    - ls -la
-    - ls -la $BACKEND_DIR || echo "back-end directory not found"
-
-    # Deploy front-end
+    # Build và push front-end
     - cd $FRONTEND_DIR
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend
 
-    # di chuyển về root
-    - cd ..
-
-    # Debug: Verify back-end 
-    - ls -la $BACKEND_DIR/user-services || echo "Directory user-services not found"
-    - ls -la $BACKEND_DIR/court-services || echo "Directory court-services not found"
-    - ls -la $BACKEND_DIR/booking-services || echo "Directory booking-services not found"
-    - ls -la $BACKEND_DIR/api-gateway || echo "Directory api-gateway not found"
-
-    # Deploy user-services
-    - cd $BACKEND_DIR/user-services
+    # Build và push user-services
+    - cd ../$BACKEND_DIR/user-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services
 
-    # Deploy court-services
-    - cd ..
-    - cd court-services
+    # Build và push court-services
+    - cd ../court-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service
 
-    # Deploy booking-services
-    - cd ..
-    - cd booking-services
+    # Build và push booking-services
+    - cd ../booking-services
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services
 
-    # Deploy api-gateway
-    - cd ..
-    - cd api-gateway
+    # Build và push api-gateway
+    - cd ../api-gateway
     - docker build -t $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway .
     - docker push $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway
 
+    # SSH vào máy chủ và triển khai
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@206.189.87.168 /bin/bash -c "
+        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY &&
+        docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend &&
+        docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services &&
+        docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service &&
+        docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services &&
+        docker pull $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway &&
+        docker stop frontend user-services court-service booking-services api-gateway || true &&
+        docker rm frontend user-services court-service booking-services api-gateway || true &&
+        docker run -d --name frontend -p 3000:3000 $DOCKER_REGISTRY/quocbao44/badminton-court-management:frontend &&
+        docker run -d --name user-services -p 8081:8081 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_USER $DOCKER_REGISTRY/quocbao44/badminton-court-management:user-services &&
+        docker run -d --name court-service -p 8082:8082 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_COURT $DOCKER_REGISTRY/quocbao44/badminton-court-management:court-service &&
+        docker run -d --name booking-services -p 8083:8083 --env SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL_BOOKING $DOCKER_REGISTRY/quocbao44/badminton-court-management:booking-services &&
+        docker run -d --name api-gateway -p 8080:8080 $DOCKER_REGISTRY/quocbao44/badminton-court-management:api-gateway"
   only:
     - main
