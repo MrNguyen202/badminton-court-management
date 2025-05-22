@@ -90,28 +90,42 @@ function CourtDetail() {
           );
           setShowSuccessToast(true);
 
-          const userInfo = JSON.parse(localStorage.getItem("user") || "null");
-
-          if (userInfo) {
-            const token = localStorage.getItem("token") || userInfo.token;
-            const response = await fetch(
-              "http://localhost:8080/api/paypal/success",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  email: userInfo.email,
-                }),
-              }
-            );
-
-            const result = await response.json();
-            if (result.status === "success") {
-              toast.success("Kiểm tra email nhé!");
+          const pendingBooking = JSON.parse(
+            localStorage.getItem("pendingBooking") || "null"
+          );
+          const token =
+            localStorage.getItem("token") || pendingBooking.userInfo.token;
+          const response = await fetch(
+            "http://localhost:8080/api/paypal/success",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                email: pendingBooking.userInfo.email,
+                courtName: pendingBooking.courtName,
+                subCourtName: pendingBooking.subCourtName,
+                province: pendingBooking.courtAddress.province,
+                district: pendingBooking.courtAddress.district,
+                ward: pendingBooking.courtAddress.ward,
+                specificAddress: pendingBooking.courtAddress.specificAddress,
+                subCourtType: pendingBooking.subCourtType,
+                date: pendingBooking.date,
+                fromHour: pendingBooking.fromHour,
+                toHour: pendingBooking.toHour,
+                totalCost: pendingBooking.totalCost,
+                price: pendingBooking.price,
+                userName: pendingBooking.userInfo.name,
+                userPhone: pendingBooking.userInfo.phone,
+              }),
             }
+          );
+
+          const result = await response.json();
+          if (result.status === "success") {
+            toast.success("Kiểm tra email nhé!");
           }
         } catch (error: any) {
           setErrorMessage(error.message || "Cập nhật trạng thái thất bại");
@@ -264,7 +278,7 @@ function CourtDetail() {
       </div>
       {courtID && <Schedule courtID={Number(courtID)} />}
       <div>
-        <MapInCourtDetail courtAddress={court?.address}/>
+        <MapInCourtDetail courtAddress={court?.address} />
       </div>
       <Feedback courtID={Number(courtID)} />
       <Footer />

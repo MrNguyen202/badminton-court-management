@@ -76,9 +76,9 @@ export default function BookingPage() {
             Number(bookingData.subCourtId),
             "BOOKED"
           );
-          localStorage.removeItem("pendingBooking");
           router.push("/owners/court-detail?courtID=" + bookingData.courtId);
           toast.success("Đặt sân thành công! Thanh toán tiền mặt tại sân.");
+          localStorage.removeItem("pendingBooking");
         }
       } else {
         // USER: Thanh toán qua PayPal

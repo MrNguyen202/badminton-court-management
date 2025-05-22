@@ -180,15 +180,49 @@ public class PaypalController {
     public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
+            String userName = request.get("userName");
+            String userPhone = request.get("userPhone");
+            String courtName = request.get("courtName");
+            String subCourtName = request.get("subCourtName");
+            String subCourtType = request.get("subCourtType");
+            String date = request.get("date");
+            String fromHour = request.get("fromHour");
+            String toHour = request.get("toHour");
+            String province = request.get("province");
+            String district = request.get("district");
+            String ward = request.get("ward");
+            String specificAddress = request.get("specificAddress");
+            String fullAddress = specificAddress + ", " + ward + ", " + district + ", " + province;
+            long price = Long.parseLong(request.get("price"));
+            long totalCost = Long.parseLong(request.get("totalCost"));
+
+
+            String emailBody = "Kính gửi " + userName + ",\n\n" +
+                    "Cảm ơn Quý khách đã đặt sân tại hệ thống của chúng tôi. Dưới đây là thông tin chi tiết về đặt sân của Quý khách:\n\n" +
+                    "--------------------------------------------------\n" +
+                                    "THÔNG TIN ĐẶT SÂN\n" +
+                    "--------------------------------------------------\n" +
+                    "- Tên sân: " + courtName + "\n" +
+                    "- Địa chỉ: " + fullAddress + "\n" +
+                    "- Loại sân: " + subCourtName + " (" + subCourtType + ")\n" +
+                    "- Ngày đặt: " + date + "\n" +
+                    "- Thời gian: " + fromHour + " - " + toHour + "\n" +
+                    "- Giá: " + String.format("%,d", price) + " VNĐ/giờ\n" +
+                    "- Tổng chi phí: " + String.format("%,d", totalCost) + " VNĐ\n" +
+                    "- Thông tin khách hàng: " + userName + " - " + userPhone + "\n\n" +
+                    "--------------------------------------------------\n" +
+                                        "LƯU Ý\n" +
+                    "--------------------------------------------------\n" +
+                    "- Vui lòng đến đúng giờ và xuất trình email này để xác nhận khi đến sân.\n" +
+                    "- Nếu có bất kỳ thắc mắc nào, Quý khách vui lòng liên hệ trực tiếp hoặc qua website: badminton-court-management" + ".\n\n" +
+                    "Chúc Quý khách có trải nghiệm tuyệt vời!\n\n" +
+                    "Trân trọng,\n" +
+                    "Đội ngũ hỗ trợ khách hàng";
 
             emailService.sendEmail(
                     email,
                     "Xác nhận thanh toán thành công",
-                    "Cảm ơn bạn đã đặt sân. Thông tin đặt sân: \n" +
-                            "Sân: XXX" + "\n" +
-                            "Thời gian: XX" + " - XX" + "\n" +
-                            "Tổng tiền: XXX.XXX" + " VNĐ" + "\n" +
-                            "Hãy đưa email để xác nhận khi đến sân nhé!" + "\n"
+                    emailBody
             );
 
             Map<String, Object> response = new HashMap<>();

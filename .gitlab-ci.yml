@@ -157,8 +157,10 @@ deploy:
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: $NEXT_PUBLIC_CLERK_SIGN_UP_URL
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: $NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
     NEXT_PUBLIC_API_GATEWAY: $NEXT_PUBLIC_API_GATEWAY
+  before_script:
+    - chmod 400 $SSH_KEY
   script:
-    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@ ip server
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@68.183.191.240
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin "$DOCKER_REGISTRY"
 
     # Debug
