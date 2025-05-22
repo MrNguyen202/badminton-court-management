@@ -71,9 +71,15 @@ function BadmintonCourtList() {
   const [currentPage, setCurrentPage] = useState(1);
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
-  const user = JSON.parse(
-    localStorage.getItem("user") || "null"
-  ) as User | null;
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("user") || "null";
+    if (storedData) {
+      setUser(JSON.parse(storedData));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCourtsAndRatings = async () => {
@@ -82,7 +88,7 @@ function BadmintonCourtList() {
         if (user === null) {
           courtData = await courtApi.getAllCourt();
         } else {
-          courtData = await courtApi.getNotCourtByUserID(user.id);
+          courtData = await courtApi.getNotCourtByUserID(user?.id);
         }
 
         const courtsWithRatings = await Promise.all(
@@ -91,7 +97,10 @@ function BadmintonCourtList() {
               const rating = await feedbackAPI.getRating(court.id);
               return { ...court, rating: rating || 0 };
             } catch (error) {
-              console.error(`Error fetching rating for court ${court.id}:`, error);
+              console.error(
+                `Error fetching rating for court ${court.id}:`,
+                error
+              );
               return { ...court, rating: 0 };
             }
           })
@@ -104,7 +113,7 @@ function BadmintonCourtList() {
     };
 
     fetchCourtsAndRatings();
-  }, [user]);
+  }, []);
 
   const handleBooking = (court: Court) => {
     setSelectedCourt(court);
@@ -139,8 +148,8 @@ function BadmintonCourtList() {
         {Array.from({ length: fullStars }, (_, i) => (
           <span key={i}>⭐</span>
         ))}
-        {hasHalfStar && <span>🌟</span>} {/* Half-star symbol */}
-        ({rating.toFixed(1)})
+        {hasHalfStar && <span>🌟</span>} {/* Half-star symbol */}(
+        {rating.toFixed(1)})
       </>
     );
   };
@@ -267,10 +276,11 @@ function BadmintonCourtList() {
                   <button
                     key={i}
                     onClick={() => paginate(i + 1)}
-                    className={`mx-1 px-3 py-1 rounded ${currentPage === i + 1
+                    className={`mx-1 px-3 py-1 rounded ${
+                      currentPage === i + 1
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200"
-                      }`}
+                    }`}
                   >
                     {i + 1}
                   </button>

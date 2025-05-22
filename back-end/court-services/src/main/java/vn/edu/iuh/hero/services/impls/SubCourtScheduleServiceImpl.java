@@ -100,7 +100,8 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
     @Transactional
     public SubCourtSchedule delete(SubCourtScheduleID subCourtScheduleID) {
         Optional<SubCourtSchedule> subCourtScheduleOpt = subCourtScheduleRepository.findById(subCourtScheduleID);
-        if (!subCourtScheduleOpt.isPresent()) {
+        System.out.println("SubCourtScheduleOpt: " + subCourtScheduleOpt);
+        if (subCourtScheduleOpt.isEmpty()) {
             throw new RuntimeException("SubCourtSchedule not found with ID: " + subCourtScheduleID);
         }
         SubCourtSchedule entity = subCourtScheduleOpt.get();
@@ -122,6 +123,10 @@ public class SubCourtScheduleServiceImpl implements IServices<SubCourtSchedule, 
         LocalTime now = LocalTime.now();
         System.out.println("Updating status of schedules..." +  today + "---" + Time.valueOf(now));
         subCourtScheduleRepository.expireSchedulesBefore(today, Time.valueOf(now));
+    }
+
+    public List<SubCourtSchedule> findBySubCourtIdAndDate(Long subCourtId, LocalDate date) {
+        return subCourtScheduleRepository.findBySubCourtIdAndScheduleDate(subCourtId, date);
     }
 
 }

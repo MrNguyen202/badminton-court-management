@@ -3,17 +3,29 @@
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import AddImage from "@/public/add-circle-stroke-rounded.svg";
 import React from "react";
+import { subCourtScheduleApi } from '@/app/api/court-services/subCourtSchedule';
+import { toast } from 'react-toastify';
 
-function AddScheduleSingle({ subcourt, date, filteredSchedules }: any) {
+function AddScheduleSingle({ subcourt, date, filteredSchedules, courtID, onScheduleAdded }: any) {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    const [localSchedules, setLocalSchedules] = React.useState<{ fromHour: string; toHour: string; price: number; status: string; }[]>([]); // Lịch cục bộ
+    const courtId = courtID;
+    const subCourt = subcourt;
+    const dateString = date.toISOString().split("T")[0];
+    const [localSchedules, setLocalSchedules] = React.useState<{ fromHour: string; toHour: string; price: number; status: string; }[]>([]);
+    const [tempFilteredSchedules, setTempFilteredSchedules] = React.useState(filteredSchedules); // Bản sao tạm thời của filteredSchedules
     const [startTime, setStartTime] = React.useState("");
     const [endTime, setEndTime] = React.useState("");
     const [price, setPrice] = React.useState("");
     const [error, setError] = React.useState("");
+    const [subCourtSchedulesDelete, setSubCourtSchedulesDelete] = React.useState<any>([]);
 
-    // Kết hợp filteredSchedules và localSchedules để hiển thị
-    const combinedSchedules = [...filteredSchedules, ...localSchedules];
+    // Kết hợp tempFilteredSchedules và localSchedules để hiển thị
+    const combinedSchedules = [...tempFilteredSchedules, ...localSchedules];
+
+    // Cập nhật tempFilteredSchedules khi filteredSchedules thay đổi
+    React.useEffect(() => {
+        setTempFilteredSchedules(filteredSchedules);
+    }, [filteredSchedules]);
 
     const validateTime = (start: any, end: any) => {
         if (!start || !end) return "Vui lòng nhập đầy đủ thời gian.";
@@ -51,7 +63,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules }: any) {
             fromHour: startTime,
             toHour: endTime,
             price: parseFloat(price),
-            status: "AVAILABLE", // Lịch mới luôn là AVAILABLE
+            status: "AVAILABLE",
         };
 
         setLocalSchedules([...localSchedules, newSchedule]);
@@ -70,22 +82,79 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules }: any) {
         if (localSchedules.includes(item)) {
             setLocalSchedules(localSchedules.filter((schedule) => schedule !== item));
         }
+        // Xóa từ tempFilteredSchedules nếu là lịch từ filteredSchedules
+        else if (tempFilteredSchedules.includes(item)) {
+            setTempFilteredSchedules(
+                tempFilteredSchedules.filter(
+                    (schedule: { fromHour: string; toHour: string; price: number; status: string; }) => schedule !== item
+                )
+            );
+            setSubCourtSchedulesDelete([...subCourtSchedulesDelete, item]);
+        }
         setError("");
     };
 
     const handleAddSubCourtSchedule = async () => {
-        alert("Thêm lịch thành công");
-        onClose();
+        try {
+            if (subCourtSchedulesDelete.length > 0) {
+                for (const subCourtSchedule of subCourtSchedulesDelete) {
+                    await subCourtScheduleApi.deleteSubCourtSchedule(subCourtSchedule.scheduleId, subCourtSchedule?.subCourtId)
+                }
+            }
+
+            let subCourtSchedulesToAdd = [];
+
+            for (const subCourtSchedule of tempFilteredSchedules) {
+                subCourtSchedulesToAdd.push({
+                    courtId: courtId,
+                    subCourtId: subCourtSchedule?.subCourtId,
+                    date: subCourtSchedule?.date,
+                    fromHour: subCourtSchedule.fromHour,
+                    toHour: subCourtSchedule.toHour,
+                    price: subCourtSchedule?.price,
+                    status: "AVAILABLE",
+                });
+            }
+
+            for (const localSchedule of localSchedules) {
+                subCourtSchedulesToAdd.push({
+                    courtId: courtId,
+                    subCourtId: subcourt?.id,
+                    date: dateString,
+                    fromHour: `${localSchedule.fromHour}:00`,
+                    toHour: `${localSchedule.toHour}:00`,
+                    price: localSchedule.price,
+                    status: "AVAILABLE",
+                });
+            }
+
+            // Gọi API để thêm lịch sân
+            for (const subCourtSchedule of subCourtSchedulesToAdd) {
+                await subCourtScheduleApi.createSubCourtSchedule(subCourtSchedule);
+            }
+
+            // Đóng modal và reset state
+            onClose();
+            toast.success("Thêm lịch thành công!");
+            // set ngày hiện tại cho lịch
+            onScheduleAdded(new Date());
+            
+        } catch (error) {
+            console.error("Error adding schedule:", error);
+            toast.error("Có lỗi xảy ra khi thêm lịch.");
+        }
     };
 
     const handleCancel = () => {
+        // Reset tất cả state về giá trị ban đầu
         setLocalSchedules([]);
+        setTempFilteredSchedules(filteredSchedules); // Khôi phục filteredSchedules gốc
         setStartTime("");
         setEndTime("");
         setPrice("");
         setError("");
         onClose();
-    }
+    };
 
     return (
         <>
@@ -111,7 +180,7 @@ function AddScheduleSingle({ subcourt, date, filteredSchedules }: any) {
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-xl font-semibold border-l-4 border-orange-300 pl-3">
-                                    Sân: {subcourt}
+                                    Sân chơi: {subCourt?.subName}
                                 </span>
                                 <span className="text-xl font-semibold">Ngày: {date.toDateString()}</span>
                             </div>

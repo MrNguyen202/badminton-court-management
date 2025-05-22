@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -9,6 +10,7 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const [user, setUser] = useState(null);
   const router = useRouter();
@@ -24,24 +26,18 @@ const SignIn = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Xử lý điều hướng đến trang đăng ký
   const handleSignUpClick = () => {
     router.push("/sign-up");
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Gọi API đăng nhập
       const loginData = await userApi.login(formData.email, formData.password);
-      localStorage.setItem("token", loginData.token); // Lưu token
-
-      // Gọi API lấy thông tin user
+      localStorage.setItem("token", loginData.token);
       const userInfo = await userApi.getMe();
-      localStorage.setItem("user", JSON.stringify(userInfo)); // Lưu thông tin user
-      
+      localStorage.setItem("user", JSON.stringify(userInfo));
       alert("Đăng nhập thành công!");
       router.push("/");
       setTimeout(() => window.location.reload(), 500);
@@ -51,10 +47,9 @@ const SignIn = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <div className="bg-white rounded-2xl shadow-2xl flex w-2/3 max-w-4xl">
-          {/* 1 */}
           <div className="w-3/5 p-5">
             <div className="text-left font-bold">
               <span className="text-primary">B</span>T
@@ -79,7 +74,6 @@ const SignIn = () => {
                 </button>
               </div>
 
-              {/* login */}
               <p className="text-gray-400 my-3">Sử dụng tài khoản email</p>
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center">
@@ -94,7 +88,8 @@ const SignIn = () => {
                       className="bg-gray-100 outline-none text-sm flex-1 ml-2"
                     />
                   </div>
-                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+
+                  <div className="bg-gray-100 w-64 p-2 flex items-center mb-3 relative">
                     <Image
                       src="/lock.png"
                       width={30}
@@ -102,19 +97,42 @@ const SignIn = () => {
                       alt="password"
                     />
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="password"
-                      placeholder="Password"
+                      placeholder="Mật khẩu"
                       onChange={handleChange}
                       required
-                      className="bg-gray-100 outline-none text-sm flex-1 ml-2"
+                      className="bg-gray-100 outline-none text-sm flex-1 ml-2 pr-8"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <Image
+                          src="/show-pass.png"
+                          width={25}
+                          height={25}
+                          alt="show"
+                        />
+                      ) : (
+                        <Image
+                          src="/hide-pass.png"
+                          width={25}
+                          height={25}
+                          alt="hide"
+                        />
+                      )}
+                    </button>
                   </div>
+
                   <div className="flex justify-end w-64 mb-5">
-                    <a href="#" className="text-xs">
+                    <a href="/forgot-password" className="text-xs">
                       Quên mật khẩu?
                     </a>
                   </div>
+
                   <button
                     type="submit"
                     className="border-2 border-primary rounded-full px-12 py-2 inline-block font-semibold hover:bg-primary hover:text-white"
@@ -126,7 +144,6 @@ const SignIn = () => {
             </div>
           </div>
 
-          {/* 2 */}
           <div className="w-2/5 bg-primary text-white rounded-tr-2xl rounded-br-2xl py-36 px-12">
             <h2 className="text-3xl font-bold mb-2">Chào bạn!</h2>
             <div className="border-2 w-10 border-white inline-block mb-2"></div>

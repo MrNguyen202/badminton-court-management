@@ -24,16 +24,23 @@ export default function BookModal({
   courtId,
   subCourtSelected,
   bookedSchedule,
-}) {
+}: any) {
   const router = useRouter();
-  const [court, setCourt] = useState(null);
-  const [subCourt, setSubCourt] = useState(null);
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+  const [court, setCourt] = useState<any>(null);
+  const [subCourt, setSubCourt] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const [userNameBooking, setUserNameBooking] = useState(user?.name || "");
   const [userPhoneBooking, setUserPhoneBooking] = useState(user?.phone || "");
-  const [error, setError] = useState({ name: "", phone: "" });
+  const [userEmailBooking, setUserEmailBooking] = useState(user?.email || "");
+  const [error, setError] = useState({ name: "", phone: "", email: "" });
 
   // Lấy thông tin sân từ courtId (nếu cần thiết)
   useEffect(() => {
@@ -76,7 +83,7 @@ export default function BookModal({
   }, [subCourtSelected]);
 
   // Hàm xử lý thay đổi input
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: any) => {
     const value = e.target.value;
     setUserNameBooking(value);
     // Kiểm tra validation
@@ -90,7 +97,7 @@ export default function BookModal({
     }
   };
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = (e: any) => {
     const value = e.target.value;
     setUserPhoneBooking(value);
     // Kiểm tra validation
@@ -105,6 +112,21 @@ export default function BookModal({
     }
   };
 
+  const handleEmailChange = (e: any) => {
+    const value = e.target.value;
+    setUserEmailBooking(value);
+    // Kiểm tra validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      setError((prev) => ({
+        ...prev,
+        email: "Email không hợp lệ",
+      }));
+    } else {
+      setError((prev) => ({ ...prev, email: "" }));
+    }
+  };
+
   // Tính toán tổng thời gian và tổng tiền
   const totalHours = bookedSchedule
     ? calculateTimeDifference(bookedSchedule.fromHour, bookedSchedule.toHour)
@@ -112,12 +134,13 @@ export default function BookModal({
   const totalCost = bookedSchedule ? bookedSchedule.price * totalHours : 0;
 
   // Hàm xử lý khi nhấn nút Đặt sân
-  const handleBooking = (onClose) => {
+  const handleBooking = (onClose: any) => {
     // Kiểm tra nếu không có user và các trường input không hợp lệ
-    if (!user && (!userNameBooking || !userPhoneBooking)) {
+    if (!user && (!userNameBooking || !userPhoneBooking || !userEmailBooking)) {
       setError({
         name: !userNameBooking ? "Vui lòng nhập họ và tên" : "",
         phone: !userPhoneBooking ? "Vui lòng nhập số điện thoại" : "",
+        email: !userEmailBooking ? "Vui lòng nhập email" : "",
       });
       return;
     }
@@ -125,7 +148,7 @@ export default function BookModal({
     if (!user && (error.name || error.phone)) {
       return;
     }
-
+    console.log("court", court);
     // Tạo đối tượng booking chứa thông tin đặt sân
     const bookingData = {
       courtId: courtId,
@@ -143,9 +166,9 @@ export default function BookModal({
       userInfo: {
         name: user ? user.name : userNameBooking,
         phone: user ? user.phone : userPhoneBooking,
-        email: user?.email || "",
+        email: user ? user.email : userEmailBooking,
       },
-      bookedScheduleId: bookedSchedule?.scheduleId
+      bookedScheduleId: bookedSchedule?.scheduleId,
     };
 
     console.log("Booking data in modal:", bookingData);
@@ -158,7 +181,7 @@ export default function BookModal({
     setSubCourt(null);
     setUserNameBooking("");
     setUserPhoneBooking("");
-    setError({ name: "", phone: "" });
+    setError({ name: "", phone: "", email: "" });
     onClose();
 
     // Chuyển hướng đến trang booking
@@ -216,6 +239,7 @@ export default function BookModal({
                     {bookedSchedule?.toHour.slice(0, 5)}
                   </span>
                 </div>
+
                 <div className="my-2">
                   <span className="font-bold">Họ và tên:</span>
                   {user && user?.role === "USER" ? (
@@ -258,12 +282,27 @@ export default function BookModal({
                     </span>
                   )}
                 </div>
-                {user && user?.role === "USER" && (
-                  <div className="my-2">
-                    <span className="font-bold">Email:</span>
+                <div className="my-2">
+                  <span className="font-bold">Email:</span>
+                  {user && user?.role === "USER" ? (
                     <span className="ml-3">{user?.email}</span>
-                  </div>
-                )}
+                  ) : (
+                    <span className="ml-3">
+                      <input
+                        type="email"
+                        className="border border-gray-300 rounded-md p-1 w-[40%]"
+                        placeholder="Nhập email"
+                        value={userEmailBooking}
+                        onChange={handleEmailChange}
+                      />
+                      {error.email && (
+                        <span className="text-red-500 text-sm ml-2">
+                          {error.email}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </div>
               </div>
               <span className="bg-gray-500 h-[1px]" />
               <div>

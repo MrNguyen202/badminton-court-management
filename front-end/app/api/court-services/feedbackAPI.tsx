@@ -73,4 +73,15 @@ export const feedbackAPI = {
             throw error;
         }
     },
+
+    // Delete feedback
+    deleteFeedback: async (feedbackId: number) => {
+        try {
+            const response = await apiClient.delete(`/delete-feedback/${feedbackId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error deleting feedback:", error);
+            throw error;
+        }
+    },
 };

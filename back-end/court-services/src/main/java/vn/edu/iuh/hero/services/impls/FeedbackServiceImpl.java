@@ -34,7 +34,7 @@ public class FeedbackServiceImpl implements IServices<Feedback, Long> {
 
     @Override
     public Optional<Feedback> findById(Long aLong) {
-        return Optional.empty();
+        return feedbackRepository.findById(aLong);
     }
 
     @Override
@@ -44,7 +44,13 @@ public class FeedbackServiceImpl implements IServices<Feedback, Long> {
 
     @Override
     public Feedback delete(Long aLong) {
-        return null;
+        Optional<Feedback> feedback = feedbackRepository.findById(aLong);
+        if (feedback.isPresent()) {
+            feedbackRepository.delete(feedback.get());
+            return feedback.get();
+        } else {
+            return null;
+        }
     }
 
     @Override

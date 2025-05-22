@@ -26,4 +26,7 @@ public interface SubCourtScheduleRepository extends JpaRepository<SubCourtSchedu
       )
 """)
     void expireSchedulesBefore(@Param("today") LocalDate today, @Param("nowTime") Time nowTime);
+
+    @Query("SELECT scs FROM SubCourtSchedule scs WHERE scs.subCourt.id = :subCourtId AND scs.schedule.date = :date")
+    List<SubCourtSchedule> findBySubCourtIdAndScheduleDate(@Param("subCourtId") Long subCourtId, @Param("date") LocalDate date);
 }

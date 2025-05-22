@@ -1,18 +1,18 @@
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation"; // Thêm import này
+import { useRouter } from "next/navigation";
 
 interface Message {
   sender: "user" | "bot";
   text: string;
   courts?: Array<{
-    id: string; // Thêm trường id
+    id: string;
     name: string;
     location: string;
     court_type: string;
-    price: number;
-    distance: number;
+    close_time: string;
+    open_time: string;
     rating: number;
     amenities: string[];
   }>;
@@ -27,7 +27,7 @@ const ChatWidget = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<string>("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter(); // Khởi tạo router
+  const router = useRouter();
 
   // Danh sách gợi ý
   const areas = ["Gò Vấp", "Quận 1", "Quận 7", "Bình Thạnh"];
@@ -52,13 +52,12 @@ const ChatWidget = () => {
     try {
       const response = await axios.post("http://localhost:5001/chatbot", {});
       setSessionId(response.data.session_id);
-      setCurrentQuestion("Bạn muốn chơi ở khu vực nào?");
       setMessages([
         {
           sender: "bot",
           text: response.data.message,
-          suggestions: areas,
-          suggestionType: "area",
+          suggestions: response.data.show_area_suggestions ? areas : undefined,
+          suggestionType: response.data.show_area_suggestions ? "area" : undefined,
         },
       ]);
     } catch (error) {
@@ -80,35 +79,38 @@ const ChatWidget = () => {
         message: userMessage,
       });
 
+      console.log("Response from server:", response.data);
+
       // Phân tích phản hồi
       const botMessageText = response.data.message;
       const courts: Message["courts"] = (response.data.courts || []).map((court: any) => ({
-        id: court.id, // Thêm id vào dữ liệu sân
+        id: court.id,
         name: court.name,
         location: court.location,
         court_type: court.court_type,
-        price: court.price,
-        distance: court.distance,
-        rating: court.rating,
+        close_time: court.close_time,
+        open_time: court.open_time,
         amenities: court.amenities.map((item: string) => item.trim()),
       }));
       let question = botMessageText.split("\n").pop()?.trim() || "";
       let suggestions: string[] | undefined = undefined;
       let suggestionType: "area" | "courtType" | "timeSlot" | "amenities" | undefined = undefined;
 
-      // Thêm gợi ý dựa trên câu hỏi
-      if (question.includes("khu vực")) {
-        suggestions = areas;
-        suggestionType = "area";
-      } else if (question.includes("Đơn hay Đôi")) {
-        suggestions = courtTypes;
-        suggestionType = "courtType";
-      } else if (question.includes("mấy giờ")) {
-        suggestions = timeSlots;
-        suggestionType = "timeSlot";
-      } else if (question.includes("tiện ích")) {
-        suggestions = amenitiesOptions;
-        suggestionType = "amenities";
+      // Gán gợi ý dựa trên show_area_suggestions từ server
+      if (response.data.show_area_suggestions) {
+        if (question.includes("khu vực")) {
+          suggestions = areas;
+          suggestionType = "area";
+        } else if (question.includes("Đơn hay Đôi")) {
+          suggestions = courtTypes;
+          suggestionType = "courtType";
+        } else if (question.includes("mấy giờ")) {
+          suggestions = timeSlots;
+          suggestionType = "timeSlot";
+        } else if (question.includes("tiện ích")) {
+          suggestions = amenitiesOptions;
+          suggestionType = "amenities";
+        }
       }
 
       const botMessage: Message = {
@@ -181,8 +183,8 @@ const ChatWidget = () => {
                 <div key={index} className="space-y-2">
                   <div
                     className={`p-2 rounded-lg text-gray-800 w-max max-w-[80%] ${msg.sender === "user"
-                        ? "bg-[#21A691] text-white ml-auto"
-                        : "bg-gray-200"
+                      ? "bg-[#21A691] text-white ml-auto"
+                      : "bg-gray-200"
                       }`}
                   >
                     {msg.text.split("\n").map((line, i) => (
@@ -195,15 +197,14 @@ const ChatWidget = () => {
                         <div
                           key={i}
                           className="p-2 rounded-lg bg-gray-100 w-max max-w-[80%] border border-gray-300 cursor-pointer hover:bg-gray-200"
-                          onClick={() => router.push(`/owners/court-detail?courtID=${court.id}`)} // Thêm sự kiện nhấp
+                          onClick={() => router.push(`/owners/court-detail?courtID=${court.id}`)}
                         >
                           <p>
                             <strong>{court.name}</strong>
                           </p>
                           <p>Địa điểm: {court.location}</p>
-                          <p>Giá: {court.price} VNĐ</p>
-                          <p>Khoảng cách: {court.distance} km</p>
-                          <p>Đánh giá: {court.rating}</p>
+                          <p>Giờ mở cửa: {court.open_time}h</p>
+                          <p>Giờ đóng cửa: {court.close_time}h</p>
                           <p>Tiện ích: {court.amenities.join(", ")}</p>
                         </div>
                       ))}
@@ -215,9 +216,9 @@ const ChatWidget = () => {
                         <button
                           key={suggestion}
                           className={`px-3 py-1 rounded-full text-sm ${msg.suggestionType === "amenities" &&
-                              selectedAmenities.includes(suggestion)
-                              ? "bg-[#21A691] text-white"
-                              : "bg-gray-300 text-gray-800"
+                            selectedAmenities.includes(suggestion)
+                            ? "bg-[#21A691] text-white"
+                            : "bg-gray-300 text-gray-800"
                             } hover:bg-[#21a692d0]`}
                           onClick={() => handleSuggestionClick(suggestion)}
                         >

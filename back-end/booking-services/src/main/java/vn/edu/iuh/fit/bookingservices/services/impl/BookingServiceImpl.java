@@ -26,8 +26,8 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRepository.findByCourtIdAndSubCourtIdAndScheduleId(booking.getCourtId(), booking.getSubCourtId(), booking.getScheduleId()).isPresent()) {
             throw new RuntimeException("Lịch đặt sân bị trùng. Vui lòng chọn khung giờ khác.");
         }
-        System.out.println("No conflict, proceeding to save booking: " + booking);
-        booking.setStatus(BookingStatus.NEW);
+
+        booking.setStatus(BookingStatus.PAID);
         Booking savedBooking = bookingRepository.save(booking);
         savedBooking.setUserInfo(userInfoJson);
         return bookingRepository.save(savedBooking);
@@ -62,27 +62,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getUserBookings(Long userId) {
-        return bookingRepository.findByUserId(userId);
-    }
+    public Booking confirmBooking(Booking booking, String userInfoJson) {
 
-    @Override
-    public Booking cancelBooking(Long id) {
-        Booking booking = getBooking(id);
-        if (booking.getStatus() == BookingStatus.PAID) {
-            throw new RuntimeException("Không thể hủy booking đã thanh toán");
-        }
-        booking.setStatus(BookingStatus.CANCELLED);
-        return bookingRepository.save(booking);
-    }
-
-    @Override
-    public Booking confirmBooking(Long id) {
-        Booking booking = getBooking(id);
-        if (booking.getStatus() != BookingStatus.NEW) {
-            throw new RuntimeException("Chỉ có thể xác nhận booking mới");
-        }
-        booking.setStatus(BookingStatus.CONFIRMED);
-        return bookingRepository.save(booking);
+        booking.setStatus(BookingStatus.DIRECT_PAYMENT);
+        Booking savedBooking = bookingRepository.save(booking);
+        savedBooking.setUserInfo(userInfoJson);
+        return bookingRepository.save(savedBooking);
     }
 }

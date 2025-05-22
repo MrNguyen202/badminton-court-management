@@ -25,13 +25,12 @@ interface Court {
     specificAddress: string;
   };
   phone: string;
-  // Thêm các trường khác nếu cần (e.g., images, rating, etc.)
 }
 
 interface SubCourt {
   id: number;
   subName: string;
-  type: string; // e.g., "SINGLE" or "DOUBLE"
+  type: string;
 }
 
 interface Booking {
@@ -152,7 +151,7 @@ function BookingDetailPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-green-100 p-4">
       <Card className="shadow-lg rounded-xl p-6 w-full max-w-2xl">
         <h1 className="text-2xl font-semibold text-gray-700 text-center mb-4">
           Chi tiết đặt sân
@@ -195,6 +194,9 @@ function BookingDetailPage() {
             <p className="text-gray-600">
               {booking.status === "NEW" && (
                 <span className="text-green-600">Đã thanh toán</span>
+              )}
+              {booking.status === "DIRECT_PAYMENT" && (
+                <span className="text-blue-600">Thanh toán tại sân</span>
               )}
             </p>
           </div>

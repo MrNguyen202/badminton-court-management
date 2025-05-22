@@ -1,179 +1,3 @@
-// package vn.edu.iuh.fit.bookingservices.controllers;
-
-// import com.paypal.api.payments.Links;
-// import com.paypal.api.payments.Payment;
-// import com.paypal.base.rest.PayPalRESTException;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
-// import vn.edu.iuh.fit.bookingservices.enums.BookingStatus;
-// import vn.edu.iuh.fit.bookingservices.models.Booking;
-// import vn.edu.iuh.fit.bookingservices.repositories.BookingRepository;
-// import vn.edu.iuh.fit.bookingservices.services.BookingService;
-// import vn.edu.iuh.fit.bookingservices.services.PaypalService;
-
-// import java.util.Collections;
-// import java.util.HashMap;
-// import java.util.Map;
-
-// @RestController
-// @RequestMapping("/api/paypal")
-// @CrossOrigin(origins = "http://localhost:3000")
-// public class PaypalController {
-
-//     @Autowired
-//     private PaypalService paypalService;
-
-//     @Autowired
-//     private BookingService bookingService;
-
-//     @Autowired
-//     private BookingRepository bookingRepository;
-
-//     private static final String SUCCESS_URL = "http://localhost:3000//owners/court-detail?courtID=";
-//     private static final String CANCEL_URL = "http://localhost:3000/owners/court-detail?courtID=";
-
-//     @PostMapping("/pay")
-//     public ResponseEntity<String> makePayment(
-//             @RequestParam("courtId") Long courtId,
-//             @RequestParam("subCourtId") Long subCourtId,
-//             @RequestParam("bookedScheduleId") Long bookedScheduleId,
-//             @RequestParam("bookingId") Long bookingId) {
-//         try {
-//             Booking booking = bookingService.getBooking(bookingId);
-//             if (booking == null) {
-//                 return ResponseEntity.badRequest().body("Booking không tồn tại");
-//             }
-
-//             // Kiểm tra trạng thái booking
-//             if (booking.getStatus() == BookingStatus.PAID) {
-//                 return ResponseEntity.badRequest().body("Booking này đã được thanh toán");
-//             }
-
-//             // Cho phép thanh toán lại nếu trạng thái là NEW hoặc PAYMENT_FAILED
-//             // Đặt booking về trạng thái NEW nếu đang ở trạng thái CANCEL
-//             if (booking.getStatus() == BookingStatus.CANCELLED) {
-//                 booking.setStatus(BookingStatus.NEW);
-//                 bookingRepository.save(booking);
-//             }
-
-
-//             double totalInVND = booking.getTotalAmount().doubleValue();
-//             double totalInUSD = Math.max(0.01, totalInVND / 25.0);
-//             System.out.println("Total in VND: " + totalInVND + ", Total in USD: " + totalInUSD);
-
-//             Payment payment = paypalService.createPayment(
-//                     totalInUSD,
-//                     "USD",
-//                     "paypal",
-//                     "sale",
-//                     "Thanh toán đặt sân #" + subCourtId,
-//                     CANCEL_URL + courtId + "&message=failed",
-//                     SUCCESS_URL + courtId + "&message=success&subCourtId=" + subCourtId + "&bookedScheduleId=" + bookedScheduleId,
-//                     false);
-
-//             for (Links links : payment.getLinks()) {
-//                 if (links.getRel().equals("approval_url")) {
-//                     booking.setPaymentId(payment.getId());
-//                     bookingRepository.save(booking);
-//                     return ResponseEntity.ok("Redirect to: " + links.getHref());
-//                 }
-//             }
-//         } catch (PayPalRESTException e) {
-//             System.out.println("PayPal error: " + e.getMessage());
-//             return ResponseEntity.badRequest().body("Lỗi PayPal: " + e.getMessage());
-//         } catch (Exception e) {
-//             System.out.println("Error: " + e.getMessage());
-//             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
-//         }
-//         return ResponseEntity.badRequest().body("Không thể tạo thanh toán");
-//     }
-
-// //    @GetMapping("/success")
-// //    public ResponseEntity<Map<String, String>> paymentSuccess(
-// //            @RequestParam("paymentId") String paymentId,
-// //            @RequestParam("PayerID") String payerId,
-// //            @RequestParam("bookingId") Long bookingId) {
-// //        try {
-// //            Payment payment = paypalService.executePayment(paymentId, payerId);
-// //            if (payment.getState().equals("approved")) {
-// //                Booking booking = bookingService.getBooking(bookingId);
-// //                booking.setStatus(BookingStatus.PAID);
-// //                bookingRepository.save(booking);
-// //
-// //                Map<String, String> response = new HashMap<>();
-// //                response.put("redirectUrl", "http://localhost:3000/dashboard?message=Thanh toán thành công cho booking #" + bookingId);
-// //                return ResponseEntity.ok(response);
-// //            }
-// //        } catch (PayPalRESTException e) {
-// //            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Lỗi khi xử lý thanh toán: " + e.getMessage()));
-// //        }
-// //        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Thanh toán thất bại"));
-// //    }
-
-//     @GetMapping("/success")
-//     public ResponseEntity<Map<String, String>> paymentSuccess(
-//             @RequestParam("paymentId") String paymentId,
-//             @RequestParam("PayerID") String payerId,
-//             @RequestParam("bookingId") Long bookingId) {
-//         try {
-//             Payment payment = paypalService.executePayment(paymentId, payerId);
-//             if (payment.getState().equals("approved")) {
-//                 Booking booking = bookingService.getBooking(bookingId);
-//                 booking.setStatus(BookingStatus.PAID);
-//                 bookingRepository.save(booking);
-
-//                 Map<String, String> response = new HashMap<>();
-//                 response.put("status", "success");
-//                 response.put("message", "Bạn đã thanh toán thành công cho booking #" + bookingId);
-//                 response.put("bookingId", String.valueOf(bookingId));
-//                 response.put("subCourtId", String.valueOf(booking.getSubCourtId()));
-//                 response.put("startTime", booking.getStartTime().toString());
-//                 response.put("endTime", booking.getEndTime().toString());
-//                 return ResponseEntity.ok(response);
-//             }
-//         } catch (PayPalRESTException e) {
-//             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Lỗi khi xử lý thanh toán: " + e.getMessage()));
-//         } catch (Exception e) {
-//             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Error: " + e.getMessage()));
-//         }
-//         return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Thanh toán thất bại"));
-//     }
-
-//     // @GetMapping("/cancel")
-//     // public String paymentCancel(@RequestParam("bookingId") Long bookingId) {
-//     //     try {
-//     //         Booking booking = bookingService.cancelBooking(bookingId);
-//     //         return "Thanh toán bị hủy cho booking " + bookingId;
-//     //     } catch (Exception e) {
-//     //         return "Lỗi khi hủy thanh toán: " + e.getMessage();
-//     //     }
-//     // }
-
-//     @GetMapping("/cancel")
-//     public String paymentCancel(@RequestParam("bookingId") Long bookingId) {
-//         System.out.println("Cancel payment for booking ID: " + bookingId);
-//         try {
-//             // Thay vì hủy booking, ta chỉ đánh dấu thanh toán thất bại/hủy
-//             Booking booking = bookingService.getBooking(bookingId);
-//             System.out.println("Booking found: " + booking);
-//             if (booking != null) {
-//                 // Đặt trạng thái là PAYMENT_FAILED thay vì CANCEL
-//                 booking.setStatus(BookingStatus.PAYMENT_FAILED);
-//                 booking.setPaymentId(null); // Xóa PaymentId cũ
-//                 bookingRepository.save(booking);
-
-//                 return "redirect:http://localhost:3000/booking?bookingId=" + bookingId + "&status=payment_cancelled";
-//             }
-//             // return "Không tìm thấy booking #" + bookingId;
-//             return "redirect:http://localhost:3000/dashboard?message=Thanh toán bị hủy cho booking #" + bookingId;
-//         } catch (Exception e) {
-//             return "Lỗi khi xử lý hủy thanh toán: " + e.getMessage();
-//         }
-//     }
-// }
-
-
 package vn.edu.iuh.fit.bookingservices.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -188,6 +12,7 @@ import vn.edu.iuh.fit.bookingservices.enums.BookingStatus;
 import vn.edu.iuh.fit.bookingservices.models.Booking;
 import vn.edu.iuh.fit.bookingservices.repositories.BookingRepository;
 import vn.edu.iuh.fit.bookingservices.services.BookingService;
+import vn.edu.iuh.fit.bookingservices.services.EmailService;
 import vn.edu.iuh.fit.bookingservices.services.PaypalService;
 
 import java.math.BigDecimal;
@@ -203,6 +28,9 @@ public class PaypalController {
 
     @Autowired
     private PaypalService paypalService;
+
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     private BookingService bookingService;
@@ -244,7 +72,7 @@ public class PaypalController {
             double totalInVND = bookingRequest.getTotalCost();
             double totalInUSD = Math.max(0.01, totalInVND / 25000.0);
 
-            // Lưu thông tin booking tạm thời vào session hoặc database với trạng thái PENDING
+            // Lưu thông tin booking tạm thời vào session hoặc database với trạng thái NEW
             Booking tempBooking = new Booking();
             tempBooking.setCourtId(bookingRequest.getCourtId());
             tempBooking.setSubCourtId(bookingRequest.getSubCourtId());
@@ -288,6 +116,124 @@ public class PaypalController {
             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
         }
         return ResponseEntity.badRequest().body("Không thể tạo thanh toán");
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<String> directPayment(@RequestBody BookingRequestDTO bookingRequest) {
+        try {
+
+            if (bookingRequest.getCourtId() == null || bookingRequest.getSubCourtId() == null) {
+                return ResponseEntity.badRequest().body("courtId và subCourtId không được để trống");
+            }
+
+            if (bookingRequest.getFromHour() == null || bookingRequest.getToHour() == null) {
+                return ResponseEntity.badRequest().body("fromHour và toHour không được để trống");
+            }
+
+            if (bookingRequest.getTotalCost() == null) {
+                return ResponseEntity.badRequest().body("totalCost không được để trống");
+            }
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime startTime;
+            LocalDateTime endTime;
+            try {
+                startTime = LocalDateTime.parse(bookingRequest.getFromHour(), formatter);
+                endTime = LocalDateTime.parse(bookingRequest.getToHour(), formatter);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Định dạng thời gian không hợp lệ. Vui lòng sử dụng định dạng yyyy-MM-dd'T'HH:mm:ss");
+            }
+
+            double totalInVND = bookingRequest.getTotalCost();
+            double totalInUSD = Math.max(0.01, totalInVND / 25000.0);
+
+            // Lưu thông tin booking vào database với trạng thái DIRECT_PAYMENT
+            Booking tempBooking = new Booking();
+            tempBooking.setCourtId(bookingRequest.getCourtId());
+            tempBooking.setSubCourtId(bookingRequest.getSubCourtId());
+            tempBooking.setUserId(bookingRequest.getUserId());
+            tempBooking.setScheduleId(bookingRequest.getScheduleId());
+            tempBooking.setStartTime(startTime);
+            tempBooking.setEndTime(endTime);
+            tempBooking.setTotalAmount(BigDecimal.valueOf(bookingRequest.getTotalCost()));
+            tempBooking.setStatus(BookingStatus.DIRECT_PAYMENT);
+
+            String userInfoJson = null;
+            if (bookingRequest.getUserId() == null) {
+                if (bookingRequest.getUserInfo() == null) {
+                    return ResponseEntity.badRequest().body("userInfo không được để trống khi không có userId");
+                }
+                userInfoJson = objectMapper.writeValueAsString(bookingRequest.getUserInfo());
+            }
+
+            Booking createdTempBooking = bookingService.confirmBooking(tempBooking, userInfoJson);
+
+            bookingRepository.save(createdTempBooking);
+
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/success")
+    public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String userName = request.get("userName");
+            String userPhone = request.get("userPhone");
+            String courtName = request.get("courtName");
+            String subCourtName = request.get("subCourtName");
+            String subCourtType = request.get("subCourtType");
+            String date = request.get("date");
+            String fromHour = request.get("fromHour");
+            String toHour = request.get("toHour");
+            String province = request.get("province");
+            String district = request.get("district");
+            String ward = request.get("ward");
+            String specificAddress = request.get("specificAddress");
+            String fullAddress = specificAddress + ", " + ward + ", " + district + ", " + province;
+            long price = Long.parseLong(request.get("price"));
+            long totalCost = Long.parseLong(request.get("totalCost"));
+
+
+            String emailBody = "Kính gửi " + userName + ",\n\n" +
+                    "Cảm ơn Quý khách đã đặt sân tại hệ thống của chúng tôi. Dưới đây là thông tin chi tiết về đặt sân của Quý khách:\n\n" +
+                    "--------------------------------------------------\n" +
+                                    "THÔNG TIN ĐẶT SÂN\n" +
+                    "--------------------------------------------------\n" +
+                    "- Tên sân: " + courtName + "\n" +
+                    "- Địa chỉ: " + fullAddress + "\n" +
+                    "- Loại sân: " + subCourtName + " (" + subCourtType + ")\n" +
+                    "- Ngày đặt: " + date + "\n" +
+                    "- Thời gian: " + fromHour + " - " + toHour + "\n" +
+                    "- Giá: " + String.format("%,d", price) + " VNĐ/giờ\n" +
+                    "- Tổng chi phí: " + String.format("%,d", totalCost) + " VNĐ\n" +
+                    "- Thông tin khách hàng: " + userName + " - " + userPhone + "\n\n" +
+                    "--------------------------------------------------\n" +
+                                        "LƯU Ý\n" +
+                    "--------------------------------------------------\n" +
+                    "- Vui lòng đến đúng giờ và xuất trình email này để xác nhận khi đến sân.\n" +
+                    "- Nếu có bất kỳ thắc mắc nào, Quý khách vui lòng liên hệ trực tiếp hoặc qua website: badminton-court-management" + ".\n\n" +
+                    "Chúc Quý khách có trải nghiệm tuyệt vời!\n\n" +
+                    "Trân trọng,\n" +
+                    "Đội ngũ hỗ trợ khách hàng";
+
+            emailService.sendEmail(
+                    email,
+                    "Xác nhận thanh toán thành công",
+                    emailBody
+            );
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Lỗi server: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
     @GetMapping("/success")

@@ -5,7 +5,7 @@ import Footer from "../_components/Footer";
 export default function PolicyPage() {
   return (
     <div>
-      <div className="min-h-screen bg-gray-100 py-12 px-4">
+      <div className="min-h-screen py-12 px-4 bg-gradient-to-br from-blue-100 to-green-100">
         <div className="max-w-3xl mx-auto bg-white p-8 shadow-lg rounded-lg">
           <h1 className="text-3xl font-bold text-center text-blue-600 decoration-blue-400 mb-8">
             Chính Sách Sử Dụng Dịch Vụ BT

@@ -50,7 +50,7 @@ const Profile = () => {
 
   return (
     <div className="max-w-6xl mx-auto my-8 px-4">
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-2xl p-8 text-white">
+      <div className="bg-gradient-to-r from-green-400 to-blue-300 rounded-t-2xl p-8 text-white">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative">
             {user.avatar ? (

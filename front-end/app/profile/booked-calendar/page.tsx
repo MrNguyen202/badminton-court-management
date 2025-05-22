@@ -118,8 +118,10 @@ function BookingHistoryPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "NEW":
+      case "PAID":
         return "success";
+      case "DIRECT_PAYMENT":
+        return "warning";
       default:
         return "default";
     }
@@ -127,8 +129,10 @@ function BookingHistoryPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "NEW":
+      case "PAID":
         return "Đã thanh toán";
+      case "DIRECT_PAYMENT":
+        return "Thanh toán trực tiếp";
       default:
         return status;
     }
@@ -143,7 +147,7 @@ function BookingHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-r from-green-50 to-gray-100 p-6">
       <div className="max-w-5xl mx-auto">
         {/* Nút Quay lại */}
         <div className="mb-4">

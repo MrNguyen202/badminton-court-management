@@ -61,8 +61,9 @@ function Header() {
     <Navbar
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
-      className="container mx-auto flex items-center justify-between"
+      className=" w-full mx-auto flex items-center justify-between bg-gradient-to-br from-gray-300 to-gray-100"
     >
+
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
