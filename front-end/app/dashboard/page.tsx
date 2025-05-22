@@ -72,14 +72,8 @@ function BadmintonCourtList() {
   const courtsPerPage = 8;
   const [courts, setCourts] = useState<Court[]>([]);
 
-  const [user, setUser] = useState<User | null>(null);
+  const user = JSON.parse(localStorage.getItem("user") || "null") as User;
 
-  useEffect(() => {
-    const storedData = localStorage.getItem("user") || "null";
-    if (storedData) {
-      setUser(JSON.parse(storedData));
-    }
-  }, []);
 
   useEffect(() => {
     const fetchCourtsAndRatings = async () => {
